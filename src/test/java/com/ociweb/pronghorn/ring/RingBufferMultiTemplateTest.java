@@ -1,9 +1,13 @@
 package com.ociweb.pronghorn.ring;
 
-import static com.ociweb.pronghorn.ring.FieldReferenceOffsetManager.*;
+import static com.ociweb.pronghorn.ring.FieldReferenceOffsetManager.lookupFieldLocator;
+import static com.ociweb.pronghorn.ring.FieldReferenceOffsetManager.lookupFragmentLocator;
+import static com.ociweb.pronghorn.ring.FieldReferenceOffsetManager.lookupTemplateLocator;
 import static com.ociweb.pronghorn.ring.RingBuffer.spinBlockOnTail;
-import static com.ociweb.pronghorn.ring.RingWalker.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 

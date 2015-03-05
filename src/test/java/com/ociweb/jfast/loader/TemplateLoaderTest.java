@@ -1,6 +1,11 @@
 package com.ociweb.jfast.loader;
 
-import static org.junit.Assert.*;
+import static com.ociweb.pronghorn.ring.FieldReferenceOffsetManager.lookupFieldLocator;
+import static com.ociweb.pronghorn.ring.FieldReferenceOffsetManager.lookupTemplateLocator;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,17 +16,12 @@ import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.LockSupport;
 
 import org.junit.Test;
 
@@ -31,11 +31,9 @@ import com.ociweb.jfast.catalog.loader.DictionaryFactory;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.catalog.loader.TemplateLoader;
 import com.ociweb.jfast.error.FASTException;
-import com.ociweb.jfast.field.LocalHeap;
 import com.ociweb.jfast.generator.DispatchLoader;
 import com.ociweb.jfast.generator.FASTClassLoader;
 import com.ociweb.jfast.primitive.FASTInput;
-import com.ociweb.jfast.primitive.FASTOutput;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
@@ -43,7 +41,11 @@ import com.ociweb.jfast.primitive.adapter.FASTInputByteBuffer;
 import com.ociweb.jfast.primitive.adapter.FASTInputStream;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArrayEquals;
-import com.ociweb.jfast.primitive.adapter.FASTOutputTotals;
+import com.ociweb.jfast.stream.FASTDecoder;
+import com.ociweb.jfast.stream.FASTDynamicWriter;
+import com.ociweb.jfast.stream.FASTEncoder;
+import com.ociweb.jfast.stream.FASTReaderReactor;
+import com.ociweb.jfast.util.Profile;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
@@ -52,18 +54,6 @@ import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
 import com.ociweb.pronghorn.ring.util.Histogram;
-import com.ociweb.jfast.stream.DispatchObserver;
-import com.ociweb.jfast.stream.FASTDecoder;
-import com.ociweb.jfast.stream.FASTDynamicWriter;
-import com.ociweb.jfast.stream.FASTEncoder;
-import com.ociweb.jfast.stream.FASTReaderReactor;
-import com.ociweb.jfast.stream.FASTListener;
-import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
-import com.ociweb.jfast.stream.FASTWriterInterpreterDispatch;
-import com.ociweb.jfast.util.Profile;
-import com.ociweb.pronghorn.ring.RingWalker;
-import static com.ociweb.pronghorn.ring.FieldReferenceOffsetManager.lookupFieldLocator;
-import static com.ociweb.pronghorn.ring.FieldReferenceOffsetManager.lookupTemplateLocator;
 
 
 public class TemplateLoaderTest {

@@ -10,9 +10,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.tools.JavaFileObject;
 
-import com.ociweb.jfast.field.LocalHeap;
-import com.ociweb.jfast.field.LocalHeap;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
+import com.ociweb.jfast.field.LocalHeap;
+import com.ociweb.jfast.field.LocalHeap;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBuffer.PaddedLong;

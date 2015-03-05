@@ -18,6 +18,7 @@ import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 import com.ociweb.pronghorn.ring.util.hash.LongHashTable;
 import com.ociweb.pronghorn.ring.util.hash.LongHashTableVisitor;
 
@@ -448,6 +449,23 @@ public class TemplateCatalogConfig {
 
 	private String[] dictionaryScript() {
 		return scriptDictionaryNames;
+	}
+
+	public static void writeTemplateCatalog(TemplateHandler handler, int byteGap, int maxByteLength, PrimitiveWriter writer, ClientConfig clientConfig) {
+	
+	    TemplateHandler.postProcessDictionary(handler, byteGap, maxByteLength);
+	
+	   //System.err.println("Names:"+ Arrays.toString(catalogScriptFieldNames));
+	
+	    // write catalog data.
+	    save(writer, handler.fieldIdBiggest, handler.templateIdUnique, handler.templateIdBiggest, handler.defaultConstValues,
+	    		handler.catalogLargestTemplatePMap, handler.catalogLargestNonTemplatePMap, handler.tokenIdxMembers, handler.tokenIdxMemberHeads,
+	    		handler.catalogScriptTokens, handler.catalogScriptFieldIds, handler.catalogScriptFieldNames, handler.catalogScriptDictionaryNames,
+	    		handler.catalogTemplateScriptIdx,  handler.templateToOffset, handler.templateToLimit ,
+	    		handler.maxGroupTokenStackDepth + 1, clientConfig);
+	
+	    // close stream.
+	    PrimitiveWriter.flush(writer);
 	}
 
 	public static int maxPMapCountInBytes(TemplateCatalogConfig catalog) {

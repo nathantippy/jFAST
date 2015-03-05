@@ -21,7 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import com.ociweb.jfast.primitive.FASTOutput;
+import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTOutputStream;
+import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 
 public class TemplateLoader {
 
@@ -88,7 +90,7 @@ public class TemplateLoader {
         
         GZIPOutputStream gZipOutputStream = new GZIPOutputStream(outputStream);
 		FASTOutput output = new FASTOutputStream(gZipOutputStream);
-		TemplateHandler handler = new TemplateHandler(output, clientConfig);   
+		TemplateHandler handler = new TemplateHandler();   
 		
 		
 		SAXParserFactory spfac = SAXParserFactory.newInstance();
@@ -103,7 +105,8 @@ public class TemplateLoader {
 		    }
 		}
 		
-		handler.postProcessing(clientConfig.getBytesGap(), clientConfig.getBytesLength());
+		PrimitiveWriter writer = new PrimitiveWriter(4096, output, false);
+		TemplateCatalogConfig.writeTemplateCatalog(handler, clientConfig.getBytesGap(), clientConfig.getBytesLength(), writer, clientConfig);
 		gZipOutputStream.close();
     }
 
@@ -113,14 +116,15 @@ public class TemplateLoader {
 
 		GZIPOutputStream gZipOutputStream = new GZIPOutputStream(outputStream);
 		FASTOutput output = new FASTOutputStream(gZipOutputStream);
-		TemplateHandler handler = new TemplateHandler(output, clientConfig);
+		TemplateHandler handler = new TemplateHandler();
 
 		SAXParserFactory spfac = SAXParserFactory.newInstance();
 		SAXParser sp = spfac.newSAXParser();
 
 		sp.parse(inputStream, handler);
 
-		handler.postProcessing(clientConfig.getBytesGap(), clientConfig.getBytesLength());
+		PrimitiveWriter writer = new PrimitiveWriter(4096, output, false);
+		TemplateCatalogConfig.writeTemplateCatalog(handler, clientConfig.getBytesGap(), clientConfig.getBytesLength(), writer, clientConfig);
 		gZipOutputStream.close();
 	}
     

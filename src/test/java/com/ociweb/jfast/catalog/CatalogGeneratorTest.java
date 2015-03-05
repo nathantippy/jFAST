@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPOutputStream;
@@ -18,7 +17,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.ociweb.jfast.FAST;
@@ -26,7 +24,6 @@ import com.ociweb.jfast.catalog.generator.CatalogGenerator;
 import com.ociweb.jfast.catalog.generator.TemplateGenerator;
 import com.ociweb.jfast.catalog.loader.ClientConfig;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
-import com.ociweb.jfast.catalog.loader.TemplateHandler;
 import com.ociweb.jfast.catalog.loader.TemplateLoader;
 import com.ociweb.jfast.error.FASTException;
 import com.ociweb.jfast.generator.DispatchLoader;
@@ -38,18 +35,17 @@ import com.ociweb.jfast.primitive.ReaderWriterPrimitiveTest;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputStream;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
+import com.ociweb.jfast.stream.FASTDynamicWriter;
+import com.ociweb.jfast.stream.FASTEncoder;
+import com.ociweb.jfast.stream.FASTReaderReactor;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
 import com.ociweb.pronghorn.ring.RingReader;
 import com.ociweb.pronghorn.ring.RingWalker;
-import com.ociweb.pronghorn.ring.RingWriter;
+import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TypeMask;
-import com.ociweb.jfast.stream.FASTDynamicWriter;
-import com.ociweb.jfast.stream.FASTEncoder;
-import com.ociweb.jfast.stream.FASTReaderReactor;
 
 
 public class CatalogGeneratorTest {
@@ -575,10 +571,11 @@ public class CatalogGeneratorTest {
             SAXParser sp = spfac.newSAXParser();
             InputStream stream = new ByteArrayInputStream(builder.toString().getBytes(StandardCharsets.UTF_8));           
             
-            TemplateHandler handler = new TemplateHandler(output, clientConfig);            
+            TemplateHandler handler = new TemplateHandler();            
             sp.parse(stream, handler);
     
-            handler.postProcessing(clientConfig.getBytesGap(), clientConfig.getBytesLength());
+            PrimitiveWriter writer = new PrimitiveWriter(4096, output, false);
+            TemplateCatalogConfig.writeTemplateCatalog(handler, clientConfig.getBytesGap(), clientConfig.getBytesLength(), writer, clientConfig);
             gZipOutputStream.close();            
             
         } catch (Exception ex) {

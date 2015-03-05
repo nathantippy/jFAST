@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Ignore;
-import org.junit.Test;
 
 import com.ociweb.jfast.catalog.loader.ClientConfig;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
@@ -30,17 +29,16 @@ import com.ociweb.jfast.catalog.loader.TemplateLoader;
 import com.ociweb.jfast.error.FASTException;
 import com.ociweb.jfast.generator.DispatchLoader;
 import com.ociweb.jfast.generator.FASTClassLoader;
-import com.ociweb.jfast.generator.GeneratorUtils;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTInputStream;
+import com.ociweb.jfast.stream.FASTDecoder;
+import com.ociweb.jfast.stream.FASTReaderReactor;
+import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
 import com.ociweb.pronghorn.ring.RingReader;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.jfast.stream.FASTDecoder;
-import com.ociweb.jfast.stream.FASTReaderReactor;
 
 public class ThreadingTest {
 
