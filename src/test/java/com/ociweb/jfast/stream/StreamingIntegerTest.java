@@ -9,7 +9,6 @@ import org.junit.AfterClass;
 import org.junit.Test;
 
 import com.ociweb.jfast.catalog.loader.ClientConfig;
-import com.ociweb.jfast.catalog.loader.DictionaryFactory;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
@@ -19,6 +18,8 @@ import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
+import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
@@ -136,13 +137,13 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 					
 					//special test with constant value.
 					if (sendNulls && ((i&MASK)==0) && TokenBuilder.isOptional(token)) {
-						writeInteger(fw, token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, writer);
+						writeInteger(fw, token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, writer);
 					} else {
 						writeInteger(fw, token, testConst, writer); 
 					}
 				} else {
 					if (sendNulls && ((f&MASK)==0) && TokenBuilder.isOptional(token)) {
-						writeInteger(fw, token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, writer);
+						writeInteger(fw, token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, writer);
 					} else {
 					    writeInteger(fw, token, testData[f], writer); 
 					}
@@ -178,9 +179,9 @@ public class StreamingIntegerTest extends BaseStreamingTest {
         } else {
             // optional
             if (0 == (token & (2 << TokenBuilder.SHIFT_TYPE))) {
-                fw.acceptIntegerUnsignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
+                fw.acceptIntegerUnsignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
             } else {
-                fw.acceptIntegerSignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
+                fw.acceptIntegerSignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
             }
         }
     }
@@ -215,8 +216,8 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 				if (((token>>TokenBuilder.SHIFT_OPER)&TokenBuilder.MASK_OPER)==OperatorMask.Field_Constant) {
 					if (sendNulls && (i&MASK)==0 && TokenBuilder.isOptional(token)) {
 						int value = TestHelper.readInt(tokenLookup[f], reader, ringBuffer, fr);
-						if (TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT!=value) {
-							assertEquals(TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, value);
+						if (TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT!=value) {
+							assertEquals(TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, value);
 						}
 					} else { 
 						int value = TestHelper.readInt(tokenLookup[f], reader, ringBuffer, fr);
@@ -230,8 +231,8 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 				
 					if (sendNulls && (f&MASK)==0 && TokenBuilder.isOptional(token)) {
 			     		int value = TestHelper.readInt(tokenLookup[f], reader, ringBuffer, fr);
-						if (TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT!=value) {
-							assertEquals(TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, value);
+						if (TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT!=value) {
+							assertEquals(TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, value);
 						}
 					} else { 
 						int value = TestHelper.readInt(tokenLookup[f], reader, ringBuffer, fr);

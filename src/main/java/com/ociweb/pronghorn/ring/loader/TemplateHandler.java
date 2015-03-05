@@ -7,13 +7,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.zip.GZIPOutputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -24,13 +22,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.ociweb.jfast.catalog.loader.ClientConfig;
-import com.ociweb.jfast.catalog.loader.DictionaryFactory;
-import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
-import com.ociweb.jfast.catalog.loader.TemplateLoader;
-import com.ociweb.jfast.primitive.FASTOutput;
-import com.ociweb.jfast.primitive.PrimitiveWriter;
-import com.ociweb.jfast.primitive.adapter.FASTOutputStream;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
@@ -195,6 +186,14 @@ public class TemplateHandler extends DefaultHandler {
     int groupTokenStackHead = -1;
     public int maxGroupTokenStackDepth;
 
+	public static final long DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG = Long.MAX_VALUE;
+
+	// because optional values are sent as +1 when >= 0 it is not possible to
+	// send the
+	// largest supported positive value, as a result this is the ideal default
+	// because it can not possibly collide with any real values
+	public static final int DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT = Integer.MAX_VALUE;
+
 
     public TemplateHandler() {
        
@@ -315,19 +314,19 @@ public class TemplateHandler extends DefaultHandler {
 
             if (qName.equalsIgnoreCase("uint32")) {
                 fieldType = "optional".equals(attributes.getValue("presence")) ? TypeMask.IntegerUnsignedOptional : TypeMask.IntegerUnsigned;
-                commonIdAttributes(attributes, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                commonIdAttributes(attributes, DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
             } else if (qName.equalsIgnoreCase("int32")) {
                 fieldType = "optional".equals(attributes.getValue("presence")) ? TypeMask.IntegerSignedOptional : TypeMask.IntegerSigned;
-                commonIdAttributes(attributes, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                commonIdAttributes(attributes, DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
             } else if (qName.equalsIgnoreCase("uint64")) {
                 fieldType = "optional".equals(attributes.getValue("presence")) ? TypeMask.LongUnsignedOptional : TypeMask.LongUnsigned;
-                commonIdAttributes(attributes, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG);
+                commonIdAttributes(attributes, DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG);
             } else if (qName.equalsIgnoreCase("int64")) {
                 fieldType = "optional".equals(attributes.getValue("presence")) ? TypeMask.LongSignedOptional : TypeMask.LongSigned;
-                commonIdAttributes(attributes, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG);
+                commonIdAttributes(attributes, DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG);
             } else if (qName.equalsIgnoreCase("length")) {
                 fieldType = TypeMask.GroupLength;// NOTE: length is not optional
-                commonIdAttributes(attributes, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                commonIdAttributes(attributes, DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
             } else if (qName.equalsIgnoreCase("string")) {
                 if ("unicode".equals(attributes.getValue("charset"))) {
                     // default is required
@@ -338,11 +337,11 @@ public class TemplateHandler extends DefaultHandler {
                     fieldType = "optional".equals(attributes.getValue("presence")) ? TypeMask.TextASCIIOptional
                             : TypeMask.TextASCII;
                 }
-                commonIdAttributes(attributes, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                commonIdAttributes(attributes, DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
             } else if (qName.equalsIgnoreCase("decimal")) {
                 fieldPMapInc = 2; // any operators must count as two PMap fields.
                 fieldType = "optional".equals(attributes.getValue("presence")) ? TypeMask.DecimalOptional  : TypeMask.Decimal;
-                commonIdAttributes(attributes, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                commonIdAttributes(attributes, DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
 
                 fieldExponentOperator = OperatorMask.Field_None;
                 fieldMantissaOperator = OperatorMask.Field_None;
@@ -359,7 +358,7 @@ public class TemplateHandler extends DefaultHandler {
                     fieldExponentAbsent = Integer.parseInt(absentString.trim());
                 } else {
                     // default value for absent of this type
-                    fieldExponentAbsent = TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT;
+                    fieldExponentAbsent = DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT;
                 }
 
             } else if (qName.equalsIgnoreCase("mantissa")) {
@@ -371,7 +370,7 @@ public class TemplateHandler extends DefaultHandler {
                     fieldMantissaAbsent = Long.parseLong(absentString.trim());
                 } else {
                     // default value for absent of this type
-                    fieldMantissaAbsent = TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG;
+                    fieldMantissaAbsent = DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG;
                 }
 
             } else if (qName.equalsIgnoreCase("bytevector")) {
@@ -973,7 +972,7 @@ public class TemplateHandler extends DefaultHandler {
     
 	public static FieldReferenceOffsetManager loadFrom(String source, short preamble) throws ParserConfigurationException, SAXException, IOException {
 
-		InputStream sourceInputStream = TemplateLoader.class.getResourceAsStream(source);
+		InputStream sourceInputStream = TemplateHandler.class.getResourceAsStream(source);
 
 		File folder = null;
 		if (null == sourceInputStream) {

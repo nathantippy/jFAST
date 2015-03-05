@@ -12,12 +12,12 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import com.ociweb.jfast.error.FASTException;
-import com.ociweb.jfast.field.LocalHeap;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
 import com.ociweb.pronghorn.ring.RingBuffer;
+import com.ociweb.pronghorn.ring.util.LocalHeap;
 
 public class UTF8EncodeDecodeTest {
 

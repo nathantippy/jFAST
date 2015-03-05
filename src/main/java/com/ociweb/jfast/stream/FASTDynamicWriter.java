@@ -3,6 +3,7 @@ package com.ociweb.jfast.stream;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingWalker;
+import com.ociweb.pronghorn.ring.util.LocalHeap;
 
 public class FASTDynamicWriter {
 
@@ -30,7 +31,7 @@ public class FASTDynamicWriter {
         if (clearData) {
             writerDispatch.dictionaryFactory.reset(writerDispatch.rIntDictionary);
             writerDispatch.dictionaryFactory.reset(writerDispatch.rLongDictionary);
-            writerDispatch.dictionaryFactory.reset(writerDispatch.byteHeap);
+            LocalHeap.reset(writerDispatch.byteHeap);
         }
     }
 

@@ -8,7 +8,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.ociweb.jfast.catalog.loader.ClientConfig;
-import com.ociweb.jfast.catalog.loader.DictionaryFactory;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
@@ -18,6 +17,8 @@ import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
+import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
@@ -113,13 +114,13 @@ public class StreamingLongTest extends BaseStreamingTest {
 					
 					//special test with constant value.
 					if (sendNulls && ((i&0xF)==0) && TokenBuilder.isOptional(token)) {
-						writeLong(fw, token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, writer);
+						writeLong(fw, token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, writer);
 					} else {
 						writeLong(fw, token, testConst, writer); 
 					}
 				} else {
 					if (sendNulls && ((f&0xF)==0) && TokenBuilder.isOptional(token)) {
-						writeLong(fw, token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, writer);
+						writeLong(fw, token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, writer);
 					} else {
 					    writeLong(fw, token, testData[f], writer); 
 					}
@@ -153,16 +154,16 @@ public class StreamingLongTest extends BaseStreamingTest {
                 fw.acceptLongSigned(token, rbPos, rbRingBufferLocal, writer);
             }
         } else {
-            if (value == TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG) {
+            if (value == TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG) {
                 BaseStreamingTest.write(token, writer, fw);
                 //writeLong(fw, token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, writer);
                 
             } else {
                 // optional
                 if (0 == (token & (2 << TokenBuilder.SHIFT_TYPE))) {
-                    fw.acceptLongUnsignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, rbPos, rbRingBufferLocal, writer);
+                    fw.acceptLongUnsignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, rbPos, rbRingBufferLocal, writer);
                 } else {
-                    fw.acceptLongSignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, rbPos, rbRingBufferLocal, writer);
+                    fw.acceptLongSignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, rbPos, rbRingBufferLocal, writer);
                 }
             }
         }
@@ -183,7 +184,7 @@ public class StreamingLongTest extends BaseStreamingTest {
 			throw new UnsupportedOperationException("must allow operations to have 3 data points but only had "+operationIters);
 		}
 			
-		final long none = TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG;
+		final long none = TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG;
 		
 		int i = operationIters;
 		int g = fieldsPerGroup;

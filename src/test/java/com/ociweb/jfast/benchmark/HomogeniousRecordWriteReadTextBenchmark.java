@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import com.google.caliper.Benchmark;
 import com.ociweb.jfast.catalog.loader.ClientConfig;
-import com.ociweb.jfast.catalog.loader.DictionaryFactory;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
@@ -22,9 +21,11 @@ import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
+import com.ociweb.pronghorn.ring.util.LocalHeap;
 import com.ociweb.jfast.stream.BaseStreamingTest;
 import com.ociweb.jfast.stream.FASTDecoder;
 import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
@@ -385,7 +386,7 @@ public class HomogeniousRecordWriteReadTextBenchmark extends Benchmark {
 			PrimitiveWriter.reset(writer); //clear any values found in writer
 			dictionaryFactory.reset(staticWriter.rIntDictionary);
             dictionaryFactory.reset(staticWriter.rLongDictionary);
-            dictionaryFactory.reset(staticWriter.byteHeap); //reset message to clear out old values;
+            LocalHeap.reset(staticWriter.byteHeap); //reset message to clear out old values;
 			
 			//////////////////////////////////////////////////////////////////
 			//This is an example of how to use the staticWriter

@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import com.google.caliper.Benchmark;
 import com.ociweb.jfast.catalog.loader.ClientConfig;
-import com.ociweb.jfast.catalog.loader.DictionaryFactory;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
@@ -21,6 +20,8 @@ import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
+import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
@@ -312,11 +313,11 @@ public class HomogeniousRecordWriteReadDecimalBenchmark extends Benchmark {
                       staticWriter.acceptLongSigned(token, rbPos+1, rbRingBufferLocal, writer);
                 } else {
                                                 
-                    int valueOfNull = TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT;
+                    int valueOfNull = TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT;
                     
                     staticWriter.acceptIntegerSignedOptional(token, valueOfNull, rbPos, rbRingBufferLocal, writer);
 
-                    staticWriter.acceptLongSignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, rbPos+1, rbRingBufferLocal, writer);
+                    staticWriter.acceptLongSignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, rbPos+1, rbRingBufferLocal, writer);
                    
                 }
             }

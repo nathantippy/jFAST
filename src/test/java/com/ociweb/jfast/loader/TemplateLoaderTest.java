@@ -27,7 +27,6 @@ import org.junit.Test;
 
 import com.ociweb.jfast.FAST;
 import com.ociweb.jfast.catalog.loader.ClientConfig;
-import com.ociweb.jfast.catalog.loader.DictionaryFactory;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.catalog.loader.TemplateLoader;
 import com.ociweb.jfast.error.FASTException;
@@ -50,10 +49,12 @@ import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
 import com.ociweb.pronghorn.ring.RingReader;
+import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
 import com.ociweb.pronghorn.ring.util.Histogram;
+import com.ociweb.pronghorn.ring.util.LocalHeap;
 
 
 public class TemplateLoaderTest {
@@ -466,7 +467,7 @@ public class TemplateLoaderTest {
             
             dictionaryFactory.reset(writerDispatch.rIntDictionary);
             dictionaryFactory.reset(writerDispatch.rLongDictionary);
-            dictionaryFactory.reset(writerDispatch.byteHeap);
+            LocalHeap.reset(writerDispatch.byteHeap);
             
             while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or a fragment is read
 
@@ -508,7 +509,7 @@ public class TemplateLoaderTest {
             DictionaryFactory dictionaryFactory = writerDispatch.dictionaryFactory;
             dictionaryFactory.reset(writerDispatch.rIntDictionary);
             dictionaryFactory.reset(writerDispatch.rLongDictionary);
-            dictionaryFactory.reset(writerDispatch.byteHeap);
+            LocalHeap.reset(writerDispatch.byteHeap);
             double start = System.nanoTime();
             
             while (FASTReaderReactor.pump(reactor)>=0) {  
@@ -611,7 +612,7 @@ public class TemplateLoaderTest {
             
             dictionaryFactory.reset(writerDispatch.rIntDictionary);
             dictionaryFactory.reset(writerDispatch.rLongDictionary);
-            dictionaryFactory.reset(writerDispatch.byteHeap);
+            LocalHeap.reset(writerDispatch.byteHeap);
 
             
             //read from reader and puts messages on the queue
@@ -675,7 +676,7 @@ public class TemplateLoaderTest {
             DictionaryFactory dictionaryFactory = writerDispatch.dictionaryFactory;
             dictionaryFactory.reset(writerDispatch.rIntDictionary);
             dictionaryFactory.reset(writerDispatch.rLongDictionary);
-            dictionaryFactory.reset(writerDispatch.byteHeap);
+            LocalHeap.reset(writerDispatch.byteHeap);
 
             final ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
 

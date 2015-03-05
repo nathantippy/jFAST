@@ -11,6 +11,8 @@ import java.util.Arrays;
 import org.junit.AfterClass;
 import org.junit.Test;
 
+import com.ociweb.pronghorn.ring.util.LocalHeap;
+
 public class LocalHeapTest {
 
 	

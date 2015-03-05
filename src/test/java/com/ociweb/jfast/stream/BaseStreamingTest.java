@@ -4,9 +4,6 @@
 package com.ociweb.jfast.stream;
 
 import com.ociweb.jfast.benchmark.TestUtil;
-import com.ociweb.jfast.catalog.loader.DictionaryFactory;
-import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
-import com.ociweb.jfast.field.LocalHeap;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.ReaderWriterPrimitiveTest;
@@ -14,8 +11,11 @@ import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
+import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
+import com.ociweb.pronghorn.ring.util.LocalHeap;
 
 public abstract class BaseStreamingTest {
 
@@ -480,16 +480,16 @@ public abstract class BaseStreamingTest {
                 //temp solution as the ring buffer is introduce into all the APIs
                 RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
                 RingBuffer.dump(rbRingBufferLocal);
-                RingBuffer.addValue(rbRingBufferLocal.buffer, rbRingBufferLocal.mask, rbRingBufferLocal.workingHeadPos, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                RingBuffer.addValue(rbRingBufferLocal.buffer, rbRingBufferLocal.mask, rbRingBufferLocal.workingHeadPos, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
                 RingBuffer ringBuffer = rbRingBufferLocal;
                 RingBuffer.publishWrites(ringBuffer);
                 int rbPos = 0;
     
                 // hack until all the classes no longer need this method.
                 if (0 == (token & (2 << TokenBuilder.SHIFT_TYPE))) {
-                    fw.acceptIntegerUnsignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
+                    fw.acceptIntegerUnsignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
                 } else {
-                    fw.acceptIntegerSignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
+                    fw.acceptIntegerSignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
                 }
             } else {
                 // long
@@ -544,16 +544,16 @@ public abstract class BaseStreamingTest {
                     //temp solution as the ring buffer is introduce into all the APIs   
                     RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
                     RingBuffer.dump(rbRingBufferLocal);
-                    RingBuffer.addValue(rbRingBufferLocal.buffer, rbRingBufferLocal.mask, rbRingBufferLocal.workingHeadPos, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                    RingBuffer.addValue(rbRingBufferLocal.buffer, rbRingBufferLocal.mask, rbRingBufferLocal.workingHeadPos, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
                     RingBuffer ringBuffer = rbRingBufferLocal;
                     RingBuffer.publishWrites(ringBuffer);
                     int rbPos = 0;
                  
                     // hack until all the classes no longer need this method.
                     if (0 == (token & (2 << TokenBuilder.SHIFT_TYPE))) {
-                        fw.acceptIntegerUnsignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
+                        fw.acceptIntegerUnsignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
                     } else {
-                        fw.acceptIntegerSignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
+                        fw.acceptIntegerSignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, rbPos, rbRingBufferLocal, writer);
                     } 
     
                     int idx1 = token & fw.longInstanceMask;

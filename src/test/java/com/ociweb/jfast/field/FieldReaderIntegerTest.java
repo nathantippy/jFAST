@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
+import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 
 public class FieldReaderIntegerTest {
@@ -26,6 +26,6 @@ public class FieldReaderIntegerTest {
 	
 	@Test
 	public void testAbsentValue11() {
-		assertEquals(TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT,TokenBuilder.absentValue32(3));		
+		assertEquals(TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT,TokenBuilder.absentValue32(3));		
 	}
 }

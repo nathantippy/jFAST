@@ -4,7 +4,6 @@
 package com.ociweb.jfast.stream;
 
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
-import com.ociweb.jfast.field.LocalHeap;
 import com.ociweb.jfast.generator.FASTWriterDispatchTemplates;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
@@ -14,6 +13,7 @@ import com.ociweb.pronghorn.ring.RingReader;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
+import com.ociweb.pronghorn.ring.util.LocalHeap;
 
 //May drop interface if this causes a performance problem from virtual table 
 public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates implements GeneratorDriving{ 

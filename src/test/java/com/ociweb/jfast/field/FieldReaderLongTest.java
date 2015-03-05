@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
+import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 
 public class FieldReaderLongTest {
@@ -26,7 +26,7 @@ public class FieldReaderLongTest {
 	
 	@Test
 	public void testAbsentValue11() {
-		assertEquals(TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG,TokenBuilder.absentValue64(3));		
+		assertEquals(TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG,TokenBuilder.absentValue64(3));		
 	}
 	
 	@Test

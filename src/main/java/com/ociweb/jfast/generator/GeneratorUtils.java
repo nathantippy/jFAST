@@ -464,11 +464,11 @@ public class GeneratorUtils {
         	final StringBuilder fragmentClassBody = new StringBuilder();
         	fragmentClassBody.append("package com.ociweb.jfast.generator;\n");
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.*;\n");
+        	fragmentClassBody.append("import com.ociweb.pronghorn.ring.util.*;\n");
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.RingBuffer.*;\n");
         	fragmentClassBody.append("import com.ociweb.jfast.stream.*;\n");
         	fragmentClassBody.append("import com.ociweb.jfast.primitive.*;\n");
             fragmentClassBody.append("import com.ociweb.jfast.error.FASTException;\n");
-        	fragmentClassBody.append("import com.ociweb.jfast.field.LocalHeap;\n");
         	fragmentClassBody.append("public final class ").append(fragmentClassName).append(" {\n");
         	fragmentClassBody.append(fragmentMethods);
         	fragmentClassBody.append("}");

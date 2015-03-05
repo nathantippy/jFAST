@@ -11,13 +11,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.tools.JavaFileObject;
 
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
-import com.ociweb.jfast.field.LocalHeap;
-import com.ociweb.jfast.field.LocalHeap;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBuffer.PaddedLong;
 import com.ociweb.pronghorn.ring.RingBuffers;
 import com.ociweb.pronghorn.ring.util.IntWriteOnceOrderedSet;
+import com.ociweb.pronghorn.ring.util.LocalHeap;
 import com.ociweb.jfast.stream.FASTDecoder;
 import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
 

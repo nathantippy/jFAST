@@ -9,7 +9,6 @@ import org.junit.AfterClass;
 import org.junit.Test;
 
 import com.ociweb.jfast.catalog.loader.ClientConfig;
-import com.ociweb.jfast.catalog.loader.DictionaryFactory;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
@@ -19,6 +18,8 @@ import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
+import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
@@ -110,7 +111,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                 if (TokenBuilder.isOpperator(token, OperatorMask.Field_Constant)) {
                     long testValue;
                     if (sendNulls && ((i & 0xF) == 0) && TokenBuilder.isOptional(token)) {
-                        testValue=TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG;
+                        testValue=TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG;
                         BaseStreamingTest.write(token, writer, fw);
                     } else {
                     	         
@@ -133,10 +134,10 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                             fw.acceptLongSigned(token, rbPos+1, rbRingBufferLocal, writer);
                         } else {
                                     
-                            int valueOfNull = TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT;
+                            int valueOfNull = TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT;
                             
                             fw.acceptIntegerSignedOptional(token, valueOfNull, rbPos, rbRingBufferLocal, writer);
-                            fw.acceptLongSignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, rbPos+1, rbRingBufferLocal, writer);
+                            fw.acceptLongSignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, rbPos+1, rbRingBufferLocal, writer);
                         }
                     }
                 } else {
@@ -165,11 +166,11 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                             fw.acceptLongSigned(token, rbPos+1, rbRingBufferLocal, writer);
                         } else {
                                     
-                            int valueOfNull = TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT;
+                            int valueOfNull = TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT;
                             
                             fw.acceptIntegerSignedOptional(token, valueOfNull, rbPos, rbRingBufferLocal, writer);
 
-                            fw.acceptLongSignedOptional(token, TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, rbPos+1, rbRingBufferLocal, writer);
+                            fw.acceptLongSignedOptional(token, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG, rbPos+1, rbRingBufferLocal, writer);
                           
                         }
                         
@@ -204,7 +205,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                     + operationIters);
         }
 
-        long none = TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG;
+        long none = TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG;
 
         int i = operationIters;
         int g = fieldsPerGroup;
@@ -241,9 +242,9 @@ public class StreamingDecimalTest extends BaseStreamingTest {
         
         if (sendNulls && (f & 0xF) == 0 && TokenBuilder.isOptional(token)) {
             int exp = StreamingDecimalTest.readDecimalExponent(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
-            if (exp != TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT) {
+            if (exp != TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT) {
                 assertEquals(TokenBuilder.tokenToString(tokenLookup[f]),
-                        TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, exp);
+                        TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, exp);
             }
             long man = StreamingDecimalTest.readDecimalMantissa(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
             if (none != man) {
@@ -261,9 +262,9 @@ public class StreamingDecimalTest extends BaseStreamingTest {
     private void readDecimalConstant(int[] tokenLookup, FASTReaderInterpreterDispatch fr, long none, int f, int token, int i) {
         if (sendNulls && (i & 0xF) == 0 && TokenBuilder.isOptional(token)) {
             int exp = StreamingDecimalTest.readDecimalExponent(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
-            if (exp != TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT) {
+            if (exp != TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT) {
                 assertEquals(TokenBuilder.tokenToString(tokenLookup[f]),
-                        TemplateCatalogConfig.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, exp);
+                        TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, exp);
             }
             long man = StreamingDecimalTest.readDecimalMantissa(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
             if (none != man) {

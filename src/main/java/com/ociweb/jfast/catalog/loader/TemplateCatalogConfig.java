@@ -18,6 +18,7 @@ import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
 import com.ociweb.pronghorn.ring.loader.TemplateHandler;
 import com.ociweb.pronghorn.ring.util.hash.LongHashTable;
 import com.ociweb.pronghorn.ring.util.hash.LongHashTableVisitor;
@@ -32,13 +33,6 @@ public class TemplateCatalogConfig {
     public final ClientConfig clientConfig;
     
     
-    // because optional values are sent as +1 when >= 0 it is not possible to
-    // send the
-    // largest supported positive value, as a result this is the ideal default
-    // because it can not possibly collide with any real values
-    public static final int DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT = Integer.MAX_VALUE;
-    public static final long DEFAULT_CLIENT_SIDE_ABSENT_VALUE_LONG = Long.MAX_VALUE;
-
     private final DictionaryFactory dictionaryFactory;
     private final int maxTemplatePMapSize;
     private final int maxNonTemplatePMapSize;
@@ -107,8 +101,10 @@ public class TemplateCatalogConfig {
         maxTemplatePMapSize = PrimitiveReader.readIntegerUnsigned(reader);
         maxNonTemplatePMapSize = PrimitiveReader.readIntegerUnsigned(reader);
         maxPMapDepth = PrimitiveReader.readIntegerUnsigned(reader);
+		DictionaryFactory df = new DictionaryFactory();
+		TemplateCatalogConfig.load(df,reader);
 
-        dictionaryFactory = new DictionaryFactory(reader);
+        dictionaryFactory = df;
                 
         clientConfig = new ClientConfig(reader);
         
@@ -224,7 +220,7 @@ public class TemplateCatalogConfig {
         PrimitiveWriter.writeIntegerUnsigned(maxNonTemplatePMap, writer);
         PrimitiveWriter.writeIntegerUnsigned(maxPMapDepth, writer);
 
-        df.save(writer);        
+        TemplateCatalogConfig.save(df, writer);        
         clientConfig.save(writer);
 
     }
@@ -449,6 +445,104 @@ public class TemplateCatalogConfig {
 
 	private String[] dictionaryScript() {
 		return scriptDictionaryNames;
+	}
+
+	public static void load(DictionaryFactory df, PrimitiveReader reader) {
+	
+		df.singleBytesSize = PrimitiveReader.readIntegerUnsigned(reader);
+		df.gapBytesSize = PrimitiveReader.readIntegerUnsigned(reader);
+		
+		df.integerCount = PrimitiveReader.readIntegerUnsigned(reader);
+		df.longCount = PrimitiveReader.readIntegerUnsigned(reader);
+		df.bytesCount = PrimitiveReader.readIntegerUnsigned(reader);
+	
+		df.integerInitCount = PrimitiveReader.readIntegerUnsigned(reader);
+		df.integerInitIndex = new int[df.integerInitCount];
+		df.integerInitValue = new int[df.integerInitCount];
+	    int c = df.integerInitCount;
+	    while (--c >= 0) {
+	    	df.integerInitIndex[c] = PrimitiveReader.readIntegerUnsigned(reader);
+	    	df.integerInitValue[c] = PrimitiveReader.readIntegerSigned(reader);
+	    }
+	
+	    df.longInitCount = PrimitiveReader.readIntegerUnsigned(reader);
+	    df.longInitIndex = new int[df.longInitCount];
+	    df.longInitValue = new long[df.longInitCount];
+	    c = df.longInitCount;
+	    while (--c >= 0) {
+	    	df.longInitIndex[c] = PrimitiveReader.readIntegerUnsigned(reader);
+	    	df.longInitValue[c] = PrimitiveReader.readLongSigned(reader);
+	    }
+	
+	
+	    df.byteInitCount = PrimitiveReader.readIntegerUnsigned(reader);
+	    df.byteInitIndex = new int[df.byteInitCount];
+	    df.byteInitValue = new byte[df.byteInitCount][];
+	    c = df.byteInitCount;
+	    while (--c >= 0) {
+	    	df.byteInitIndex[c] = PrimitiveReader.readIntegerUnsigned(reader);
+	        int len = PrimitiveReader.readIntegerUnsigned(reader);
+	        if (len>0) {
+	        	byte[] value = new byte[len];
+	        	PrimitiveReader.readByteData(value, 0, len, reader);
+	        	df.byteInitValue[c] = value;
+	        } else {
+	        	if (len<0) {
+	        		df.byteInitValue[c]=null;
+	        	} else {
+	        		df.byteInitValue[c]=new byte[0];
+	        	}
+	        }
+	    }
+	    df.byteInitTotalLength = PrimitiveReader.readIntegerUnsigned(reader);
+	
+	}
+
+	public static void save(DictionaryFactory df, PrimitiveWriter writer) {
+	
+		PrimitiveWriter.writeIntegerUnsigned(df.singleBytesSize, writer);
+		PrimitiveWriter.writeIntegerUnsigned(df.gapBytesSize, writer);
+		
+	    PrimitiveWriter.writeIntegerUnsigned(df.integerCount, writer);
+	    PrimitiveWriter.writeIntegerUnsigned(df.longCount, writer);
+	    PrimitiveWriter.writeIntegerUnsigned(df.bytesCount, writer);
+	
+	    PrimitiveWriter.writeIntegerUnsigned(df.integerInitCount, writer);
+	    int c = df.integerInitCount;
+	    while (--c >= 0) {
+	        PrimitiveWriter.writeIntegerUnsigned(df.integerInitIndex[c], writer);
+	        PrimitiveWriter.writeIntegerSigned(df.integerInitValue[c], writer);
+	    }
+	
+	    PrimitiveWriter.writeIntegerUnsigned(df.longInitCount, writer);
+	    c = df.longInitCount;
+	    while (--c >= 0) {
+	        PrimitiveWriter.writeIntegerUnsigned(df.longInitIndex[c], writer);
+	        PrimitiveWriter.writeLongSigned(df.longInitValue[c], writer);
+	    }
+	
+	    PrimitiveWriter.writeIntegerUnsigned(df.byteInitCount, writer);
+	    c = df.byteInitCount;
+	    while (--c >= 0) {
+	        PrimitiveWriter.writeIntegerUnsigned(df.byteInitIndex[c], writer);
+	        byte[] value = df.byteInitValue[c];
+	        PrimitiveWriter.writeIntegerUnsigned(null==value? -1 :value.length, writer);
+	        if (null!=value && value.length>0) {
+	        	PrimitiveWriter.writeByteArrayData(value, 0, value.length, writer);
+	        }
+	    }
+	    PrimitiveWriter.writeIntegerUnsigned(df.byteInitTotalLength, writer);
+	
+	    /*
+	     * Fastest searialize deserialize however its more verbose and there is
+	     * no object dectection and construction.
+	     * 
+	     * These files can be deleted and modified but those changes are only
+	     * refelected on startup. New templates can be added but an explicit
+	     * call must be made to load them. The new templates will be loaded
+	     * dynamicaly on first use but this is not recommended.
+	     */
+	
 	}
 
 	public static void writeTemplateCatalog(TemplateHandler handler, int byteGap, int maxByteLength, PrimitiveWriter writer, ClientConfig clientConfig) {
