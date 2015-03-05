@@ -23,7 +23,6 @@ import org.junit.Test;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBufferMonitorStage;
 import com.ociweb.pronghorn.ring.RingReader;
 import com.ociweb.pronghorn.ring.RingWriter;
 import com.ociweb.pronghorn.ring.stream.StreamingConsumer;
