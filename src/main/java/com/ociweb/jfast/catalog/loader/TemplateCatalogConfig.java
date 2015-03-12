@@ -432,8 +432,18 @@ public class TemplateCatalogConfig {
     
 	public static FieldReferenceOffsetManager createFieldReferenceOffsetManager(TemplateCatalogConfig config) {
 		
+		//the scriptTokens array is too long and must be shortened, this will cause some garbage once but the length is important
+		int tokenCount = 0;
+		if (null!=config.scriptTokens) {//for teting
+			while (tokenCount<config.scriptTokens.length && config.scriptTokens[tokenCount]<0) {
+				tokenCount++;
+			}		
+			if (0 == tokenCount || 0 != config.scriptTokens[config.scriptTokens.length-1] ) {//this hack is here for testing
+				tokenCount = config.scriptTokens.length;
+			}
+		}
 		
-		return new FieldReferenceOffsetManager(   config.scriptTokens, 
+		return new FieldReferenceOffsetManager(   null==config.scriptTokens? null : Arrays.copyOfRange(config.scriptTokens, 0, tokenCount), 
 									        	  config.clientConfig.getPreableBytes(), 
 									              config.fieldNameScript(),
 									              config.fieldIdScript(),

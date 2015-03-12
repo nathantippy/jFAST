@@ -5,9 +5,8 @@ import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.stream.FASTEncoder;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBuffer.PaddedLong;
-import com.ociweb.pronghorn.ring.util.LocalHeap;
 import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.RingReader;
+import com.ociweb.pronghorn.ring.util.LocalHeap;
 
 
 public abstract class FASTWriterDispatchTemplates extends FASTEncoder {

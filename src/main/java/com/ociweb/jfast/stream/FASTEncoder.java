@@ -3,7 +3,6 @@ package com.ociweb.jfast.stream;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArrayEquals;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;

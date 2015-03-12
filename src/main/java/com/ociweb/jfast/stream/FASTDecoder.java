@@ -1,6 +1,5 @@
 package com.ociweb.jfast.stream;
 
-import com.ociweb.jfast.catalog.loader.ClientConfig;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.pronghorn.ring.RingBuffer;

@@ -3,7 +3,9 @@
 //Send support requests to http://www.ociweb.com/contact
 package com.ociweb.jfast.field;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -17,7 +19,6 @@ import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
 import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.util.LocalHeap;
 
 public class UTF8EncodeDecodeTest {
 

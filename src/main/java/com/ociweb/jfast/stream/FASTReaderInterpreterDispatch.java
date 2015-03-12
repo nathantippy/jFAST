@@ -133,11 +133,11 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         
         //Waiting for tail position to change! can cache the value, must make same change in compiled code.
         long neededTailStop = rbRingBuffer.workingHeadPos.value   - rbRingBuffer.maxSize + fragDataSize;
-        if (rbRingBuffer.ringWalker.tailCache < neededTailStop && ((rbRingBuffer.ringWalker.tailCache=rbRingBuffer.tailPos.longValue()) < neededTailStop) ) {
+        if (rbRingBuffer.ringWalker.tailCache < neededTailStop && ((rbRingBuffer.ringWalker.tailCache=RingBuffer.tailPosition(rbRingBuffer)) < neededTailStop) ) {
               return 0; //no space to read data and start new message so read nothing
         }
         
-        assert(rbRingBuffer.workingHeadPos.value>=rbRingBuffer.headPos.get());
+        assert(rbRingBuffer.workingHeadPos.value>=RingBuffer.headPosition(rbRingBuffer));
         
         int token;
         do {
@@ -277,8 +277,8 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         genReadGroupCloseMessage(reader, this); //active script cursor is set to end of messge by this call
 
         //this conditional is for the code generator so it need not check
-        if (rbRingBuffer.workingHeadPos.value != rbRingBuffer.headPos.get()) {
-	        assert (fragDataSize == ((int)(rbRingBuffer.workingHeadPos.value-rbRingBuffer.headPos.get()))) : "expected to write "+fragDataSize+" but wrote "+((int)(rbRingBuffer.workingHeadPos.value-rbRingBuffer.headPos.get()));
+        if (rbRingBuffer.workingHeadPos.value != RingBuffer.headPosition(rbRingBuffer)) {
+	        assert (fragDataSize == ((int)(rbRingBuffer.workingHeadPos.value-RingBuffer.headPosition(rbRingBuffer)))) : "expected to write "+fragDataSize+" but wrote "+((int)(rbRingBuffer.workingHeadPos.value-RingBuffer.headPosition(rbRingBuffer)));
 	        RingBuffer.publishHeadPositions(rbRingBuffer);  
         }
         assert(rbRingBuffer.byteWorkingHeadPos.value == rbRingBuffer.bytesHeadPos.get());

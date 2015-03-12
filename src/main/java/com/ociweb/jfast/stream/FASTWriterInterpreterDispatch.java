@@ -695,7 +695,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                 if (0 == (token & (4 << TokenBuilder.SHIFT_TYPE))) {
                 	
                 	//all these types will be reading 1 positions from the ring so we can do a bounds check here
-                	assert(0==rbRingBuffer.headPos.get() || rbRingBuffer.workingTailPos.value+1<rbRingBuffer.headPos.get()) : "Reading ring data past head!";
+                	assert(0==RingBuffer.headPosition(rbRingBuffer) || rbRingBuffer.workingTailPos.value+1<RingBuffer.headPosition(rbRingBuffer)) : "Reading ring data past head!";
                 	
                     if (0 == (token & (1 << TokenBuilder.SHIFT_TYPE))) {// compiler does all
                                                                         // the work.
@@ -748,7 +748,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                 if (0 == (token & (4 << TokenBuilder.SHIFT_TYPE))) {
                     
                 	//all these types will be reading 2 positions from the ring so we can do a bounds check here
-                	assert(0==rbRingBuffer.headPos.get() || rbRingBuffer.workingTailPos.value+2<=rbRingBuffer.headPos.get()) : "Reading ring data past head!";
+                	assert(0==RingBuffer.headPosition(rbRingBuffer) || rbRingBuffer.workingTailPos.value+2<=RingBuffer.headPosition(rbRingBuffer)) : "Reading ring data past head!";
                 	
                 	
                     //text is written to the ring buffer encoded as ascii or utf8
@@ -793,7 +793,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                     if (0 == (token & (2 << TokenBuilder.SHIFT_TYPE))) {
                         // 0110? Decimal and DecimalOptional
                     	//all these types will be reading 3 positions from the ring so we can do a bounds check here
-                    	assert(0==rbRingBuffer.headPos.get() || rbRingBuffer.workingTailPos.value+3<rbRingBuffer.headPos.get()) : "Reading ring data past head!";
+                    	assert(0==RingBuffer.headPosition(rbRingBuffer) || rbRingBuffer.workingTailPos.value+3<RingBuffer.headPosition(rbRingBuffer)) : "Reading ring data past head!";
                         
                         int expoToken = token;
                         
@@ -818,7 +818,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                         fieldPos+=3;
                     } else {
                     	//all these types will be reading 2 positions from the ring so we can do a bounds check here
-                    	assert(0==rbRingBuffer.headPos.get() || rbRingBuffer.workingTailPos.value+2<rbRingBuffer.headPos.get()) : "Reading ring data past head!";
+                    	assert(0==RingBuffer.headPosition(rbRingBuffer) || rbRingBuffer.workingTailPos.value+2<RingBuffer.headPosition(rbRingBuffer)) : "Reading ring data past head!";
                     	
                         if (readFromIdx>=0) {
                             int source = token & instanceBytesMask;
@@ -888,7 +888,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
 
                 } else {
                 	//all these types will be reading 1 positions from the ring so we can do a bounds check here
-                	assert(0==rbRingBuffer.headPos.get() || rbRingBuffer.workingTailPos.value+1<rbRingBuffer.headPos.get()) : "Reading ring data past head!";
+                	assert(0==RingBuffer.headPosition(rbRingBuffer) || rbRingBuffer.workingTailPos.value+1<RingBuffer.headPosition(rbRingBuffer)) : "Reading ring data past head!";
                 	
                     // 101??
                     // Length Type, no others defined so no need to keep

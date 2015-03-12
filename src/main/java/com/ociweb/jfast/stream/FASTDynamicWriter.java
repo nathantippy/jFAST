@@ -2,7 +2,6 @@ package com.ociweb.jfast.stream;
 
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingWalker;
 import com.ociweb.pronghorn.ring.util.LocalHeap;
 
 public class FASTDynamicWriter {

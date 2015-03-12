@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 import java.nio.ByteBuffer;
 
 import org.junit.Ignore;
-import org.junit.Test;
 
 import com.google.caliper.Benchmark;
 import com.ociweb.jfast.catalog.loader.ClientConfig;
@@ -17,8 +16,12 @@ import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteBuffer;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteBuffer;
-import com.ociweb.pronghorn.ring.RingBuffer;
+import com.ociweb.jfast.stream.BaseStreamingTest;
+import com.ociweb.jfast.stream.FASTDecoder;
+import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
+import com.ociweb.jfast.stream.FASTWriterInterpreterDispatch;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
 import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
@@ -26,10 +29,6 @@ import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
 import com.ociweb.pronghorn.ring.util.LocalHeap;
-import com.ociweb.jfast.stream.BaseStreamingTest;
-import com.ociweb.jfast.stream.FASTDecoder;
-import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
-import com.ociweb.jfast.stream.FASTWriterInterpreterDispatch;
 
 public class HomogeniousRecordWriteReadTextBenchmark extends Benchmark {
 

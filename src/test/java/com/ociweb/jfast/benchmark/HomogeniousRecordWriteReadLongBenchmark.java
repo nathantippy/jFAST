@@ -3,11 +3,9 @@
 //Send support requests to http://www.ociweb.com/contact
 package com.ociweb.jfast.benchmark;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
-
-import javax.swing.text.MaskFormatter;
 
 import org.junit.Test;
 
@@ -23,7 +21,6 @@ import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
 import com.ociweb.jfast.stream.FASTWriterInterpreterDispatch;
 import com.ociweb.jfast.stream.StreamingLongTest;
 import com.ociweb.jfast.stream.TestHelper;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;

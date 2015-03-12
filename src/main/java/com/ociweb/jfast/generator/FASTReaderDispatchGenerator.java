@@ -2,23 +2,19 @@ package com.ociweb.jfast.generator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.tools.JavaFileObject;
 
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
+import com.ociweb.jfast.stream.FASTDecoder;
+import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBuffer.PaddedLong;
 import com.ociweb.pronghorn.ring.RingBuffers;
 import com.ociweb.pronghorn.ring.util.IntWriteOnceOrderedSet;
 import com.ociweb.pronghorn.ring.util.LocalHeap;
-import com.ociweb.jfast.stream.FASTDecoder;
-import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
 
 //This generator makes use of class names whenever possible to allow for obfuscation if needed.
 public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
