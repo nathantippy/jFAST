@@ -191,7 +191,7 @@ public class GeneratorUtils {
 		    //TODO: B, simplify this to do less runtime work.
 			builder.append(" {int fragmentSize = rb.ringWalker.from.fragDataSize[x]+ rb.ringWalker.from.templateOffset + 1;\n\r")
 			       .append(" long neededTailStop = rb.workingHeadPos.value - (rb.maxSize-fragmentSize);\n\r")
-			       .append(" if (rb.ringWalker.tailCache < neededTailStop && ((rb.ringWalker.tailCache=rb.tailPos.longValue()) < neededTailStop) ) {\n\r")
+			       .append(" if (rb.ringWalker.tailCache < neededTailStop && ((rb.ringWalker.tailCache=RingBuffer.tailPosition(rb)) < neededTailStop) ) {\n\r")
 			       .append("       return 0;//nothing read\n\r")
 			       .append(" }}\n\r");
             
