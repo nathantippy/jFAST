@@ -128,6 +128,7 @@ public class TemplateLoaderTest {
         FASTClassLoader.deleteFiles();
 
         RingBuffer queue = new RingBuffer(new RingBufferConfig((byte)7, (byte)15, catalog.ringByteConstants(), catalog.getFROM()));
+        queue.initBuffers();
 		RingBuffers buildNoFanRingBuffers = RingBuffers.buildNoFanRingBuffers(queue);
 		FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, buildNoFanRingBuffers);
 

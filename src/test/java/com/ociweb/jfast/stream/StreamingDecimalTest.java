@@ -47,9 +47,14 @@ public class StreamingDecimalTest extends BaseStreamingTest {
 
     FASTReaderInterpreterDispatch fr;
 
+    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+
+
     public StreamingDecimalTest() {
     	this.sampleSize = 100;
     	this.fields = 10;
+    	
+    	rbRingBufferLocal.initBuffers();
     }
     
     // NO PMAP
@@ -81,7 +86,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
         }
 
     }
-    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+ 
 
     @Override
     protected long timeWriteLoop(int fields, int fieldsPerGroup, int maxMPapBytes, int operationIters,

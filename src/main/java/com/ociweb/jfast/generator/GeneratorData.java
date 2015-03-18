@@ -91,7 +91,7 @@ public class GeneratorData {
         this.from = template.getFROM();
         //must be zero size to make the mask also zero
         this.mockRB = new RingBuffer(new RingBufferConfig((byte)0, (byte)0, null, this.from));
-        
+        this.mockRB.initBuffers();
     }
 
 	public static int[] hashCatBytes(byte[] catBytes) {

@@ -93,6 +93,12 @@ public class HomogeniousRecordWriteReadDecimalBenchmark extends Benchmark {
     static final int groupTokenMap = TokenBuilder.buildToken(TypeMask.Group, OperatorMask.Group_Bit_PMap, 2);
     static final int groupTokenNoMap = TokenBuilder.buildToken(TypeMask.Group, 0, 0);
 
+    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+
+    public HomogeniousRecordWriteReadDecimalBenchmark() {
+    	rbRingBufferLocal.initBuffers();
+    }
+    
     public static int[] buildTokens(int count, int[] types, int[] operators) {
         int[] lookup = new int[count];
         int typeIdx = types.length - 1;
@@ -275,8 +281,7 @@ public class HomogeniousRecordWriteReadDecimalBenchmark extends Benchmark {
         }
         return result;
     }
-    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
-
+    
     protected long staticWriteReadDecimalGroup(int reps, int token, int groupToken, int pmapSize) {
         long result = 0;
         for (int i = 0; i < reps; i++) {

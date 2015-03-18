@@ -161,6 +161,9 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 	}
 
 	static RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+    static {
+    	rbRingBufferLocal.initBuffers();
+    }
 
     public static void writeInteger(FASTWriterInterpreterDispatch fw, int token, int value, PrimitiveWriter writer) {
         //temp solution as the ring buffer is introduce into all the APIs
@@ -194,6 +197,7 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 		testCatalog.clientConfig();
 		testCatalog.clientConfig();
 		FASTReaderInterpreterDispatch fr = new FASTReaderInterpreterDispatch(testCatalog, RingBuffers.buildNoFanRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, testCatalog.ringByteConstants(), testCatalog.getFROM()))));
+		
 		
 		long start = System.nanoTime();
 		if (operationIters<3) {

@@ -26,7 +26,89 @@ import com.ociweb.pronghorn.ring.RingReader;
 
 public class DispatchLoaderTest {
 
-    final int PREAMBLE_IDX = 0;
+    private final class DemoFASTListener implements FASTListener {
+		private final FASTReaderReactor[] reactor;
+		private final AtomicInteger records;
+		private final int switchToCompiled2;
+		private final int exitTest;
+		private final byte[] catalog1;
+		private final FASTDecoder[] decoder;
+		private final byte[] catalog2;
+		private final PrimitiveReader reader;
+		private final int switchToCompiled1;
+		private final AtomicBoolean alive;
+		RingBuffer queue = null;
+
+		private DemoFASTListener(FASTReaderReactor[] reactor,
+				AtomicInteger records, int switchToCompiled2, int exitTest,
+				byte[] catalog1, FASTDecoder[] decoder, byte[] catalog2,
+				PrimitiveReader reader, int switchToCompiled1,
+				AtomicBoolean alive) {
+			this.reactor = reactor;
+			this.records = records;
+			this.switchToCompiled2 = switchToCompiled2;
+			this.exitTest = exitTest;
+			this.catalog1 = catalog1;
+			this.decoder = decoder;
+			this.catalog2 = catalog2;
+			this.reader = reader;
+			this.switchToCompiled1 = switchToCompiled1;
+			this.alive = alive;
+		}
+
+		@Override
+		public void fragment(int templateId, RingBuffer queue) {
+		         this.queue = queue;
+
+		}
+
+		@Override
+		public void fragment() {
+		    if (null!=queue) {
+		        
+		        int id = RingReader.readInt(queue, MESSAGE_ID_IDX);
+		      //  System.err.println(templateId+" "+id);
+		        
+		        String version = RingReader.readASCII(queue, VERSION_IDX, new StringBuilder()).toString();
+
+		       if (records.intValue()<switchToCompiled1) {
+		           //Interpreter
+		           assertEquals("1.0",version);
+		       } else if (records.intValue()<switchToCompiled2) {
+		           //Compiled
+		           assertEquals("1.0",version);
+		       } else if (records.intValue()<exitTest) {
+		           //Compiled 2
+		           assertEquals("2.0",version);
+		       }               
+		       
+		       RingBuffer.dump(queue); //don't need the data but do need to empty the queue.
+		       
+		       records.incrementAndGet();
+		       
+		       if (records.intValue()==switchToCompiled1) {
+		           decoder[0] = DispatchLoader.loadDispatchReader(catalog1, TemplateCatalogConfig.buildRingBuffers(new TemplateCatalogConfig(catalog1), (byte)8, (byte)18));
+		           reactor[0] = new FASTReaderReactor(decoder[0],reader);
+		          // queue = decoder[0].ringBuffer(0);
+		           System.err.println("Created new "+decoder.getClass().getSimpleName());
+		       }
+		       if (records.intValue()==switchToCompiled2) {
+		           decoder[0] = DispatchLoader.loadDispatchReader(catalog2, TemplateCatalogConfig.buildRingBuffers(new TemplateCatalogConfig(catalog2), (byte)8, (byte)18));
+		           reactor[0] = new FASTReaderReactor(decoder[0],reader);
+		         //  queue = decoder[0].ringBuffer(0);
+		           System.err.println("Created new "+decoder.getClass().getSimpleName());
+		       }
+		       if (records.intValue()>exitTest) {
+		           alive.set(false);
+		       }                    
+		        
+		        RingBuffer.dump(queue);
+		    }
+		    queue = null;
+		}
+	}
+
+	final int PREAMBLE_IDX = 0;
     final int MESSAGE_ID_IDX = 1;
     final int VERSION_IDX = 2;
        
@@ -58,62 +140,8 @@ public class DispatchLoaderTest {
         
         //This test can only be fixed after we establish when the switchovers are to happen.
         
-        listener[0] = new FASTListener() {
-                        
-            RingBuffer queue = null;
-            
-            @Override
-            public void fragment(int templateId, RingBuffer queue) {
-                     this.queue = queue;
-
-            }
-            
-            @Override
-            public void fragment() {
-                if (null!=queue) {
-                    
-                    int id = RingReader.readInt(queue, MESSAGE_ID_IDX);
-                  //  System.err.println(templateId+" "+id);
-                    
-                    String version = RingReader.readASCII(queue, VERSION_IDX, new StringBuilder()).toString();
-
-                   if (records.intValue()<switchToCompiled1) {
-                       //Interpreter
-                       assertEquals("1.0",version);
-                   } else if (records.intValue()<switchToCompiled2) {
-                       //Compiled
-                       assertEquals("1.0",version);
-                   } else if (records.intValue()<exitTest) {
-                       //Compiled 2
-                       assertEquals("2.0",version);
-                   }               
-                   
-                   RingBuffer.dump(queue); //don't need the data but do need to empty the queue.
-                   
-                   records.incrementAndGet();
-                   
-                   if (records.intValue()==switchToCompiled1) {
-                       decoder[0] = DispatchLoader.loadDispatchReader(catalog1, TemplateCatalogConfig.buildRingBuffers(new TemplateCatalogConfig(catalog1), (byte)8, (byte)18));
-                       reactor[0] = new FASTReaderReactor(decoder[0],reader);
-                      // queue = decoder[0].ringBuffer(0);
-                       System.err.println("Created new "+decoder.getClass().getSimpleName());
-                   }
-                   if (records.intValue()==switchToCompiled2) {
-                       decoder[0] = DispatchLoader.loadDispatchReader(catalog2, TemplateCatalogConfig.buildRingBuffers(new TemplateCatalogConfig(catalog2), (byte)8, (byte)18));
-                       reactor[0] = new FASTReaderReactor(decoder[0],reader);
-                     //  queue = decoder[0].ringBuffer(0);
-                       System.err.println("Created new "+decoder.getClass().getSimpleName());
-                   }
-                   if (records.intValue()>exitTest) {
-                       alive.set(false);
-                   }                    
-                    
-                    RingBuffer.dump(queue);
-                }
-                queue = null;
-            }
-            
-        };
+        listener[0] = new DemoFASTListener(reactor, records, switchToCompiled2, exitTest,
+				catalog1, decoder, catalog2, reader, switchToCompiled1, alive);
         
         reactor[0] = new FASTReaderReactor(decoder[0], reader);
                 

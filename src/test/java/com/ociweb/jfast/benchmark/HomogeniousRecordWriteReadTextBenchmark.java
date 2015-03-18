@@ -416,6 +416,9 @@ public class HomogeniousRecordWriteReadTextBenchmark extends Benchmark {
 	}
 	
 	static RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)7, (byte)16, null, FieldReferenceOffsetManager.RAW_BYTES));
+	static {
+		rbRingBufferLocal.initBuffers();
+	}
 	
 	protected long staticWriteReadTextGroup(int reps, int token, int groupToken, int pmapSize) {
 		long result = 0;

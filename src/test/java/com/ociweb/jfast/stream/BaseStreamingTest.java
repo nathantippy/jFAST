@@ -479,6 +479,7 @@ public abstract class BaseStreamingTest {
                 
                 //temp solution as the ring buffer is introduce into all the APIs
                 RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+                rbRingBufferLocal.initBuffers();
                 RingBuffer.dump(rbRingBufferLocal);
                 RingBuffer.addValue(rbRingBufferLocal.buffer, rbRingBufferLocal.mask, rbRingBufferLocal.workingHeadPos, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
                 RingBuffer ringBuffer = rbRingBufferLocal;
@@ -543,6 +544,7 @@ public abstract class BaseStreamingTest {
                     
                     //temp solution as the ring buffer is introduce into all the APIs   
                     RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+                    rbRingBufferLocal.initBuffers();
                     RingBuffer.dump(rbRingBufferLocal);
                     RingBuffer.addValue(rbRingBufferLocal.buffer, rbRingBufferLocal.mask, rbRingBufferLocal.workingHeadPos, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
                     RingBuffer ringBuffer = rbRingBufferLocal;
