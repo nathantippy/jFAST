@@ -81,10 +81,13 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             RingBuffer rb = RingBuffers.get(dispatch.ringBuffers,dispatch.activeScriptCursor);          
             
             //confirm that this ring buffer has enough room to hold the new results, and wait if it does not
-            rb.ringWalker.tailCache = RingBuffer.spinBlockOnTail(rb.ringWalker.tailCache, 1 + preambleDataLength + rb.workingHeadPos.value - rb.maxSize, rb);
             
-           // rb.consumerData.tailCache = RingBuffer.spinBlock(rb.tailPos, rb.consumerData.tailCache, 1 + preambleDataLength + rb.workingHeadPos.value - rb.maxSize);
-            //TODO: B, should only spin loock above once but afte this method call it is done again, also sping lock causes cpu to sleep, how to avoid.
+            //TODO: C, convert to non blocking.
+            RingBuffer.initLowLevelWriter(rb);
+            while(!RingBuffer.roomToLowLevelWrite(rb,1+preambleDataLength)) {
+            	Thread.yield();
+            };
+            //RingBuffer.confirmLowLevelWrite(rb, 1+preambleDataLength);
   
         }
     }

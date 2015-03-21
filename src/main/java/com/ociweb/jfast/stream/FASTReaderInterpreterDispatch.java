@@ -130,12 +130,22 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
            
         FieldReferenceOffsetManager from = RingBuffer.from(rbRingBuffer);		
         int fragDataSize = from.fragDataSize[activeScriptCursor];   
-        
-        //Waiting for tail position to change! can cache the value, must make same change in compiled code.
-        long neededTailStop = rbRingBuffer.workingHeadPos.value   - rbRingBuffer.maxSize + fragDataSize;
-        if (rbRingBuffer.ringWalker.tailCache < neededTailStop && ((rbRingBuffer.ringWalker.tailCache=RingBuffer.tailPosition(rbRingBuffer)) < neededTailStop) ) {
-              return 0; //no space to read data and start new message so read nothing
+
+        RingBuffer.initLowLevelWriter(rbRingBuffer);
+        if (!RingBuffer.roomToLowLevelWrite(rbRingBuffer,fragDataSize)) {
+        	return 0;
         }
+     //   RingBuffer.confirmLowLevelWrite(rbRingBuffer, fragDataSize);
+        
+        
+//        //Waiting for tail position to change! can cache the value, must make same change in compiled code.
+//        long neededTailStop = rbRingBuffer.workingHeadPos.value   - rbRingBuffer.maxSize + fragDataSize;
+//        
+//        
+//        
+//        if (rbRingBuffer.ringWalker.tailCache < neededTailStop && ((rbRingBuffer.ringWalker.tailCache=RingBuffer.tailPosition(rbRingBuffer)) < neededTailStop) ) {
+//              return 0; //no space to read data and start new message so read nothing
+//        }
         
         assert(rbRingBuffer.workingHeadPos.value>=RingBuffer.headPosition(rbRingBuffer));
         
