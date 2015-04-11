@@ -5,7 +5,9 @@ import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArrayEquals;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
+import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
+import com.ociweb.pronghorn.ring.token.TypeMask;
 import com.ociweb.pronghorn.ring.util.LocalHeap;
 
 public abstract class FASTEncoder { 
@@ -111,7 +113,11 @@ public abstract class FASTEncoder {
     public abstract void encode(PrimitiveWriter writer, RingBuffer ringBuffer);
     
 
-    public void setActiveScriptCursor(int cursor) {
+    public void setActiveScriptCursor(int cursor) {   	
+    	
+		assert(TypeMask.Group == TokenBuilder.extractType(fullScript[cursor])) : "Templated message must start with group open and this starts with "+TokenBuilder.tokenToString(fullScript[cursor]);
+		assert((OperatorMask.Group_Bit_Close&TokenBuilder.extractOper(fullScript[cursor])) == 0) : "Templated message must start with group open and this starts with "+TokenBuilder.tokenToString(fullScript[cursor]);
+
        activeScriptCursor = cursor;
     }
     

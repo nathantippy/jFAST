@@ -850,7 +850,7 @@ public final class PrimitiveWriter {
         // ///
         // push open writes
         int s = --writer.safetyStackDepth;
-        assert (s >= 0) : "Must call pushPMap(maxBytes) before attempting to write bits to it";
+        assert (s >= 0) : "Must call openPMap(maxBytes) before attempting to closePMap, This may be caused by a misplaced cursor value that is not starting the message at the beginning of the template. "+s;
 
         // final byte to be saved into the feed. //NOTE: pos pos can inc because
         // it does not roll over.
@@ -922,7 +922,7 @@ public final class PrimitiveWriter {
     public static void writeNextPMapByte(byte bit, PrimitiveWriter writer) {
 
         // bits but it must be less! what if we cached the buffer writes?
-      //     assert (writer.safetyStackDepth > 0) : "PMap must be open before write of bits.";
+        assert (writer.safetyStackDepth > 0) : "PMap must be open before write of any bits.";
         int idx = (int) (POS_POS_MASK & writer.safetyStackPosPos[writer.safetyStackDepth - 1]++);
 
         // save this byte and if it was not a zero save that fact as well

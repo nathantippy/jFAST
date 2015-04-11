@@ -15,6 +15,7 @@ import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.ring.RingReader;
 import com.ociweb.pronghorn.ring.RingWalker;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
@@ -171,7 +172,7 @@ public class GeneratorUtils {
             builder.append("\n");
             builder.append("setActiveScriptCursor(rb.ringWalker.cursor);\n");        
 
-            builder.append("if ("+RingWalker.class.getCanonicalName()+".isNewMessage(rb.ringWalker)) {\n");                
+            builder.append("if ("+RingReader.class.getCanonicalName()+".isNewMessage(rb)) {\n");                
             
             if (preambleLength==0) {
                 builder.append("    beginMessage(this);\n");
@@ -463,6 +464,7 @@ public class GeneratorUtils {
         	final StringBuilder fragmentClassBody = new StringBuilder();
         	fragmentClassBody.append("package com.ociweb.jfast.generator;\n");
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.*;\n");
+        	fragmentClassBody.append("import com.ociweb.pronghorn.ring.loader.*;\n");
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.util.*;\n");
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.RingBuffer.*;\n");
         	fragmentClassBody.append("import com.ociweb.jfast.stream.*;\n");

@@ -116,7 +116,7 @@ import com.ociweb.pronghorn.ring.util.hash.IntHashTable;
                         try {
                             exportSourceToClassFolder(jfo.getName(),jfo.getCharContent(false).toString());
                         } catch (IOException e) {
-                            throw new FASTException(e);
+                            log.trace("Unable to write source {}",e.getMessage());
                         }	                		
                 	}
                 }
@@ -169,7 +169,7 @@ import com.ociweb.pronghorn.ring.util.hash.IntHashTable;
                 out.write(content);
                 out.close();
             } catch (IOException e1) {
-                e1.printStackTrace();
+            	log.trace("uanble to export source: {} ",e1.getMessage());
             }
         }
         

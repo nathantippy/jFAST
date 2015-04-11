@@ -678,7 +678,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         PrimitiveWriter.flush(writer);
     }
 
-      
+      int x = 0;
     
     private boolean dispatchWriteByToken(PrimitiveWriter writer, RingBuffer rbRingBuffer) {
 
@@ -686,7 +686,9 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
        
         assert (gatherWriteData(writer, token, activeScriptCursor, fieldPos, rbRingBuffer));
                    
-     //System.err.println("FASTWriterInterpreterDispatch: "+TokenBuilder.tokenToString(token)+" fieldPos "+fieldPos);
+        
+    System.err.println(x+" FASTWriterInterpreterDispatch: "+TokenBuilder.tokenToString(token)+" fieldPos "+fieldPos+"   cursor "+activeScriptCursor);
+
               
         if (0 == (token & (16 << TokenBuilder.SHIFT_TYPE))) {
             // 0????
@@ -850,7 +852,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                 		
 	                    // Group Type, no others defined so no need to keep checking
 	                    if (0 == (token & (OperatorMask.Group_Bit_Close << TokenBuilder.SHIFT_OPER))) {
-	
+	x++;
 	                        boolean isTemplate = (0 != (token & (OperatorMask.Group_Bit_Templ << TokenBuilder.SHIFT_OPER)));
 	                        if (isTemplate) {
 	                        	
