@@ -687,7 +687,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         assert (gatherWriteData(writer, token, activeScriptCursor, fieldPos, rbRingBuffer));
                    
         
-    System.err.println(x+" FASTWriterInterpreterDispatch: "+TokenBuilder.tokenToString(token)+" fieldPos "+fieldPos+"   cursor "+activeScriptCursor);
+   // System.err.println(x+" FASTWriterInterpreterDispatch: "+TokenBuilder.tokenToString(token)+" fieldPos "+fieldPos+"   cursor "+activeScriptCursor);
 
               
         if (0 == (token & (16 << TokenBuilder.SHIFT_TYPE))) {
@@ -1353,8 +1353,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
             	(TokenBuilder.extractType(fullScript[activeScriptCursor]) == TypeMask.Group &&
             	0 != (TokenBuilder.extractOper(fullScript[activeScriptCursor])&OperatorMask.Group_Bit_Close) &&
             	0 == (TokenBuilder.extractOper(fullScript[activeScriptCursor])&OperatorMask.Group_Bit_Seq)) ) {
-            	//System.err.println("would break but did not at "+activeScriptCursor+"  "+TokenBuilder.tokenToString(fullScript[activeScriptCursor]));
-            	            	
+            	//System.err.println("would break but did not at "+activeScriptCursor+"  "+TokenBuilder.tokenToString(fullScript[activeScriptCursor]));   	
         		break;
             }
             
