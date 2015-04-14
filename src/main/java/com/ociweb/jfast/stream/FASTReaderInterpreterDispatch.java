@@ -135,18 +135,8 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         if (!RingBuffer.roomToLowLevelWrite(rbRingBuffer,fragDataSize)) {
         	return 0;
         }
-     //   RingBuffer.confirmLowLevelWrite(rbRingBuffer, fragDataSize);
-        
-        
-//        //Waiting for tail position to change! can cache the value, must make same change in compiled code.
-//        long neededTailStop = rbRingBuffer.workingHeadPos.value   - rbRingBuffer.maxSize + fragDataSize;
-//        
-//        
-//        
-//        if (rbRingBuffer.ringWalker.tailCache < neededTailStop && ((rbRingBuffer.ringWalker.tailCache=RingBuffer.tailPosition(rbRingBuffer)) < neededTailStop) ) {
-//              return 0; //no space to read data and start new message so read nothing
-//        }
-        
+        RingBuffer.confirmLowLevelWrite(rbRingBuffer, fragDataSize);
+           
         assert(rbRingBuffer.workingHeadPos.value>=RingBuffer.headPosition(rbRingBuffer));
         
         int token;
@@ -289,6 +279,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         //this conditional is for the code generator so it need not check
         if (rbRingBuffer.workingHeadPos.value != RingBuffer.headPosition(rbRingBuffer)) {
 	        assert (fragDataSize == ((int)(rbRingBuffer.workingHeadPos.value-RingBuffer.headPosition(rbRingBuffer)))) : "expected to write "+fragDataSize+" but wrote "+((int)(rbRingBuffer.workingHeadPos.value-RingBuffer.headPosition(rbRingBuffer)));
+	        RingBuffer.publishWrites(rbRingBuffer);
 	        RingBuffer.publishAllBatchedWrites(rbRingBuffer);  
         }
         assert(rbRingBuffer.byteWorkingHeadPos.value == rbRingBuffer.bytesHeadPos.get());

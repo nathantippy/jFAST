@@ -177,6 +177,8 @@ public class CodeGenerationTest {
         while (FASTReaderReactor.pump(reactor1) >= 0 && //continue if no room to read or read new message
                FASTReaderReactor.pump(reactor2) >= 0) {
 
+            assertEquals(RingBuffer.contentRemaining(queue1),RingBuffer.contentRemaining(queue2));
+            
             while (RingBuffer.contentRemaining(queue1)>0 && RingBuffer.contentRemaining(queue2)>0) {
 				int int1 = RingBuffer.readInt(queue1.buffer, queue1.mask, ++queue1.workingTailPos.value);
                 int int2 = RingBuffer.readInt(queue2.buffer, queue2.mask, ++queue2.workingTailPos.value);
@@ -202,11 +204,10 @@ public class CodeGenerationTest {
                 RingBuffer.releaseReadLock(queue1);
                 RingBuffer.releaseReadLock(queue2);
                 
-                
 				i++;
             }
         }
-        assertEquals(PrimitiveReader.totalRead(primitiveReader1), PrimitiveReader.totalRead(primitiveReader2));
+        assertEquals("Expected Interpreter not matching Generator", PrimitiveReader.totalRead(primitiveReader1), PrimitiveReader.totalRead(primitiveReader2));
 
     }
     
