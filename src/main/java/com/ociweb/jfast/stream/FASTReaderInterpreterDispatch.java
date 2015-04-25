@@ -106,7 +106,6 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         genWriteTemplateId(this);
         //set this again because the code generation path may not have set it if it were skipped.
         RingBuffer rb = RingBuffers.get(ringBuffers,activeScriptCursor);
-        rb.writeTrailingCountOfBytesConsumed = msgIdx>=0 && (1==rb.ringWalker.from.fragNeedsAppendedCountOfBytesConsumed[msgIdx]);
     }
     
     //TODO: MUST only call when we know there is room for the biggest known fragment, must avoid additional checks.
@@ -122,9 +121,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
             beginMessage(reader); 
             rbRingBuffer = RingBuffers.get(ringBuffers, activeScriptCursor); 
         } else {
-        	rbRingBuffer = RingBuffers.get(ringBuffers, activeScriptCursor); 
-        	//this is not the beginning of a fragment but we still need to mark the need to add the trailing bytes.
-        	rbRingBuffer.writeTrailingCountOfBytesConsumed = (1==rbRingBuffer.ringWalker.from.fragNeedsAppendedCountOfBytesConsumed[activeScriptCursor]);        	
+        	rbRingBuffer = RingBuffers.get(ringBuffers, activeScriptCursor);        	
         }
               
            
@@ -266,12 +263,8 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
             
         } while (true);
         
-        if (rbRingBuffer.writeTrailingCountOfBytesConsumed) {
+        genReadTotalMessageBytesUsed(rbRingBuffer.workingHeadPos, rbRingBuffer );
 
-        	genReadTotalMessageBytesUsed(rbRingBuffer.workingHeadPos, rbRingBuffer );
-        	//this stopping logic is only needed for the interpreter, the generated version has this call injected at the right poing.
-        	rbRingBuffer.writeTrailingCountOfBytesConsumed = false;
-        } 
         genReadTotalMessageBytesResetUsed(rbRingBuffer);
         
         genReadGroupCloseMessage(reader, this); //active script cursor is set to end of messge by this call

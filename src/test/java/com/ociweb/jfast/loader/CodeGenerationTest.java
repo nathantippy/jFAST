@@ -201,8 +201,8 @@ public class CodeGenerationTest {
                     }
                 }
                 
-                RingBuffer.releaseReadLock(queue1);
-                RingBuffer.releaseReadLock(queue2);
+                RingBuffer.readBytesAndreleaseReadLock(queue1);
+                RingBuffer.readBytesAndreleaseReadLock(queue2);
                 
 				i++;
             }

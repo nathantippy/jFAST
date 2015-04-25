@@ -177,10 +177,8 @@ public abstract class BaseStreamingTest {
 			RingBuffer ringBuffer = RingBuffers.get( fr.ringBuffers, 0);			
 			fr.closeGroup(groupToken|(OperatorMask.Group_Bit_Close<<TokenBuilder.SHIFT_OPER),idx, reader);
 			
-	    	if (ringBuffer.writeTrailingCountOfBytesConsumed) {
-				RingBuffer.writeTrailingCountOfBytesConsumed(ringBuffer, ringBuffer.workingHeadPos.value++); //increment because this is the low-level API calling
-				//this updated the head so it must repositioned
-			} //MUST be before the assert.
+			RingBuffer.writeTrailingCountOfBytesConsumed(ringBuffer, ringBuffer.workingHeadPos.value++); //increment because this is the low-level API calling
+
 	    	//single length field still needs to move this value up, so this is always done
 	    	ringBuffer.bytesWriteLastConsumedBytePos = ringBuffer.byteWorkingHeadPos.value;
 	    	
@@ -543,7 +541,7 @@ public abstract class BaseStreamingTest {
                     int idx = token & fw.intInstanceMask;
                     
                     //temp solution as the ring buffer is introduce into all the APIs   
-                    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+                    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
                     rbRingBufferLocal.initBuffers();
                     RingBuffer.dump(rbRingBufferLocal);
                     RingBuffer.addValue(rbRingBufferLocal.buffer, rbRingBufferLocal.mask, rbRingBufferLocal.workingHeadPos, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);

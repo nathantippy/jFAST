@@ -93,7 +93,7 @@ public class HomogeniousRecordWriteReadDecimalBenchmark extends Benchmark {
     static final int groupTokenMap = TokenBuilder.buildToken(TypeMask.Group, OperatorMask.Group_Bit_PMap, 2);
     static final int groupTokenNoMap = TokenBuilder.buildToken(TypeMask.Group, 0, 0);
 
-    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
 
     public HomogeniousRecordWriteReadDecimalBenchmark() {
     	rbRingBufferLocal.initBuffers();

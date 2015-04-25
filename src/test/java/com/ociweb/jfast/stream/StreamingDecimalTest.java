@@ -47,7 +47,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
 
     FASTReaderInterpreterDispatch fr;
 
-    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
 
 
     public StreamingDecimalTest() {
@@ -131,6 +131,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                         RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,testExpConst);
                         RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,(int) (testValue >>> 32));
                         RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,(int) (testValue & 0xFFFFFFFF)); 
+
                         RingBuffer.publishWrites(rbRingBufferLocal);
                         int rbPos = 0;
 
@@ -149,8 +150,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                     if (sendNulls && ((f & 0xF) == 0) && TokenBuilder.isOptional(token)) {
                         BaseStreamingTest.write(token, writer, fw);
                     } else {
-                        
-                    	
+                                          	
                     	
                     	long mantissa = testData[f];
                         assert (0 == (token & (2 << TokenBuilder.SHIFT_TYPE)));
@@ -162,6 +162,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                         RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,1);
                         RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,(int) (mantissa >>> 32));
                         RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,(int) (mantissa & 0xFFFFFFFF)); 
+
                         RingBuffer.publishWrites(rbRingBufferLocal);
                         int rbPos = 0;
 
