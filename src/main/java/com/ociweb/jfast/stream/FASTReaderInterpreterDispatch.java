@@ -140,7 +140,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         do {
             token = fullScript[activeScriptCursor];
   
-        //    System.err.println("reading:"+TokenBuilder.tokenToString(token)+" from "+(null==reader ? "N/A" : String.valueOf(reader.position)));
+            //System.err.println("reading:"+TokenBuilder.tokenToString(token)+" from "+(null==reader ? "N/A" : String.valueOf(reader.position)));
     
             // The trick here is to keep all the conditionals in this method and
             // do the work elsewhere.
@@ -219,15 +219,6 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     	} else {
                     		// 1001??  
                     		
-                    		//template ref
-                    		if (0 == (token & (OperatorMask.Group_Bit_Close << TokenBuilder.SHIFT_OPER))) {
-                    			//TODO: A, read open template ref
-                    			
-                    		} else {
-                    			//TODO: A, read close template ref
-                    			
-                    		}
-                    		
                     	}
                             
 
@@ -272,7 +263,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         //this conditional is for the code generator so it need not check
         if (rbRingBuffer.workingHeadPos.value != RingBuffer.headPosition(rbRingBuffer)) {
 	        assert (fragDataSize == ((int)(rbRingBuffer.workingHeadPos.value-RingBuffer.headPosition(rbRingBuffer)))) : "expected to write "+fragDataSize+" but wrote "+((int)(rbRingBuffer.workingHeadPos.value-RingBuffer.headPosition(rbRingBuffer)));
-	        RingBuffer.publishWrites(rbRingBuffer);
+	        RingBuffer.publishWritesBatched(rbRingBuffer);
 	        RingBuffer.publishAllBatchedWrites(rbRingBuffer);  
         }
         assert(rbRingBuffer.byteWorkingHeadPos.value == rbRingBuffer.bytesHeadPos.get());
