@@ -12,39 +12,24 @@ public class ClientConfig {
     private int bytesLengthMax = 4096;
     private int bytesGap = 64;
     
-    private int rbPrimaryRingBits = 7;
-    private int rbTextRingBits = 15;
-    
     private static final int NONE = -1;
     private int catalogId = NONE;
 
-    //TODO: AA,  these will be injected at runtime and should not be part of the saved cat bytes?
-    
-    public ClientConfig(int primaryRingBits, int textRingBits) {
-        this.rbPrimaryRingBits = primaryRingBits;
-        this.rbTextRingBits = textRingBits;
+    public ClientConfig() {
     }
     
-    public ClientConfig(int primaryRingBits, int textRingBits, int bytesLength, int bytesGap) {
-        this.rbPrimaryRingBits = primaryRingBits;
-        this.rbTextRingBits = textRingBits;
+    public ClientConfig(int bytesLength, int bytesGap) {
         this.bytesLengthMax = bytesLength;
         this.bytesGap = bytesGap;
         
     }
     
-    public ClientConfig() {
-    }
-
     public ClientConfig(PrimitiveReader reader) {
         
         preambleBytes = (short)PrimitiveReader.readIntegerUnsigned(reader);
         
         bytesLengthMax = PrimitiveReader.readIntegerUnsigned(reader);
         bytesGap = PrimitiveReader.readIntegerUnsigned(reader);
-        
-        rbPrimaryRingBits = PrimitiveReader.readIntegerUnsigned(reader);
-        rbTextRingBits = PrimitiveReader.readIntegerUnsigned(reader);
         
         catalogId = PrimitiveReader.readIntegerSigned(reader);
 
@@ -56,9 +41,6 @@ public class ClientConfig {
 
         PrimitiveWriter.writeIntegerUnsigned(bytesLengthMax, writer);
         PrimitiveWriter.writeIntegerUnsigned(bytesGap, writer);
-        
-        PrimitiveWriter.writeIntegerUnsigned(rbPrimaryRingBits, writer);
-        PrimitiveWriter.writeIntegerUnsigned(rbTextRingBits, writer);
         
         PrimitiveWriter.writeIntegerSigned(catalogId, writer);
     

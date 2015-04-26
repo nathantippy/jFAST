@@ -47,7 +47,7 @@ public class ThreadingTest {
 	public void builtInTest() {
 		//this example uses the preamble feature
         //large value for bandwidth, small for latency
-        ClientConfig clientConfig = new ClientConfig(20,22);
+        ClientConfig clientConfig = new ClientConfig();
         clientConfig.setPreableBytes((short)4);
         String templateSource = "/performance/example.xml";
         String dataSource = "/performance/complex30000.dat";

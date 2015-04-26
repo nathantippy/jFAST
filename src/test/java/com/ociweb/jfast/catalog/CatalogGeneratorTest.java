@@ -550,7 +550,7 @@ public class CatalogGeneratorTest {
 			}
 			
 			
-			ClientConfig clientConfig = new ClientConfig(21,19);  //keep bits small or the test will take a very long time to run.              
+			ClientConfig clientConfig = new ClientConfig();  //keep bits small or the test will take a very long time to run.              
 			byte[] catBytes = convertTemplateToCatBytes(builder, clientConfig);
 			return catBytes;
 		} catch (IOException e) {

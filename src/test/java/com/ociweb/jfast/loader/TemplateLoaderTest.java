@@ -65,7 +65,7 @@ public class TemplateLoaderTest {
     public void buildRawCatalog() {
 
         byte[] catalogByteArray = buildRawCatalogData(new ClientConfig());
-        assertEquals(762, catalogByteArray.length);
+        assertEquals(760, catalogByteArray.length);
 
 
         // reconstruct Catalog object from stream
@@ -557,7 +557,7 @@ public class TemplateLoaderTest {
 
         FASTClassLoader.deleteFiles();
 
-        byte[] catBytes = buildRawCatalogData(new ClientConfig(22,20));
+        byte[] catBytes = buildRawCatalogData(new ClientConfig());
         final TemplateCatalogConfig catalog = new TemplateCatalogConfig(catBytes);
         int maxPMapCountInBytes = TemplateCatalogConfig.maxPMapCountInBytes(catalog);
 

@@ -113,7 +113,7 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 	protected long timeWriteLoop(int fields, int fieldsPerGroup, int maxMPapBytes, int operationIters,
 			int[] tokenLookup, DictionaryFactory dcr) {
 				
-		TemplateCatalogConfig catalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null,	64,4, 100, new ClientConfig(8 ,7) );
+		TemplateCatalogConfig catalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null,	64,4, 100, new ClientConfig() );
 		
 		FASTWriterInterpreterDispatch fw = FASTWriterInterpreterDispatch
 				.createFASTWriterInterpreterDispatch(catalog);
@@ -193,7 +193,7 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 	protected long timeReadLoop(int fields, int fieldsPerGroup, int maxMPapBytes, 
 			                      int operationIters, int[] tokenLookup, DictionaryFactory dcr) {
 		
-	    TemplateCatalogConfig testCatalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null, 64,maxGroupCount * 10, -1, new ClientConfig(8 ,7));
+	    TemplateCatalogConfig testCatalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null, 64,maxGroupCount * 10, -1, new ClientConfig());
 		testCatalog.clientConfig();
 		testCatalog.clientConfig();
 		FASTReaderInterpreterDispatch fr = new FASTReaderInterpreterDispatch(testCatalog, RingBuffers.buildNoFanRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, testCatalog.ringByteConstants(), testCatalog.getFROM()))));

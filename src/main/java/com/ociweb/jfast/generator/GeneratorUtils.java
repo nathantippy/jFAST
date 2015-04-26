@@ -8,27 +8,24 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.tools.JavaFileObject;
-import javax.tools.SimpleJavaFileObject;
 
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
+import com.ociweb.jfast.stream.GeneratorDriving;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBuffers;
 import com.ociweb.pronghorn.ring.RingReader;
-import com.ociweb.pronghorn.ring.RingWalker;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
 import com.ociweb.pronghorn.ring.util.IntWriteOnceOrderedSet;
 import com.ociweb.pronghorn.ring.util.hash.LongHashTable;
 import com.ociweb.pronghorn.ring.util.hash.LongHashTableVisitor;
-import com.ociweb.jfast.stream.GeneratorDriving;
 
 public class GeneratorUtils {
     
     static final boolean REMOVE_ARRAY = false; //TODO: B, not working for writer. still testing this idea, must decide after writer is finished 
-    static final boolean ADD_COMMENTS = false; //set to true if generated code should have helpful comments
+    static final boolean ADD_COMMENTS = true; //set to true if generated code should have helpful comments
     static final int COMPLEXITY_LIMITY_PER_METHOD = 24;//30;//28;//10050;//22;//18 25;
     static final boolean OPTIMIZE_PMAP_READ_WRITE = true; 
     static final boolean COMPILE_TO_SINGLE_CLASS = false;

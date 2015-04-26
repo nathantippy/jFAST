@@ -94,7 +94,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
 
         FASTWriterInterpreterDispatch fw = FASTWriterInterpreterDispatch
 				.createFASTWriterInterpreterDispatch(new TemplateCatalogConfig(dcr, 3, new int[0][0], null,
-				64,4, 100,  new ClientConfig(8 ,7) ));
+				64,4, 100,  new ClientConfig() ));
 
         long start = System.nanoTime();
         if (operationIters < 3) {
@@ -201,7 +201,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
     protected long timeReadLoop(int fields, int fieldsPerGroup, int maxMPapBytes, int operationIters,
             int[] tokenLookup, DictionaryFactory dcr) {
 
-        TemplateCatalogConfig testCatalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null, 64, maxGroupCount * 10, -1, new ClientConfig(8 ,7));
+        TemplateCatalogConfig testCatalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null, 64, maxGroupCount * 10, -1, new ClientConfig());
 		RingBuffer rb = new RingBuffer(new RingBufferConfig((byte)15, (byte)7, testCatalog.ringByteConstants(), testCatalog.getFROM()));
 		fr = new FASTReaderInterpreterDispatch(testCatalog, RingBuffers.buildNoFanRingBuffers(rb));
         
