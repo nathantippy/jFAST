@@ -479,7 +479,7 @@ public abstract class BaseStreamingTest {
                 RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
                 rbRingBufferLocal.initBuffers();
                 RingBuffer.dump(rbRingBufferLocal);
-                RingBuffer.addValue(rbRingBufferLocal.buffer, rbRingBufferLocal.mask, rbRingBufferLocal.workingHeadPos, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos.value++,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
                 RingBuffer ringBuffer = rbRingBufferLocal;
                 RingBuffer.publishWrites(ringBuffer);
                 int rbPos = 0;
@@ -544,7 +544,7 @@ public abstract class BaseStreamingTest {
                     RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
                     rbRingBufferLocal.initBuffers();
                     RingBuffer.dump(rbRingBufferLocal);
-                    RingBuffer.addValue(rbRingBufferLocal.buffer, rbRingBufferLocal.mask, rbRingBufferLocal.workingHeadPos, TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                    RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos.value++,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
                     RingBuffer ringBuffer = rbRingBufferLocal;
                     RingBuffer.publishWrites(ringBuffer);
                     int rbPos = 0;

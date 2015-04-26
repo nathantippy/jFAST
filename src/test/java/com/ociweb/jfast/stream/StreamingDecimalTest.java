@@ -128,9 +128,9 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                         //bridge solution as the ring buffer is introduce into all the APIs
                         RingBuffer.dump(rbRingBufferLocal);
                        
-                        RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,testExpConst);
-                        RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,(int) (testValue >>> 32));
-                        RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,(int) (testValue & 0xFFFFFFFF)); 
+                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos.value++,testExpConst);
+                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos.value++,(int) (testValue >>> 32));
+                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos.value++,(int) (testValue & 0xFFFFFFFF)); 
 
                         RingBuffer.publishWrites(rbRingBufferLocal);
                         int rbPos = 0;
@@ -159,9 +159,9 @@ public class StreamingDecimalTest extends BaseStreamingTest {
 
                         //bridge solution as the ring buffer is introduce into all the APIs
                         RingBuffer.dump(rbRingBufferLocal);
-                        RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,1);
-                        RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,(int) (mantissa >>> 32));
-                        RingBuffer.addValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos,(int) (mantissa & 0xFFFFFFFF)); 
+                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos.value++,1);
+                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos.value++,(int) (mantissa >>> 32));
+                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos.value++,(int) (mantissa & 0xFFFFFFFF)); 
 
                         RingBuffer.publishWrites(rbRingBufferLocal);
                         int rbPos = 0;

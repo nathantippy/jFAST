@@ -419,7 +419,7 @@ public class CatalogGeneratorTest {
                         
                         int j = fieldCount;
                         while (--j>=0) {
-                            RingBuffer.addValue(ringBuffer.buffer, ringBuffer.mask, ringBuffer.workingHeadPos, ReaderWriterPrimitiveTest.unsignedIntData[--d]);
+                            RingBuffer.setValue(ringBuffer.buffer,ringBuffer.mask,ringBuffer.workingHeadPos.value++,ReaderWriterPrimitiveTest.unsignedIntData[--d]);
                             
                             if (0 == d) {
                                 d = ReaderWriterPrimitiveTest.unsignedIntData.length;
