@@ -83,7 +83,6 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             //confirm that this ring buffer has enough room to hold the new results, and wait if it does not
             
             //TODO: C, convert to non blocking.
-            RingBuffer.initLowLevelWriter(rb);
             while(!RingBuffer.roomToLowLevelWrite(rb,1+preambleDataLength)) {
             	Thread.yield();
             };

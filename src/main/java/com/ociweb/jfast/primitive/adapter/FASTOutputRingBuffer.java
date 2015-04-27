@@ -29,7 +29,8 @@ public class FASTOutputRingBuffer implements FASTOutput {
 	@Override
 	public void flush() {		
 		int size = PrimitiveWriter.nextBlockSize(dataTransfer.writer);
-		while (size>0) {		
+		while (size>0) {
+		    
 			tailPosCache = RingBuffer.spinBlockOnTail(tailPosCache, headPosition(ringBuffer)-fill, ringBuffer);			
 			RingBuffer.addMsgIdx(ringBuffer, 0);
 			RingBuffer.addByteArray(dataTransfer.writer.buffer, PrimitiveWriter.nextOffset(dataTransfer.writer), size, ringBuffer);

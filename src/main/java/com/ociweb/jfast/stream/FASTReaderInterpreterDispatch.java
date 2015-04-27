@@ -128,7 +128,6 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         FieldReferenceOffsetManager from = RingBuffer.from(rbRingBuffer);		
         int fragDataSize = from.fragDataSize[activeScriptCursor];   
 
-        RingBuffer.initLowLevelWriter(rbRingBuffer);
         if (!RingBuffer.roomToLowLevelWrite(rbRingBuffer,fragDataSize)) {
         	return 0;
         }
