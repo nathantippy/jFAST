@@ -114,8 +114,9 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 
     	final RingBuffer rbRingBuffer;
         if (activeScriptCursor<0) {
-            if (PrimitiveReader.isEOF(reader)) { 
-               // System.err.println("EOF");
+            if (PrimitiveReader.isEOF(reader)) {                 
+                System.err.println("EOF");
+                //genReadTotalMessageBytesUsed(rbRingBuffer.workingHeadPos, rbRingBuffer );
                 return -1; //no more data stop
             }  
             beginMessage(reader); 

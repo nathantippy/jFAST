@@ -60,7 +60,7 @@ public class SourceTemplates {
         final String sourceFile = "/"+clazz.getSimpleName()+".java";        
         InputStream inputStream = SourceTemplates.class.getResourceAsStream(sourceFile);
         if (null!=inputStream) {
-           
+            System.err.println("using template source resourceAsStream from "+sourceFile);
             int v;
             StringBuilder builder = new StringBuilder();
             try {
@@ -79,6 +79,7 @@ public class SourceTemplates {
         //This allows for interactive testing without having to complete the full release cycle.
         
         File sourceDataFile = new File(dispatchTemplateSourcePath(clazz));
+      
         if (!sourceDataFile.exists()) {
             //when we are in production the file will be found here
              URL sourceData = getClass().getResource(sourceFile);              
@@ -172,6 +173,8 @@ public class SourceTemplates {
         try {
             String name = clazz.getSimpleName() + ".class";
             URL resource = clazz.getResource(name);
+            System.err.println("using active template source file from :"+resource);
+            
             classFile = new File(resource.toURI());
             //assuming a maven directory structure the needed source file should be found here
             return classFile.getPath()

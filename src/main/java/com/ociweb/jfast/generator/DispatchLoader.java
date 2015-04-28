@@ -86,7 +86,7 @@ public class DispatchLoader {
             int[] expectedHash = GeneratorData.hashCatBytes(catBytes);
             
             if (!Arrays.equals(catHash, expectedHash)) {
-            	log.trace("Catalog mistmatch, attempting source regeneration and recompile.");
+            	log.error("Catalog mistmatch, attempting source regeneration and recompile.");
                 //the templates catalog this was generated for does not match the current value so force a recompile
                 generatedClass = new FASTClassLoader(catBytes, parentClassLoader, FORCE_COMPILE).loadClass(type);
             }
@@ -94,7 +94,7 @@ public class DispatchLoader {
             
             return (T)generatedClass.getConstructor(catBytes.getClass()).newInstance(catBytes);
         } catch (Throwable t) {
-        	log.trace("Error in creating instance, attempting source regeneration and recompile.", t);
+        	log.error("Error in creating instance, attempting source regeneration and recompile.", t);
             //can not create instance because the class is no longer compatible with the rest of the code base so force a recompile
             Class generatedClass = new FASTClassLoader(catBytes, parentClassLoader, FORCE_COMPILE).loadClass(type);
             return (T)generatedClass.getConstructor(catBytes.getClass()).newInstance(catBytes);

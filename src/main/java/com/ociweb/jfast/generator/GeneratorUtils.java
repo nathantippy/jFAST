@@ -42,7 +42,7 @@ public class GeneratorUtils {
         target.append("public static int[] hashedCat = new int[]"+(Arrays.toString(generatorData.hashedCat).replace('[', '{').replace(']', '}'))+";\n"); //static constant
         target.append("\n");
         if (name.contains("Writer")) {
-        	target.append("public "+name+"(byte[] catBytes, "+RingBuffers.class.getSimpleName()+" ringBuffers) {super(new "+TemplateCatalogConfig.class.getSimpleName()+"(catBytes));}");//constructor 	
+        	target.append("public "+name+"(byte[] catBytes) {super(new "+TemplateCatalogConfig.class.getSimpleName()+"(catBytes));}");//constructor 	
         } else {
         	target.append("public "+name+"(byte[] catBytes, "+RingBuffers.class.getSimpleName()+" ringBuffers) {super(new "+TemplateCatalogConfig.class.getSimpleName()+"(catBytes),ringBuffers);}");//constructor       	
         }
@@ -147,13 +147,13 @@ public class GeneratorUtils {
 
         
         //if this is the beginning of a new template we use this special logic to pull the template id
-        String methodArgsDef;
+        String methodParaDef;
         String methodArgsCall;
         
         if (isReader) {
-        	methodArgsDef = primClass.getSimpleName()+" "+primVarName;
+        	methodParaDef = primClass.getSimpleName()+" "+primVarName;
         	methodArgsCall = primVarName;
-            builder.append("public final int "+entryMethodName+"("+methodArgsDef+") {\n");
+            builder.append("public final int "+entryMethodName+"("+methodParaDef+") {\n");
             builder.append("    if (activeScriptCursor<0) {\n");
             builder.append("        if (PrimitiveReader.isEOF("+primVarName+")) { \n");
             builder.append("            return -1;//end of file\n");
@@ -161,9 +161,9 @@ public class GeneratorUtils {
             builder.append("        beginMessage("+primVarName+",this);\n");
             builder.append("    }\n");
         } else {
-        	methodArgsDef = primClass.getSimpleName()+" "+primVarName+", "+RingBuffer.class.getSimpleName()+" rb";
+        	methodParaDef = primClass.getSimpleName()+" "+primVarName+", "+RingBuffer.class.getSimpleName()+" rb";
         	methodArgsCall = primVarName+", rb";
-            builder.append("public final void "+entryMethodName+"("+methodArgsDef+") {\n"); 
+            builder.append("public final void "+entryMethodName+"("+methodParaDef+") {\n"); 
             
             builder.append("fieldPos = 0;\n");
             builder.append("\n");
@@ -187,8 +187,9 @@ public class GeneratorUtils {
             builder.append("    "+RingBuffer.class.getSimpleName()+" rb="+RingBuffers.class.getSimpleName()+".get(ringBuffers,x);\n" ); 
             
 		    //TODO: B, simplify this to do less runtime work.
-			builder.append(" {int fragmentSize = rb.ringWalker.from.fragDataSize[x]+ rb.ringWalker.from.templateOffset + 1;\n\r")
+			builder.append(" {int fragmentSize = rb.ringWalker.from.fragDataSize[x];\n\r")
 			       .append("if (!RingBuffer.roomToLowLevelWrite(rb, fragmentSize)) {return 0;}\n\r")
+			       .append(" RingBuffer.confirmLowLevelWrite(rb, fragmentSize);")
 			       .append("}\n\r");
             
         }
@@ -211,12 +212,12 @@ public class GeneratorUtils {
         		
         	} else {
         		if (isReader) {
-        			methodArgsDef += ",RingBuffer rb";
+        			methodParaDef += ",RingBuffer rb";
         			methodArgsCall+= ",rb";
         		}
         		builder.append("dispatch"+Integer.toString(doneValues[0])+"_"+Integer.toString(doneValues[doneValues.length-1])+"("+methodArgsCall+");\n");        		
         		
-        		recursiveDispatchBuild(extraMethods, doneValues, doneCode, 0, doneValues.length-1, methodArgsDef, methodArgsCall);
+        		recursiveDispatchBuild(extraMethods, doneValues, doneCode, 0, doneValues.length-1, methodParaDef, methodArgsCall);
         	}        	
         	
         }
@@ -224,7 +225,7 @@ public class GeneratorUtils {
         
         if (isReader) {
             builder.append("    ").append(RingBuffer.class.getSimpleName()).append(".publishHeadPositions(rb);\n");
-            
+            builder.append("    ").append(RingBuffer.class.getSimpleName()).append(".publishAllBatchedWrites(rb);\n");
             builder.append("    return 1;//read a fragment\n"); 
         } 
         builder.append("}\n");

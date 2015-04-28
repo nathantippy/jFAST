@@ -45,6 +45,7 @@ import com.ociweb.jfast.stream.FASTDynamicWriter;
 import com.ociweb.jfast.stream.FASTEncoder;
 import com.ociweb.jfast.stream.FASTReaderReactor;
 import com.ociweb.jfast.util.Profile;
+import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
@@ -127,12 +128,14 @@ public class TemplateLoaderTest {
 
         FASTClassLoader.deleteFiles();
 
-        RingBuffer queue = new RingBuffer(new RingBufferConfig((byte)7, (byte)15, catalog.ringByteConstants(), catalog.getFROM()));
+        final FieldReferenceOffsetManager from = catalog.getFROM();
+        
+        RingBuffer queue = new RingBuffer(new RingBufferConfig((byte)7, (byte)15, catalog.ringByteConstants(), from));
 		RingBuffers buildNoFanRingBuffers = RingBuffers.buildNoFanRingBuffers(queue);
+		
 		FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, buildNoFanRingBuffers);
 
         Histogram stats = new Histogram(100000,13000000,1000000,100000000);
-
 
         System.err.println("using: "+readerDispatch.getClass().getSimpleName());
 
@@ -162,7 +165,7 @@ public class TemplateLoaderTest {
             reactor = new FASTReaderReactor(readerDispatch,reader);
             RingBuffer rb = reactor.ringBuffers()[0];
             rb.reset();
-           // RingBuffer.setPublishBatchSize(rb, 30);
+            RingBuffer.setPublishBatchSize(rb, 0);
 
             while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or if a fragment is read.
                 if (RingReader.tryReadFragment(rb)) {
@@ -241,12 +244,14 @@ public class TemplateLoaderTest {
                 }
                 while (FASTReaderReactor.pump(reactor)>=0) {
                     if (RingReader.tryReadFragment(rb)) {
-
+                      
+                        RingReader.releaseReadLock(rb);
                     };
                 }
                 //the buffer has extra records in it so we must clean them out here.
                 while (RingReader.tryReadFragment(rb)) {
-
+                    
+                    RingReader.releaseReadLock(rb);
                 }
 
                 duration = System.nanoTime() - start;
@@ -445,7 +450,7 @@ public class TemplateLoaderTest {
 
         //unusual case just for checking performance. Normally one could not pass the catalog.ringBuffer() in like this.
         //FASTEncoder writerDispatch = new FASTWriterInterpreterDispatch(catalog, readerDispatch.ringBuffers);
-        FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriterDebug(catBytes);
+        FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriter(catBytes);
         //System.err.println("using: "+writerDispatch.getClass().getSimpleName());
 
         FASTDynamicWriter dynamicWriter = new FASTDynamicWriter(writer, queue, writerDispatch);
@@ -577,6 +582,7 @@ public class TemplateLoaderTest {
         FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, RingBuffers.buildNoFanRingBuffers(new RingBuffer(new RingBufferConfig((byte)22, (byte)20, catalog.ringByteConstants(), catalog.getFROM()))));
         FASTReaderReactor reactor = new FASTReaderReactor(readerDispatch,reader);
 
+        System.err.println("usingReader: "+readerDispatch.getClass().getSimpleName());
 
         RingBuffer queue = RingBuffers.get(readerDispatch.ringBuffers,0);
 
@@ -591,7 +597,7 @@ public class TemplateLoaderTest {
          //FASTEncoder writerDispatch = new FASTWriterInterpreterDispatch(catalog, readerDispatch.ringBuffers);
          FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriter(catBytes);
 
-        System.err.println("using: "+writerDispatch.getClass().getSimpleName());
+        System.err.println("usingWriter: "+writerDispatch.getClass().getSimpleName());
 
         FASTDynamicWriter dynamicWriter = new FASTDynamicWriter(writer, queue, writerDispatch);
 
