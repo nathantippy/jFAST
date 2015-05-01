@@ -873,19 +873,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
 	                    }
                 	} else {
                 		// 1001??
-                		
-                		//template ref
-                		if (0 == (token & (OperatorMask.Group_Bit_Close << TokenBuilder.SHIFT_OPER))) {
-                			//TODO: A, write open template ref
-                			//push current position on the stack before we start processing this new location
-                			
-                		} else {
-                			//TODO: A, write close template ref
-                			//pop the old position back to continue on from where we left off
-                			
-                			
-                		}
-                		
+                	    
                 	}
 
                 } else {

@@ -371,7 +371,7 @@ public class CatalogGeneratorTest {
 	        assertEquals(0,writer.flushSkipsIdxLimit);
 	        
         } catch (Exception ex) {
-        	//TODO: the template ID appears to be missing for the new message!!
+        	
             System.err.println(catalogXML);
         	
             //dump exactly what was written
