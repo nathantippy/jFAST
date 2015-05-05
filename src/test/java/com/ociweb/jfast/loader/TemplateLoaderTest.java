@@ -624,7 +624,7 @@ public class TemplateLoaderTest {
             //read from reader and puts messages on the queue
             while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or a fragment is read
 
-            	assert(queue.byteWorkingTailPos.value<=queue.bytesHeadPos.get());
+            	assert(RingBuffer.bytesWorkingTailPosition(queue)<=RingBuffer.bytesHeadPosition(queue));
             	
             		//confirms full message to read on the queue            	
                     if (RingReader.tryReadFragment(queue)) {
@@ -635,7 +635,7 @@ public class TemplateLoaderTest {
                         	}
                             msgs.incrementAndGet();
                         }
-                        assert(queue.byteWorkingTailPos.value<=queue.bytesHeadPos.get());
+                        assert(RingBuffer.bytesWorkingTailPosition(queue)<=RingBuffer.bytesHeadPosition(queue));
                         try{
                         	//write message found on the queue to the output writer
                         	FASTDynamicWriter.write(dynamicWriter);

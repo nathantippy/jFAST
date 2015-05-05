@@ -477,7 +477,7 @@ public class CatalogGeneratorTest {
                         RingBuffer.addMsgIdx(ringBuffer, testMessageIdx);
                         int j = fieldCount;
                         while (--j>=0) {
-                            RingBuffer.addValues(ringBuffer.buffer, ringBuffer.mask, ringBuffer.workingHeadPos, exponent, ReaderWriterPrimitiveTest.unsignedLongData[--d]);
+                            RingBuffer.addDecimal(exponent, ReaderWriterPrimitiveTest.unsignedLongData[--d],ringBuffer);
                             if (0==d) {
                                 d = ReaderWriterPrimitiveTest.unsignedLongData.length;
                             }
