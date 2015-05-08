@@ -134,7 +134,6 @@ public final class FASTReaderReactor {
     }
 
     public static int pump(FASTReaderReactor reactor) {
-    	//System.err.println("  _______________________  FAST Decode (write to ring buffer )");
             return reactor.decoder.decode(reactor.reader);
     }
     

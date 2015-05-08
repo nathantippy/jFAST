@@ -203,7 +203,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
 
         TemplateCatalogConfig testCatalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null, 64, maxGroupCount * 10, -1, new ClientConfig());
 		RingBuffer rb = new RingBuffer(new RingBufferConfig((byte)15, (byte)7, testCatalog.ringByteConstants(), testCatalog.getFROM()));
-		fr = new FASTReaderInterpreterDispatch(testCatalog, RingBuffers.buildNoFanRingBuffers(rb));
+		fr = new FASTReaderInterpreterDispatch(testCatalog, RingBuffers.buildRingBuffers(rb.initBuffers()));
         
         long start = System.nanoTime();
         if (operationIters < 3) {

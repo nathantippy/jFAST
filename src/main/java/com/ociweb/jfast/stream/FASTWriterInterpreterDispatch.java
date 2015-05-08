@@ -852,7 +852,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                 		
 	                    // Group Type, no others defined so no need to keep checking
 	                    if (0 == (token & (OperatorMask.Group_Bit_Close << TokenBuilder.SHIFT_OPER))) {
-	x++;
+	                        x++;
 	                        boolean isTemplate = (0 != (token & (OperatorMask.Group_Bit_Templ << TokenBuilder.SHIFT_OPER)));
 	                        if (isTemplate) {
 	                        	

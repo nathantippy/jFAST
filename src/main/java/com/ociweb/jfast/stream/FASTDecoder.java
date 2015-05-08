@@ -36,7 +36,7 @@ public abstract class FASTDecoder{
         
     public FASTDecoder(TemplateCatalogConfig catalog) {
 		this(catalog, 
-             RingBuffers.buildNoFanRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM()))) );
+             RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()) );
         
     }
     

@@ -131,7 +131,7 @@ public class TemplateLoaderTest {
         final FieldReferenceOffsetManager from = catalog.getFROM();
         
         RingBuffer queue = new RingBuffer(new RingBufferConfig((byte)7, (byte)15, catalog.ringByteConstants(), from));
-		RingBuffers buildNoFanRingBuffers = RingBuffers.buildNoFanRingBuffers(queue);
+		RingBuffers buildNoFanRingBuffers = RingBuffers.buildRingBuffers(queue.initBuffers());
 		
 		FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, buildNoFanRingBuffers);
 
@@ -364,7 +364,7 @@ public class TemplateLoaderTest {
         final AtomicInteger msgs = new AtomicInteger();
 		ClientConfig r = catalog.clientConfig();
 
-        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, RingBuffers.buildNoFanRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())))); 
+        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers())); 
         
         assertEquals(1,reactor.ringBuffers().length);
         RingBuffer rb = reactor.ringBuffers()[0];
@@ -431,7 +431,7 @@ public class TemplateLoaderTest {
         PrimitiveReader reader = new PrimitiveReader(2048, fastInput, maxPMapCountInBytes);
 		ClientConfig r = catalog.clientConfig();
 
-        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, RingBuffers.buildNoFanRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM()))));
+        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
 
        // readerDispatch = new FASTReaderInterpreterDispatch(catBytes);//not using compiled code
 
@@ -477,7 +477,7 @@ public class TemplateLoaderTest {
             while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or a fragment is read
 
                     if (RingReader.tryReadFragment(queue)) {
-                        if (RingReader.isNewMessage(queue.ringWalker)) {
+                        if (RingReader.isNewMessage(queue)) {
                             msgs.incrementAndGet();   	
                         }
                         try{   
@@ -579,7 +579,7 @@ public class TemplateLoaderTest {
 
         PrimitiveReader reader = new PrimitiveReader(4096, fastInput, maxPMapCountInBytes);
 
-        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, RingBuffers.buildNoFanRingBuffers(new RingBuffer(new RingBufferConfig((byte)22, (byte)20, catalog.ringByteConstants(), catalog.getFROM()))));
+        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)22, (byte)20, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
         FASTReaderReactor reactor = new FASTReaderReactor(readerDispatch,reader);
 
         System.err.println("usingReader: "+readerDispatch.getClass().getSimpleName());
@@ -800,7 +800,7 @@ public class TemplateLoaderTest {
         final AtomicInteger msgs = new AtomicInteger();
 		ClientConfig r = catalog.clientConfig();
 
-        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, RingBuffers.buildNoFanRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM()))));
+        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
 
         assertEquals(1,reactor.ringBuffers().length);
         RingBuffer rb = reactor.ringBuffers()[0];

@@ -53,7 +53,7 @@ public class Complex30000Benchmark extends Benchmark {
 			ClientConfig r = catalog.clientConfig();
 			ClientConfig r1 = catalog.clientConfig();
             
-            reactor = FAST.inputReactor(fastInput, catBytes, RingBuffers.buildNoFanRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM()))));
+            reactor = FAST.inputReactor(fastInput, catBytes, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
                         
             queue = reactor.ringBuffers()[0];//RingBuffers.get(readerDispatch.ringBuffers,0);
 

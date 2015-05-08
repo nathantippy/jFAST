@@ -427,7 +427,7 @@ public class TemplateCatalogConfig {
     }
 
     public static RingBuffers buildRingBuffers(TemplateCatalogConfig catalog, byte primaryBits, byte secondaryBits) {
-		return RingBuffers.buildNoFanRingBuffers(new RingBuffer(new RingBufferConfig(primaryBits, secondaryBits, catalog.ringByteConstants(), catalog.getFROM())));
+		return RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig(primaryBits, secondaryBits, catalog.ringByteConstants(), catalog.getFROM())).initBuffers());
 	}
     
 	public static FieldReferenceOffsetManager createFieldReferenceOffsetManager(TemplateCatalogConfig config) {
