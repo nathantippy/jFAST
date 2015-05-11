@@ -31,7 +31,7 @@ public class stagePipelineTest {
     private final int iterations = 10; //TODO: AA, this seems to generate no data if iteration is 1
     private final long TIMEOUT_SECONDS = 4;
 
-    @Ignore
+    @Test
     public void roundTripTest() {
         
         String templatePath = "/performance/example.xml";  //TODO: AAA, Does not support the "creative" messages in the simpleExample.xml   
@@ -40,8 +40,8 @@ public class stagePipelineTest {
         FieldReferenceOffsetManager from = buildFROM(templatePath);        
         assertTrue(null!=from);
         
-        RingBufferConfig busConfig = new RingBufferConfig(from, 10, 127);
-        RingBufferConfig rawConfig = new RingBufferConfig(FieldReferenceOffsetManager.RAW_BYTES, 10, 512); 
+        RingBufferConfig busConfig = new RingBufferConfig(from, 20, 127);
+        RingBufferConfig rawConfig = new RingBufferConfig(FieldReferenceOffsetManager.RAW_BYTES, 20, 1024); 
         
         
         GraphManager gm = new GraphManager();

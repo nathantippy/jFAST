@@ -62,19 +62,18 @@ public class FASTEncodeStage extends PronghornStage {
         if (RingReader.tryReadFragment(input)) {
             
             //TODO: create debug statement here that can print fragment should be same code for new stack trace.
-            RingReader.printFragment(input);
+            //RingReader.printFragment(input);
+           
             
-            
-           FASTDynamicWriter.write(dynamicWriter);
-         //  RingBuffer.publishWrites(output);
-           //RingReader.releaseReadLock(input);
-        System.err.println(input);
-        }
+            FASTDynamicWriter.write(dynamicWriter);
+                    
+            RingReader.releaseReadLock(input);
+          //  System.err.println(input);
+        } 
     }
     
     @Override
-    public void shutdown() {
-         new Exception("shutodown called").printStackTrace();
+    public void shutdown() {         
     }
 
 }
