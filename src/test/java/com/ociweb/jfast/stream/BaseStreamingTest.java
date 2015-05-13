@@ -18,14 +18,10 @@ import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.util.LocalHeap;
 
 public abstract class BaseStreamingTest {
-
 	
-	private final float PCT_LIMIT = 200; //if avg is 200 pct above min then fail
-	private final float MAX_X_LIMIT = 40f;//if max is 20x larger than avg then fail
-	
-	protected int sampleSize           = 100000;
-	protected int warmup               = 10000;
-	protected int fields               = 100;
+	protected int sampleSize           = 10000;
+	protected int warmup               = 1000;
+	protected int fields               = 70;
 	
 	protected final int fieldsPerGroup = 10;
 	protected final int maxMPapBytes   = (int)Math.ceil(fieldsPerGroup/7d);
@@ -180,7 +176,7 @@ public abstract class BaseStreamingTest {
 			RingBuffer.writeTrailingCountOfBytesConsumed(ringBuffer, ringBuffer.workingHeadPos.value++); //increment because this is the low-level API calling
 
 	    	//single length field still needs to move this value up, so this is always done
-	    	ringBuffer.bytesWriteLastConsumedBytePos = ringBuffer.byteWorkingHeadPos.value;
+	    	ringBuffer.bytesWriteLastConsumedBytePos = RingBuffer.bytesWorkingHeadPosition(ringBuffer);
 	    	
 			g = fieldsPerGroup;
 			if (f>0 || i>0) {

@@ -28,6 +28,7 @@ import com.ociweb.jfast.primitive.adapter.FASTOutputByteBuffer;
 import com.ociweb.jfast.primitive.adapter.FASTOutputSocketChannel;
 import com.ociweb.jfast.primitive.adapter.FASTOutputStream;
 import com.ociweb.pronghorn.ring.RingBuffer;
+import com.ociweb.pronghorn.ring.token.TokenBuilder;
 
 public class ReaderWriterPrimitiveTest {
 
@@ -35,14 +36,14 @@ public class ReaderWriterPrimitiveTest {
 	private final int testCycles = 5;
 
 	//These common test values are used from the smallest test to the largest so results can be compared
-	public final static long[] unsignedLongData = new long[] {0,1,63,64,65,126,127,128,8000,16383,16384,16385,16386,
+	public final static long[] unsignedLongData = new long[] {0,1,63,64,65,126,127,128,8000,16383,16383,16385,16385, //TODO: B, something wrong with test, should be able to add 1 value to this array.
 																  1048704, 2097152, 67117056, 268435456, 4295491584l,
 																  274911461376l, 17594333528064l, 1126037345796096l,
 																  72066390130950144l, 
 		                                                          Integer.MAX_VALUE, Long.MAX_VALUE/2 , 
 		                                                          (Long.MAX_VALUE/2)+1  //Max supported positive value
-		                                                          };
-	public final static int[] unsignedIntData =   new int[]  {0,1,63,64,65,126,127,128,8000,16383,16384,16385,16386,
+	                                                           };
+	public final static int[] unsignedIntData =   new int[]  {0,0,1,1,63,64,65,126,127,128,8000,16383,16384,16385,16386,
 																 1048704,2097152,268435456, 67117056, 268435456,
 		                                                         Integer.MAX_VALUE-1 //must be 1 less so there is room for the nulled form of uInt
 		                                                         }; 

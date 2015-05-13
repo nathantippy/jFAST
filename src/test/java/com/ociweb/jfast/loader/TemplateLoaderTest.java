@@ -603,8 +603,8 @@ public class TemplateLoaderTest {
 
         System.gc();
 
-        int warmup = 20;// set much larger for profiler
-        int count = 512;
+        int warmup = 10;// set much larger for profiler
+        int count = 128;
 
 
         long wroteSize = 0;

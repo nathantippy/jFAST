@@ -109,7 +109,7 @@ import com.ociweb.pronghorn.ring.util.hash.IntHashTable;
 									             										       writeGenerator.generateFullSource(new StringBuilder()));
 					toCompile.add(sourceWriterFileObject);
                 }
-                System.err.println("Begin full compile of "+toCompile.size()+" files");
+                log.debug("Begin full compile of {} files",toCompile.size());
                 
                 if (exportSource) {
                 	for(JavaFileObject jfo:toCompile) {
@@ -127,7 +127,7 @@ import com.ociweb.pronghorn.ring.util.hash.IntHashTable;
                     byte[] classData = readClassBytes(classFile);
                     Class result =  defineClass(name, classData , 0, classData.length);
                     fullCompiled = true; //only set after success
-                    System.err.println("Finished full compile");
+                    log.debug("Finished full compile");
                     return result;
                 } else {
                     reportCompileError(diagnostics.getDiagnostics());      

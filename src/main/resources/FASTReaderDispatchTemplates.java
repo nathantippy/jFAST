@@ -131,7 +131,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     }
     
     protected void genReadTotalMessageBytesResetUsed(RingBuffer rbRingBuffer) { 
-    	rbRingBuffer.bytesWriteLastConsumedBytePos = rbRingBuffer.byteWorkingHeadPos.value;
+    	rbRingBuffer.bytesWriteLastConsumedBytePos = RingBuffer.bytesWorkingHeadPosition(rbRingBuffer);
     }
     
     
@@ -1629,13 +1629,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 RingBuffer.addBytePosAndLenSpecial(rbB, rbMask, rbPos, bytesBasePos, defIdx, defLen);
             } else {
-                int bytePos = rbRingBuffer.byteWorkingHeadPos.value;
+                int bytePos = RingBuffer.bytesWorkingHeadPosition(rbRingBuffer);                
                 int lenTemp = PrimitiveReader.readTextASCIIIntoRing(byteBuffer,
                                                                     bytePos, 
                                                                     byteMask,
                                                                     reader);
                 RingBuffer.addBytePosAndLenSpecial(rbB,rbMask,rbPos, bytesBasePos, bytePos, lenTemp);
-                rbRingBuffer.byteWorkingHeadPos.value = bytePos+lenTemp;                  
+
+                RingBuffer.addAndGetBytesWorkingHeadPosition(rbRingBuffer, lenTemp);      
             }
     }    
     
@@ -1749,7 +1750,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             int length = PrimitiveReader.readIntegerUnsigned(reader) - 1;
                 
             if (length<0) {
-                RingBuffer.addBytePosAndLenSpecial(rbB, rbMask, rbPos, bytesBasePos, rbRingBuffer.byteWorkingHeadPos.value, length);
+                RingBuffer.addBytePosAndLenSpecial(rbB, rbMask, rbPos, bytesBasePos, RingBuffer.bytesWorkingHeadPosition(rbRingBuffer), length);
                 return;
             }
             if (length>0) {        

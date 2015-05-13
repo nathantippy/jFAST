@@ -108,75 +108,99 @@ public class CatalogGeneratorTest {
     List<Integer> numericFieldTypes;
     List<Integer> numericFieldOperators;
     
+    List<String>  textCatalogXML;
     List<byte[]> textCatalogs;
     List<Integer> textFieldCounts;
     List<Integer> textFieldTypes;
     List<Integer> textFieldOperators;
     
+
+    int intDataIndex = ReaderWriterPrimitiveTest.unsignedIntData.length;
+    int longDataIndex = ReaderWriterPrimitiveTest.unsignedLongData.length;
+    int stringDataIndex = ReaderWriterPrimitiveTest.stringData.length;
     
     @Before
     public void buildCatalogs() {
-        
-    	numericCatalogXML = new ArrayList<String>();
-        numericCatalogs = new ArrayList<byte[]>();
-        numericFieldCounts = new ArrayList<Integer>();
-        numericFieldTypes = new ArrayList<Integer>();
-        numericFieldOperators = new ArrayList<Integer>();
-        
+        textCatalogXML = new ArrayList<String>();
         textCatalogs = new ArrayList<byte[]>();
         textFieldCounts = new ArrayList<Integer>();
         textFieldTypes = new ArrayList<Integer>();
         textFieldOperators = new ArrayList<Integer>();
         
+
+        buildNumericCatalogs();
+      
+        
+    }
+
+
+    private void buildNumericCatalogs() {
+        numericCatalogXML = new ArrayList<String>();
+        numericCatalogs = new ArrayList<byte[]>();
+        numericFieldCounts = new ArrayList<Integer>();
+        numericFieldTypes = new ArrayList<Integer>();
+        numericFieldOperators = new ArrayList<Integer>();
+        
+        
         String name = "testTemplate";
         
         boolean reset = false;
         String dictionary = null;
-        boolean fieldPresence = false;     
-        String fieldInitial = "10";        
-        int totalFields = 10;//400;//1024;  //at 4 bytes per int for 4K message size test                              
         
-        int p = numericOps.length;
-        while (--p>=0) {            
-            int fieldOperator = numericOps[p];            
-            int t = numericTypes.length;
-            while (--t>=0) {               
-                int fieldType = numericTypes[t];
-                int fieldCount = 1; 
-                while (fieldCount<totalFields) {     
-                	StringBuilder templateXML = new StringBuilder();
-                    byte[] catBytes = buildCatBytes(name, testTemplateId, reset, dictionary, fieldPresence, fieldInitial, fieldOperator, fieldType, fieldCount, templateXML);  
-                    
-                    
-                    TemplateCatalogConfig catalog = new TemplateCatalogConfig(catBytes);                    
-                    assertEquals(1, catalog.templatesCount());
-                    
-                    int expectedScriptLength = 2+fieldCount;
-                    if (fieldType == TypeMask.Decimal || fieldType == TypeMask.DecimalOptional) {
-                        expectedScriptLength +=fieldCount;
-                    }
-                    assertEquals(expectedScriptLength,catalog.getScriptTokens().length);
+        
+        
+        boolean fieldPresence = false;  
                 
-                    numericCatalogXML.add(templateXML.toString());
-                    numericCatalogs.add(catBytes);
-                    numericFieldCounts.add(new Integer(fieldCount));
-                    numericFieldTypes.add(new Integer(fieldType));
-                    numericFieldOperators.add(new Integer(fieldOperator));
+        do {
+        
+            String fieldInitial = "10";        
+            int totalFields = Math.max(ReaderWriterPrimitiveTest.unsignedLongData.length, ReaderWriterPrimitiveTest.unsignedIntData.length);                         
+           
+            assert(totalFields>2) : "need room for the presence toggle";
+            int p = numericOps.length;
+            while (--p>=0) {            
+                int fieldOperator = numericOps[p];            
+                int t = numericTypes.length;
+                while (--t>=0) {               
+                    int fieldType = numericTypes[t];
                     
-                    if (fieldCount<10) {
-                        fieldCount+=1;
-                    } else if (fieldCount<100) {
-                        fieldCount+=10;
-                    } else {
-                        fieldCount+=100;//by steps of 100, 
+                    //TODO: if type is decimal we need second loop for second operator.
+                    
+                    int fieldCount = 1; 
+                    while (fieldCount<totalFields) {     
+                        
+                    	StringBuilder templateXML = new StringBuilder();
+                        byte[] catBytes = buildCatBytes(name, testTemplateId, reset, dictionary, fieldPresence, fieldInitial, fieldOperator, fieldType, fieldCount, templateXML);  
+                                            
+                        TemplateCatalogConfig catalog = new TemplateCatalogConfig(catBytes);                    
+                        assertEquals(1, catalog.templatesCount());
+                        
+                        int expectedScriptLength = 2+fieldCount;
+                        if (fieldType == TypeMask.Decimal || fieldType == TypeMask.DecimalOptional) {
+                            expectedScriptLength +=fieldCount;
+                        }
+                        assertEquals(expectedScriptLength,catalog.getScriptTokens().length);
+                    
+                        numericCatalogXML.add(templateXML.toString());
+                        numericCatalogs.add(catBytes);
+                        numericFieldCounts.add(new Integer(fieldCount));
+                        numericFieldTypes.add(new Integer(fieldType));
+                        numericFieldOperators.add(new Integer(fieldOperator));
+                        
+                        if (fieldCount<4) {
+                            fieldCount+=1;
+                        } else if (fieldCount<100) {
+                            fieldCount+=11;
+                        } else {
+                            fieldCount+=111;
+                        }
                     }
-                }
-            }            
-        } 
-        
-        //cleanup now that our test data is built so it will not run later
-        System.gc();        
-        
+                }            
+            } 
+                    
+            fieldPresence = !fieldPresence;
+            
+        } while (fieldPresence);
     }
     
     
@@ -199,22 +223,24 @@ public class CatalogGeneratorTest {
             
     }
     
-//    @Test
-//    public void textFieldTest() {
-//        
-//        AtomicLong totalWrittenCount = new AtomicLong();
-//        int i = textCatalogs.size();
-//        System.out.println("testing "+i+" text configurations");
-//        while (--i>=0) {
-//            testEncoding(textFieldOperators.get(i).intValue(), 
-//            			 textFieldTypes.get(i).intValue(), 
-//            			 textFieldCounts.get(i).intValue(), 
-//            			 textCatalogs.get(i),
-//                         totalWrittenCount);
-//        }
-//        System.err.println("totalWritten:"+totalWrittenCount.longValue());
-//            
-//    }
+    @Test
+    public void textFieldTest() {
+        
+        AtomicLong totalWrittenCount = new AtomicLong();
+        int i = textCatalogs.size();
+        System.out.println("testing "+i+" text configurations");
+        while (--i>=0) {
+            testEncoding(textFieldOperators.get(i).intValue(), 
+            			 textFieldTypes.get(i).intValue(), 
+            			 textFieldCounts.get(i).intValue(), 
+            			 textCatalogs.get(i),
+                         totalWrittenCount,
+                         textCatalogXML.get(i),
+                         textCatalogs.size()-i);
+        }
+        System.err.println("totalWritten:"+totalWrittenCount.longValue());
+            
+    }
 
 
     int lastOp = -1;
@@ -236,23 +262,17 @@ public class CatalogGeneratorTest {
 		catalog.clientConfig();
 		RingBuffers ringBuffers= RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers());
                 
-        //FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriter(catBytes); //compiles new encoder         
         FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriterDebug(catBytes);
-        
 
-        boolean debug = false;
         if (operation!=lastOp) {
-            lastOp = operation;
-            
-            System.err.println(this.getClass()+" using "+writerDispatch.getClass().getSimpleName()+" testing "+OperatorMask.methodOperatorName[operation]);
+            lastOp = operation;            
+            System.err.println(this.getClass().getSimpleName()+" using "+writerDispatch.getClass().getSimpleName()+" testing "+OperatorMask.methodOperatorName[operation]);
             
         }
         
         if (type!=lastType) {
             lastType = type;
-            if (debug) {
-            	System.err.println("type:"+TypeMask.methodTypeName[type]+TypeMask.methodTypeSuffix[type]);  
-            }
+           	System.err.println("                                  type:"+TypeMask.methodTypeName[type]+TypeMask.methodTypeSuffix[type]);  
         }
 
         
@@ -275,74 +295,12 @@ public class CatalogGeneratorTest {
         
         //Use as bases for building single giant test file with test values provided, in ascii?
         totalWritten.addAndGet(PrimitiveWriter.totalWritten(writer));
-             
-        //TODO: D, write to flat file to produce google chart.
-       //System.err.println(TypeMask.xmlTypeName[fieldType]+" "+OperatorMask.xmlOperatorName[fieldOperator]+" fields: "+ fieldCount+" latency:"+nsLatency+"ns total mil per second "+millionPerSecond);
-        //System.err.println("bytes written:"+bytesWritten);
-        
-        //This visual check confirms that the write
-//        int limit = (int) Math.min(bytesWritten, 10);
-//        int q = 0;
-//        while (q<limit) {
-//        	//template pmap
-//        	//template id of zero
-//        	//data 0, 1 ,63, 64, 65
-//        	System.err.println(q+"   "+byteString(buffer[q]));
-//        	q++;
-//        	
-//        }
-        
-        //delta
-//        0   11000000   PMap we need template id
-//        1   10000010   The template id of 2
-//        2   00000111   int32 field1000 delta
-//        3   01111111   int32 field1000
-//        4   01111111   int32 field1000
-//        5   01111111   int32 field1000
-//        6   11110100   int32 field1000
-//        7   00000000   int32 field1001 delta
-//        8   01111111   int32 field1001
-//        9   01111111   int32 field1001
-        
-        //constant
-//        0   11000000   PMap we need template id
-//        1   10000010   The template id of 2
-//        2   11000000   PMap we need template id
-//        3   10000010   The template id of 2
-//        4   11000000
-//        5   10000010
-        
-        //none
-//        0   11000000  PMap we need template id
-//        1   10000010  The template id of 2
-//        2   00000111  int32 field1000 none
-//        3   01111111  int32 field1000
-//        4   01111111  int32 field1000
-//        5   01111111  int32 field1000
-//        6   11111110  int32 field1000
-//        7   00000001  int32 field1001 none
-//        8   00000000  int32 field1001
-//        9   00000000  int32 field1001
-        
-        //Default  with 9 defaults each needing pmap bit set to 1
-//        0   01111111  Top bit set for tempate, following 9 are for default fields
-//        1   11110000  end of pmap has trailing zeros
-//        2   10000010  The template id of 2
-//        3   00000111  int32 field1000 not default
-//        4   01111111  int32 field1000
-//        5   01111111  int32 field1000
-//        6   01111111  int32 field1000
-//        7   11111110  int32 field1000
-//        8   00000001  int32 field1001 not default
-//        9   00000000  int32 field1001
-        
-
         
         FASTInput fastInput = new FASTInputByteArray(buffer, (int)bytesWritten);
         
 
         FASTReaderReactor reactor = FAST.inputReactorDebug(fastInput, catBytes, ringBuffers);
-        //FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes);
+        //FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, ringBuffers);
         
 
         RingBuffer[] buffers = reactor.ringBuffers();
@@ -364,7 +322,6 @@ public class CatalogGeneratorTest {
 	        			j--;
 	        		}        		
 	        	}       	
-	//        	System.err.println("end of message "+ reactor.reader.position);
 	        }
 	        //confirm that the internal stacks have gone back down to zero
 	        assertEquals(0,writer.safetyStackDepth);
@@ -394,17 +351,13 @@ public class CatalogGeneratorTest {
 		return tmp.substring(tmp.length()-8, tmp.length());
 	}
 
-    //TODO: B, need to review all misconfigured error messages to ensure that they are helpful and point in the right direction.
-    
-
+	 
     private float timeEncoding(int fieldType, final int fieldCount, RingBuffer ringBuffer, FASTDynamicWriter dynamicWriter) {
-       
-//    	System.err.println("field Count:"+fieldCount);
-//    	FieldReferenceOffsetManager.printScript("timeEncoding", ringBuffer.consumerData.from);
-//    	System.err.println(Arrays.toString(ringBuffer.consumerData.from.fragScriptSize));
+
     	    	
+        boolean isOptional = 0!=(1&fieldType);
+        
     	int i = testRecordCount;
-        int d;
         switch(fieldType) {
             case TypeMask.IntegerUnsigned:
             case TypeMask.IntegerUnsignedOptional:
@@ -413,16 +366,17 @@ public class CatalogGeneratorTest {
                 {                 	
                     long start = System.nanoTime();
                     
-                    d = ReaderWriterPrimitiveTest.unsignedIntData.length;
                     while (--i>=0) {
                         RingBuffer.addMsgIdx(ringBuffer, testMessageIdx);
                         
                         int j = fieldCount;
                         while (--j>=0) {
-                            RingBuffer.setValue(ringBuffer.buffer,ringBuffer.mask,ringBuffer.workingHeadPos.value++,ReaderWriterPrimitiveTest.unsignedIntData[--d]);
+                            int value = ReaderWriterPrimitiveTest.unsignedIntData[--intDataIndex];
                             
-                            if (0 == d) {
-                                d = ReaderWriterPrimitiveTest.unsignedIntData.length;
+                            RingBuffer.setValue(ringBuffer.buffer,ringBuffer.mask,ringBuffer.workingHeadPos.value++,value);
+                            
+                            if (0 == intDataIndex) {
+                                intDataIndex = ReaderWriterPrimitiveTest.unsignedIntData.length;
                             }
                             
                         }
@@ -445,16 +399,17 @@ public class CatalogGeneratorTest {
                 { 
                     long start = System.nanoTime();
                     
-                    d = ReaderWriterPrimitiveTest.unsignedLongData.length;
                   
                     while (--i>=0) {
                     	RingBuffer.addMsgIdx(ringBuffer, testMessageIdx);
                     	 
                         int j = fieldCount;
                         while (--j>=0) {
-                            RingBuffer.addLongValue(ringBuffer.buffer, ringBuffer.mask, ringBuffer.workingHeadPos, ReaderWriterPrimitiveTest.unsignedLongData[--d]);
-                            if (0==d) {
-                                d = ReaderWriterPrimitiveTest.unsignedLongData.length;
+                            long value = ReaderWriterPrimitiveTest.unsignedLongData[--longDataIndex];
+                            
+                            RingBuffer.addLongValue(ringBuffer.buffer, ringBuffer.mask, ringBuffer.workingHeadPos, value);
+                            if (0==longDataIndex) {
+                                longDataIndex = ReaderWriterPrimitiveTest.unsignedLongData.length;
                             }
                         }
                         RingBuffer.publishWrites(ringBuffer);
@@ -471,15 +426,14 @@ public class CatalogGeneratorTest {
                     long start = System.nanoTime();
                     
                     int exponent = 2;
-                    d = ReaderWriterPrimitiveTest.unsignedLongData.length;
           
                     while (--i>=0) {
                         RingBuffer.addMsgIdx(ringBuffer, testMessageIdx);
                         int j = fieldCount;
                         while (--j>=0) {
-                            RingBuffer.addDecimal(exponent, ReaderWriterPrimitiveTest.unsignedLongData[--d],ringBuffer);
-                            if (0==d) {
-                                d = ReaderWriterPrimitiveTest.unsignedLongData.length;
+                            RingBuffer.addDecimal(exponent, ReaderWriterPrimitiveTest.unsignedLongData[--longDataIndex],ringBuffer);
+                            if (0==longDataIndex) {
+                                longDataIndex = ReaderWriterPrimitiveTest.unsignedLongData.length;
                             }
                         }
                         RingBuffer.publishWrites(ringBuffer);
@@ -498,17 +452,17 @@ public class CatalogGeneratorTest {
                     long start = System.nanoTime();
                     
                     int exponent = 2;
-                    d = ReaderWriterPrimitiveTest.stringData.length;
+                   
       
                     while (--i>=0) {
                         RingBuffer.addMsgIdx(ringBuffer, testMessageIdx);
                         int j = fieldCount;
                         while (--j>=0) {
                             //TODO: B, this test is not using UTF8 encoding for the UTF8 type mask!!!! this is only ASCII enoding always.
-                            byte[] source = ReaderWriterPrimitiveTest.stringDataBytes[--d];
+                            byte[] source = ReaderWriterPrimitiveTest.stringDataBytes[--stringDataIndex];
 							RingBuffer.addByteArray(source, 0, source.length, ringBuffer);
-                            if (0==d) {
-                                d = ReaderWriterPrimitiveTest.stringData.length;
+                            if (0==stringDataIndex) {
+                                stringDataIndex = ReaderWriterPrimitiveTest.stringData.length;
                             }
                         }
                         RingBuffer.publishWrites(ringBuffer);
@@ -540,7 +494,12 @@ public class CatalogGeneratorTest {
             String fieldName = "field"+fieldId;
             template.addField(fieldName, fieldId++, fieldPresence, fieldType, fieldOperator, fieldInitial);        
         }
-        
+       
+//        //This is for decimal and needs to cover all the permutations.
+//        while (--f>=0) {
+//            String fieldName = "field"+fieldId;
+//            template.addField(fieldName, fieldId++, fieldPresence, fieldType, fieldOperator, fieldOperator, fieldInitial, fieldInitial);        
+//        }
         
 		try {
 			builder = (StringBuilder) cg.appendTo("", builder);

@@ -181,8 +181,6 @@ public class ThreadingTest {
     
     private double multiThreadedExample(FASTDecoder readerDispatch, final AtomicInteger msgs, final FASTReaderReactor reactor, PrimitiveReader reader) {
 
-    //    System.err.println("*************************************************************** multi test instance begin ");
-        
         RingBuffer[] buffers = RingBuffers.buffers(readerDispatch.ringBuffers);
                 
         int reactors = 1;

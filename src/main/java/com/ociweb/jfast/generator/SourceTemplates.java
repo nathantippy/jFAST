@@ -12,6 +12,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ociweb.jfast.error.FASTException;
 import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
 import com.ociweb.pronghorn.ring.util.hash.IntHashTable;
@@ -24,6 +27,7 @@ public class SourceTemplates {
     
     //5 bits for type 5 bits for operators 3 bits for extra space
     IntHashTable cacheOfIdx = new IntHashTable(13);
+    private static Logger log = LoggerFactory.getLogger(SourceTemplates.class);
     
     public SourceTemplates(Class clazz) {
         this.clazz = clazz;
@@ -60,7 +64,7 @@ public class SourceTemplates {
         final String sourceFile = "/"+clazz.getSimpleName()+".java";        
         InputStream inputStream = SourceTemplates.class.getResourceAsStream(sourceFile);
         if (null!=inputStream) {
-            System.err.println("using template source resourceAsStream from "+sourceFile);
+            log.debug("using template source resourceAsStream from {}",sourceFile);
             int v;
             StringBuilder builder = new StringBuilder();
             try {
