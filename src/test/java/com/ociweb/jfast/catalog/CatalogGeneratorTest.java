@@ -128,7 +128,7 @@ public class CatalogGeneratorTest {
         textFieldOperators = new ArrayList<Integer>();
         
 
-        buildNumericCatalogs();
+       
       
         
     }
@@ -149,6 +149,7 @@ public class CatalogGeneratorTest {
         
         
         
+        StringBuilder templateXML = new StringBuilder();
         boolean fieldPresence = false;  
                 
         do {
@@ -164,37 +165,23 @@ public class CatalogGeneratorTest {
                 while (--t>=0) {               
                     int fieldType = numericTypes[t];
                     
-                    //TODO: if type is decimal we need second loop for second operator.
-                    
-                    int fieldCount = 1; 
-                    while (fieldCount<totalFields) {     
-                        
-                    	StringBuilder templateXML = new StringBuilder();
-                        byte[] catBytes = buildCatBytes(name, testTemplateId, reset, dictionary, fieldPresence, fieldInitial, fieldOperator, fieldType, fieldCount, templateXML);  
-                                            
-                        TemplateCatalogConfig catalog = new TemplateCatalogConfig(catBytes);                    
-                        assertEquals(1, catalog.templatesCount());
-                        
-                        int expectedScriptLength = 2+fieldCount;
-                        if (fieldType == TypeMask.Decimal || fieldType == TypeMask.DecimalOptional) {
-                            expectedScriptLength +=fieldCount;
+                    if (fieldType == TypeMask.Decimal || fieldType == TypeMask.DecimalOptional) {
+                        //must try all the second operators with the first for all the decimal combinations.
+                        int o2 = numericOps.length;
+                        while (--o2>=0) {    
+                            int fieldOperator2 = numericOps[o2];      
+                            buildAllCatalogsForTypeAndOperation(name, reset,
+                                    dictionary, templateXML, fieldPresence,
+                                    fieldInitial, totalFields, fieldOperator, fieldOperator2, fieldType);
                         }
-                        assertEquals(expectedScriptLength,catalog.getScriptTokens().length);
-                    
-                        numericCatalogXML.add(templateXML.toString());
-                        numericCatalogs.add(catBytes);
-                        numericFieldCounts.add(new Integer(fieldCount));
-                        numericFieldTypes.add(new Integer(fieldType));
-                        numericFieldOperators.add(new Integer(fieldOperator));
                         
-                        if (fieldCount<4) {
-                            fieldCount+=1;
-                        } else if (fieldCount<100) {
-                            fieldCount+=11;
-                        } else {
-                            fieldCount+=111;
-                        }
+                    } else {
+                        //for simple case where field only has 1 operator
+                        buildAllCatalogsForTypeAndOperation(name, reset,
+                                dictionary, templateXML, fieldPresence,
+                                fieldInitial, totalFields, fieldOperator, fieldType);
                     }
+
                 }            
             } 
                     
@@ -202,10 +189,99 @@ public class CatalogGeneratorTest {
             
         } while (fieldPresence);
     }
+
+
+    private void buildAllCatalogsForTypeAndOperation(String name,
+            boolean reset, String dictionary, StringBuilder templateXML,
+            boolean fieldPresence, String fieldInitial, int totalFields, int fieldOperator, int fieldType) {
+            
+            int fieldCount = 1; 
+            while (fieldCount<totalFields) {     
+            	templateXML.setLength(0);
+                int f = fieldCount;
+                CatalogGenerator cg = new CatalogGenerator();
+                TemplateGenerator template = cg.addTemplate(name, testTemplateId, reset, dictionary);            
+                
+                int fieldId = 1000;
+                while (--f>=0) {
+                    String fieldName = "field"+fieldId;
+                    template.addField(fieldName, fieldId++, fieldPresence, fieldType, fieldOperator, fieldInitial);        
+                }
+                int expectedScriptLength = 2+fieldCount;
+                assertTrue(fieldType != TypeMask.Decimal && fieldType != TypeMask.DecimalOptional);
+                                
+                populateNumericTestData(fieldOperator, fieldType,
+                                        fieldCount, templateXML, cg,
+                                        expectedScriptLength);
+                
+                if (fieldCount<4) {
+                    fieldCount+=1;
+                } else if (fieldCount<100) {
+                    fieldCount+=11;
+                } else {
+                    fieldCount+=111;
+                }
+            }
+            
+    }
+
+    private void buildAllCatalogsForTypeAndOperation(String name,
+            boolean reset, String dictionary, StringBuilder templateXML,
+            boolean fieldPresence, String fieldInitial, int totalFields, int fieldOperator1, int fieldOperator2, int fieldType) {
+            
+            int fieldCount = 1; 
+            while (fieldCount<totalFields) {     
+                templateXML.setLength(0);
+                int f = fieldCount;
+                CatalogGenerator cg = new CatalogGenerator();
+                TemplateGenerator template = cg.addTemplate(name, testTemplateId, reset, dictionary);            
+                
+                int fieldId = 1000;
+                while (--f>=0) {
+                    String fieldName = "field"+fieldId;
+                    template.addField(fieldName, fieldId++, fieldPresence, fieldType, fieldOperator1, fieldOperator2, fieldInitial, fieldInitial);        
+                }
+                int expectedScriptLength = 2+fieldCount;
+                expectedScriptLength +=fieldCount;
+                assertTrue(fieldType == TypeMask.Decimal || fieldType == TypeMask.DecimalOptional);
+                
+                populateNumericTestData(fieldOperator1, fieldType,
+                                        fieldCount, templateXML, cg,
+                                        expectedScriptLength);
+                
+                if (fieldCount<4) {
+                    fieldCount+=1;
+                } else if (fieldCount<100) {
+                    fieldCount+=11;
+                } else {
+                    fieldCount+=111;
+                }
+            }
+            
+    }
+    
+
+    private void populateNumericTestData(int fieldOperator, int fieldType,
+            int fieldCount, StringBuilder templateXML, CatalogGenerator cg,
+            int expectedScriptLength) {
+        byte[] catBytes = buildCatBytes(templateXML, cg);  
+                            
+        TemplateCatalogConfig catalog = new TemplateCatalogConfig(catBytes);                    
+        assertEquals(1, catalog.templatesCount());
+        
+        assertEquals(expectedScriptLength,catalog.getScriptTokens().length);
+               
+        numericCatalogXML.add(templateXML.toString());
+        numericCatalogs.add(catBytes);
+        numericFieldCounts.add(new Integer(fieldCount));
+        numericFieldTypes.add(new Integer(fieldType));
+        numericFieldOperators.add(new Integer(fieldOperator));
+    }
     
     
     @Test
     public void numericFieldTest() {
+        buildNumericCatalogs();
         
         AtomicLong totalWrittenCount = new AtomicLong();
         int i = numericCatalogs.size();
@@ -262,7 +338,8 @@ public class CatalogGeneratorTest {
 		catalog.clientConfig();
 		RingBuffers ringBuffers= RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers());
                 
-        FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriterDebug(catBytes);
+        FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriter(catBytes);
+        //FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriterDebug(catBytes);
 
         if (operation!=lastOp) {
             lastOp = operation;            
@@ -482,26 +559,8 @@ public class CatalogGeneratorTest {
 
 
 
-    private byte[] buildCatBytes(String name, int id, boolean reset, String dictionary, boolean fieldPresence,
-            String fieldInitial, int fieldOperator, int fieldType, int f, StringBuilder builder) {
-        
-        int fieldId = 1000;
-        
-        CatalogGenerator cg = new CatalogGenerator();
-        TemplateGenerator template = cg.addTemplate(name, id, reset, dictionary);            
-        
-        while (--f>=0) {
-            String fieldName = "field"+fieldId;
-            template.addField(fieldName, fieldId++, fieldPresence, fieldType, fieldOperator, fieldInitial);        
-        }
-       
-//        //This is for decimal and needs to cover all the permutations.
-//        while (--f>=0) {
-//            String fieldName = "field"+fieldId;
-//            template.addField(fieldName, fieldId++, fieldPresence, fieldType, fieldOperator, fieldOperator, fieldInitial, fieldInitial);        
-//        }
-        
-		try {
+    private byte[] buildCatBytes(StringBuilder builder, CatalogGenerator cg) {
+        try {
 			builder = (StringBuilder) cg.appendTo("", builder);
 			boolean debug = false;
 			if (debug) {
@@ -514,8 +573,7 @@ public class CatalogGeneratorTest {
 			return catBytes;
 		} catch (IOException e) {
 			throw new FASTException(e);
-		}        
-   
+		}
     }
 
 
