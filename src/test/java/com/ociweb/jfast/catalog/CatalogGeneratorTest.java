@@ -338,8 +338,8 @@ public class CatalogGeneratorTest {
 		catalog.clientConfig();
 		RingBuffers ringBuffers= RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers());
                 
-        FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriter(catBytes);
-        //FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriterDebug(catBytes);
+       // FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriter(catBytes);
+        FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriterDebug(catBytes);
 
         if (operation!=lastOp) {
             lastOp = operation;            
@@ -565,11 +565,10 @@ public class CatalogGeneratorTest {
 			boolean debug = false;
 			if (debug) {
 				System.err.println(builder);
-			}
-			
+			}			
 			
 			ClientConfig clientConfig = new ClientConfig();  //keep bits small or the test will take a very long time to run.              
-			byte[] catBytes = convertTemplateToCatBytes(builder, clientConfig);
+			byte[] catBytes = TemplateLoader.buildCatBytes(new ByteArrayInputStream(builder.toString().getBytes(StandardCharsets.UTF_8)), clientConfig);
 			return catBytes;
 		} catch (IOException e) {
 			throw new FASTException(e);
@@ -578,32 +577,6 @@ public class CatalogGeneratorTest {
 
 
 
-    public static byte[] convertTemplateToCatBytes(StringBuilder builder, ClientConfig clientConfig) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            GZIPOutputStream gZipOutputStream = new GZIPOutputStream(baos);
-            FASTOutput output = new FASTOutputStream(gZipOutputStream);
-            
-            SAXParserFactory spfac = SAXParserFactory.newInstance();
-            SAXParser sp = spfac.newSAXParser();
-            InputStream stream = new ByteArrayInputStream(builder.toString().getBytes(StandardCharsets.UTF_8));           
-            
-            TemplateHandler handler = new TemplateHandler();            
-            sp.parse(stream, handler);
-    
-            PrimitiveWriter writer = new PrimitiveWriter(4096, output, false);
-            TemplateCatalogConfig.writeTemplateCatalog(handler, clientConfig.getBytesGap(), clientConfig.getBytesLength(), writer, clientConfig);
-            gZipOutputStream.close();            
-            
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        byte[] catBytes = baos.toByteArray();
-        return catBytes;
-    }
-    
-    
-    
     public static byte[] buildRawCatalogData(ClientConfig clientConfig) {
         //this example uses the preamble feature
         clientConfig.setPreableBytes((short)4);
