@@ -333,6 +333,16 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         RingBuffer.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? constAbsent : constConst));
     }
 
+//        {
+//            long value = PrimitiveReader.readLongSigned(reader);
+//            if (0 == value) {
+//                rLongDictionary[target] = 0;// set to absent
+//                RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);
+//            } else {
+//                long tmpLng = rLongDictionary[target] = (rLongDictionary[source] + (-1 + (value + (value >>> 63))));
+//                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+//            }
+//        }
     protected void genReadIntegerUnsignedDeltaOptional(int target, int source, int constAbsent, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             long value = PrimitiveReader.readLongSigned(reader);
@@ -343,9 +353,11 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
 
             } else {
                 //
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + ((value-1)+((value-1)>>63))));    
+                RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 63)))));    
             }
         }
+        
+        
     }
 
     protected void genReadIntegerUnsignedOptional(int constAbsent, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
@@ -465,7 +477,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadIntegerSignedConstantOptional(int constAbsent, int constConst, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         RingBuffer.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? constAbsent : constConst));
     }
-    
+
     protected void genReadIntegerSignedDeltaOptional(int target, int source, int constAbsent, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             long value = PrimitiveReader.readLongSigned(reader);
@@ -476,6 +488,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
                 RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] +  (-1 + (value + (value >>> 63))) ));  
             }
         }
+        
     }
 
     
@@ -662,7 +675,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     
     //increment
     
-    protected void genReadDecimalDefaultOptionalMantissaIncrement(int constAbsent, int constDefault, int mantissaTarget, int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalDefaultOptionalMantissaIncrement(int constAbsent, int constDefault, int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
@@ -682,7 +695,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
     
-    protected void genReadDecimalIncrementOptionalMantissaIncrement(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalIncrementOptionalMantissaIncrement(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 if (0==rIntDictionary[target]) {
@@ -712,7 +725,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
     
-    protected void genReadDecimalCopyOptionalMantissaIncrement(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalCopyOptionalMantissaIncrement(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             
             int xi1 = rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] :  PrimitiveReader.readIntegerSigned(reader));
@@ -730,7 +743,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
     
-    protected void genReadDecimalConstantOptionalMantissaIncrement(int constAbsent, int constConst, int mantissaTarget, int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalConstantOptionalMantissaIncrement(int constAbsent, int constConst, int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
 
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
@@ -744,7 +757,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             }
 
     }
-    protected void genReadDecimalDeltaOptionalMantissaIncrement(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalDeltaOptionalMantissaIncrement(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0==value) {
@@ -762,7 +775,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
     
-    protected void genReadDecimalOptionalMantissaIncrement(int constAbsent, int mantissaTarget, int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalOptionalMantissaIncrement(int constAbsent, int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             int value = PrimitiveReader.readIntegerSigned(reader);
             if (0==value) {
@@ -781,7 +794,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     
     //copy
     
-    protected void genReadDecimalDefaultOptionalMantissaCopy(int constAbsent, int constDefault, int mantissaTarget, int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalDefaultOptionalMantissaCopy(int constAbsent, int constDefault, int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {            
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
@@ -802,7 +815,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
     
-    protected void genReadDecimalIncrementOptionalMantissaCopy(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalIncrementOptionalMantissaCopy(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             
             if (0 == PrimitiveReader.readPMapBit(reader)) {
@@ -837,7 +850,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
          
     }
     
-    protected void genReadDecimalCopyOptionalMantissaCopy(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalCopyOptionalMantissaCopy(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             int xi1 = rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] :  PrimitiveReader.readIntegerSigned(reader));
             if (0==xi1) {
@@ -854,7 +867,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
     
-    protected void genReadDecimalConstantOptionalMantissaCopy(int constAbsent, int constConst, int mantissaTarget, int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalConstantOptionalMantissaCopy(int constAbsent, int constConst, int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
 
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
@@ -868,7 +881,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             }             
 
     }
-    protected void genReadDecimalDeltaOptionalMantissaCopy(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalDeltaOptionalMantissaCopy(int target, int source, int constAbsent, int mantissaTarget, int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0==value) {
@@ -886,7 +899,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
     
-    protected void genReadDecimalOptionalMantissaCopy(int constAbsent, int mantissaTarget, int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+    protected void genReadDecimalOptionalMantissaCopy(int constAbsent, int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             
             int value = PrimitiveReader.readIntegerSigned(reader);
@@ -1403,16 +1416,6 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             
         }
     }
-    //branched version
-//            long value = PrimitiveReader.readLongUnsigned(reader);
-//            if (0==value) {
-//                FASTRingBuffer.addValue(rbB,rbMask,rbPos, (int) (constAbsent >>> 32)); 
-//                FASTRingBuffer.addValue(rbB,rbMask,rbPos, (int) (constAbsent & 0xFFFFFFFF));
-//            } else {
-//                long tmpLng = value-1;
-//                FASTRingBuffer.addValue(rbB,rbMask,rbPos, (int) (tmpLng >>> 32)); 
-//                FASTRingBuffer.addValue(rbB,rbMask,rbPos, (int) (tmpLng & 0xFFFFFFFF));
-//            }
 
     protected void genReadLongSignedDefault(long constDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         if (0 == PrimitiveReader.readPMapBit(reader)) {
@@ -1468,12 +1471,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             RingBuffer.addLongValue(rbB,rbMask,rbPos, constDefault);
         } else {
             long value = PrimitiveReader.readLongSigned(reader);
-            if (0==value) {
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);
-            } else {
-                long tmpLng = (-1 + (value + (value >>> 31)));
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
-            }
+            RingBuffer.addLongValue(rbB,rbMask,rbPos, value == 0 ? constAbsent : (-1 + (value + (value >>> 63))));
         }
     }
 
@@ -1705,7 +1703,6 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             } else {
                 trim--;
                 int utfLength = PrimitiveReader.readIntegerUnsigned(reader);
-                // append to tail
                 PrimitiveReader.readByteData(LocalHeap.rawAccess(byteHeap), LocalHeap.makeSpaceForAppend(target,trim,utfLength,byteHeap), utfLength, reader);
             }
             int len = LocalHeap.valueLength(target,byteHeap);

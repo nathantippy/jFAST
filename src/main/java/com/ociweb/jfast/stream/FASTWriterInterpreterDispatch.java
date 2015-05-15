@@ -588,7 +588,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                                                                 // all the work.
                 // copy
                 assert (TokenBuilder.isOpperator(token, OperatorMask.Field_Copy)) : "Found "
-                        + TokenBuilder.tokenToString(token);
+                        + TokenBuilder.tokenToString(token) +" but this is NOT supported.";
                 
                 //genWriteTextCopy(idx, fieldPos, writer, byteHeap, rbRingBuffer);
                 genWriteTextCopyOptional(idx, fieldPos, writer, byteHeap, rbRingBuffer);
@@ -1068,7 +1068,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                             genWriteDecimalConstantOptionalNone(exponentValueOfNull, mantissaTarget, rbPos, writer, rbRingBuffer, rLongDictionary, this);
                         } else {
                             // constant delta
-                            genWriteDecimalConstantOptionalDelta(exponentValueOfNull, mantissaSource, mantissaTarget, rbPos, writer, rbRingBuffer, rLongDictionary, this);
+                            genWriteDecimalConstantOptionalDelta(exponentValueOfNull, mantissaSource, mantissaTarget, rbPos, writer, rbRingBuffer, rLongDictionary, rLongDictionary, this);
                         }
                     } else {
                         // constant constant
@@ -1109,7 +1109,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                                 genWriteDecimalCopyOptionalNone(exponentTarget, exponentSource, mantissaTarget, exponentValueOfNull, rbPos, writer, rIntDictionary, rbRingBuffer, rLongDictionary, this);
                             } else {
                                 // copy delta
-                                genWriteDecimalCopyOptionalDelta(exponentTarget, exponentSource, mantissaSource, mantissaTarget, exponentValueOfNull, rbPos, writer, rIntDictionary, rbRingBuffer, rLongDictionary, this);
+                                genWriteDecimalCopyOptionalDelta(exponentTarget, exponentSource, mantissaSource, mantissaTarget, exponentValueOfNull, rbPos, writer, rLongDictionary, rIntDictionary, rbRingBuffer, rLongDictionary, this);
                             }
                         } else {
                             // copy constant

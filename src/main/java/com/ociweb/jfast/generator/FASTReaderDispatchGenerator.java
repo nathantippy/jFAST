@@ -602,8 +602,8 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalDefaultOptionalMantissaIncrement(int constAbsent, int constDefault,
-            int mantissaTarget, int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader,
-            PaddedLong rbPos) {
+            int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask,
+            PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, constAbsent, constDefault, mantissaTarget, mantissaSource);
     }
@@ -611,8 +611,8 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalIncrementOptionalMantissaIncrement(int target, int source, int constAbsent,
-            int mantissaTarget, int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask,
-            PrimitiveReader reader, PaddedLong rbPos) {
+            int mantissaTarget, int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB,
+            int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, target, source, constAbsent, mantissaTarget, mantissaSource);
     }
@@ -620,8 +620,8 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalCopyOptionalMantissaIncrement(int target, int source, int constAbsent,
-            int mantissaTarget, int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask,
-            PrimitiveReader reader, PaddedLong rbPos) {
+            int mantissaTarget, int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB,
+            int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, target, source, constAbsent, mantissaTarget, mantissaSource);
     }
@@ -629,7 +629,7 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalConstantOptionalMantissaIncrement(int constAbsent, int constConst, int mantissaTarget,
-            int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+            int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, constAbsent, constConst, mantissaTarget, mantissaSource);
     }
@@ -637,8 +637,8 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalDeltaOptionalMantissaIncrement(int target, int source, int constAbsent,
-            int mantissaTarget, int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask,
-            PrimitiveReader reader, PaddedLong rbPos) {
+            int mantissaTarget, int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB,
+            int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, target, source, constAbsent, mantissaTarget, mantissaSource);
     }
@@ -646,7 +646,7 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalOptionalMantissaIncrement(int constAbsent, int mantissaTarget, int mantissaSource,
-            int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+            long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, constAbsent, mantissaTarget, mantissaSource);
     }
@@ -654,7 +654,7 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalDefaultOptionalMantissaCopy(int constAbsent, int constDefault, int mantissaTarget,
-            int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+            int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, constAbsent, constDefault, mantissaTarget, mantissaSource);
     }
@@ -662,8 +662,8 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalIncrementOptionalMantissaCopy(int target, int source, int constAbsent,
-            int mantissaTarget, int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask,
-            PrimitiveReader reader, PaddedLong rbPos) {
+            int mantissaTarget, int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB,
+            int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, target, source, constAbsent, mantissaTarget, mantissaSource);
     }
@@ -671,8 +671,8 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalCopyOptionalMantissaCopy(int target, int source, int constAbsent, int mantissaTarget,
-            int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader,
-            PaddedLong rbPos) {
+            int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB, int rbMask,
+            PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, target, source, constAbsent, mantissaTarget, mantissaSource);
     }
@@ -680,7 +680,7 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalConstantOptionalMantissaCopy(int constAbsent, int constConst, int mantissaTarget,
-            int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+            int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, constAbsent, constConst, mantissaTarget, mantissaSource);
     }
@@ -688,8 +688,8 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalDeltaOptionalMantissaCopy(int target, int source, int constAbsent, int mantissaTarget,
-            int mantissaSource, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader,
-            PaddedLong rbPos) {
+            int mantissaSource, int[] rIntDictionary, long[] rLongDictionary, int[] rbB, int rbMask,
+            PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, target, source, constAbsent, mantissaTarget, mantissaSource);
     }
@@ -697,7 +697,7 @@ public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
     @Override
     protected void genReadDecimalOptionalMantissaCopy(int constAbsent, int mantissaTarget, int mantissaSource,
-            int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
+            long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         
         GeneratorUtils.generator(new Exception().getStackTrace(),generatorData, this, constAbsent, mantissaTarget, mantissaSource);
     }

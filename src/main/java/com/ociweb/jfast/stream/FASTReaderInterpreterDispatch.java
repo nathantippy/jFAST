@@ -401,10 +401,10 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalDefaultOptionalMantissaCopy(expoConstAbsent, expoConstDefault, mantissaTarget, mantissaSource, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalDefaultOptionalMantissaCopy(expoConstAbsent, expoConstDefault, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 } else {
                     // increment
-                    genReadDecimalDefaultOptionalMantissaIncrement(expoConstAbsent, expoConstDefault, mantissaTarget, mantissaSource, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalDefaultOptionalMantissaIncrement(expoConstAbsent, expoConstDefault, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 }
             } else {
 
@@ -446,10 +446,10 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalIncrementOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalIncrementOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 } else {
                     // increment
-                    genReadDecimalIncrementOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalIncrementOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 }
             } else {
 
@@ -493,10 +493,10 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalCopyOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalCopyOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 } else {
                     // increment
-                    genReadDecimalCopyOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalCopyOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 }
             } else {
 
@@ -536,10 +536,10 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalConstantOptionalMantissaCopy(expoConstAbsent, expoConstConst, mantissaTarget, mantissaSource, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalConstantOptionalMantissaCopy(expoConstAbsent, expoConstConst, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 } else {
                     // increment
-                    genReadDecimalConstantOptionalMantissaIncrement(expoConstAbsent, expoConstConst, mantissaTarget, mantissaSource, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalConstantOptionalMantissaIncrement(expoConstAbsent, expoConstConst, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 }
             } else {
 
@@ -580,10 +580,10 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalDeltaOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalDeltaOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 } else {
                     // increment
-                    genReadDecimalDeltaOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalDeltaOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 }
             } else {
 
@@ -623,10 +623,10 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalOptionalMantissaCopy(expoConstAbsent, mantissaTarget, mantissaSource, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalOptionalMantissaCopy(expoConstAbsent, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 } else {
                     // increment
-                    genReadDecimalOptionalMantissaIncrement(expoConstAbsent, mantissaTarget, mantissaSource, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
+                    genReadDecimalOptionalMantissaIncrement(expoConstAbsent, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, rbRingBuffer.workingHeadPos);
                 }
             } else {
 
