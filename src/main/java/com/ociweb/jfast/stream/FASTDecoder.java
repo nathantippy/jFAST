@@ -5,7 +5,7 @@ import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
+import com.ociweb.pronghorn.ring.schema.loader.DictionaryFactory;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.util.LocalHeap;
 import com.ociweb.pronghorn.ring.util.hash.LongHashTable;

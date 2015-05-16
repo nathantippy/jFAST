@@ -24,7 +24,7 @@ import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.loader.DictionaryFactory;
+import com.ociweb.pronghorn.ring.schema.loader.DictionaryFactory;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;

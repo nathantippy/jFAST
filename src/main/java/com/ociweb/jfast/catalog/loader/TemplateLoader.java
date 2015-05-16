@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 import com.ociweb.jfast.primitive.FASTOutput;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTOutputStream;
-import com.ociweb.pronghorn.ring.loader.TemplateHandler;
+import com.ociweb.pronghorn.ring.schema.loader.TemplateHandler;
 
 public class TemplateLoader {
 

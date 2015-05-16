@@ -16,8 +16,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.ociweb.jfast.FAST;
-import com.ociweb.jfast.catalog.generator.CatalogGenerator;
-import com.ociweb.jfast.catalog.generator.TemplateGenerator;
 import com.ociweb.jfast.catalog.loader.ClientConfig;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.catalog.loader.TemplateLoader;
@@ -39,6 +37,8 @@ import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
 import com.ociweb.pronghorn.ring.RingReader;
 import com.ociweb.pronghorn.ring.RingWalker;
+import com.ociweb.pronghorn.ring.schema.generator.CatalogGenerator;
+import com.ociweb.pronghorn.ring.schema.generator.TemplateGenerator;
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
 import com.ociweb.pronghorn.ring.token.TypeMask;
