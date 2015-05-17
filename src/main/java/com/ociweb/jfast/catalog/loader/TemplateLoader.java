@@ -23,6 +23,7 @@ import org.xml.sax.SAXException;
 import com.ociweb.jfast.primitive.FASTOutput;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTOutputStream;
+import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.schema.loader.TemplateHandler;
 
 public class TemplateLoader {
@@ -75,7 +76,7 @@ public class TemplateLoader {
         }
     }
 
-    public static void buildCatalog(OutputStream outputStream, String source, ClientConfig clientConfig) throws ParserConfigurationException,
+    public static FieldReferenceOffsetManager buildCatalog(OutputStream outputStream, String source, ClientConfig clientConfig) throws ParserConfigurationException,
             SAXException, IOException {
         log.trace("source file:{}",source);               
         InputStream sourceInputStream = TemplateLoader.class.getResourceAsStream(source);     
@@ -108,6 +109,8 @@ public class TemplateLoader {
 		PrimitiveWriter writer = new PrimitiveWriter(4096, output, false);
 		TemplateCatalogConfig.writeTemplateCatalog(handler, clientConfig.getBytesGap(), clientConfig.getBytesLength(), writer, clientConfig);
 		gZipOutputStream.close();
+		
+		return TemplateHandler.from(handler, clientConfig.getPreableBytes());
     }
 
 	public static void buildCatalog(OutputStream outputStream,

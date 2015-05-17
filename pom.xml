@@ -98,7 +98,7 @@
 	          <archive>
 	            <manifest>
 	              <addClasspath>true</addClasspath>
-	              <mainClass>com.ociweb.jfast.Test</mainClass>
+	              <mainClass>com.ociweb.jfast.TestApp</mainClass>
 	            </manifest>
 	         </archive>
 	       </configuration>

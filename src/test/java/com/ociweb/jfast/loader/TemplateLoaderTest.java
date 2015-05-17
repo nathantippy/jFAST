@@ -126,7 +126,7 @@ public class TemplateLoaderTest {
 
         PrimitiveReader reader = new PrimitiveReader(buildInputArrayForTesting(sourceDataFile), TemplateCatalogConfig.maxPMapCountInBytes(catalog));
 
-        FASTClassLoader.deleteFiles();
+        FASTClassLoader.deleteFiles();//force rebuild of any previous compiled runs
 
         final FieldReferenceOffsetManager from = catalog.getFROM();
         
@@ -140,8 +140,8 @@ public class TemplateLoaderTest {
         System.err.println("using: "+readerDispatch.getClass().getSimpleName());
 
 
-        int warmup = 128;
-        int count = 512;
+        int warmup = 10;
+        int count = 60;
         final int[] fullScript = catalog.getScriptTokens();
 
 

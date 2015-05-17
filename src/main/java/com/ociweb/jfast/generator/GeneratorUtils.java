@@ -461,7 +461,7 @@ public class GeneratorUtils {
         	final StringBuilder fragmentClassBody = new StringBuilder();
         	fragmentClassBody.append("package com.ociweb.jfast.generator;\n");
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.*;\n");
-        	fragmentClassBody.append("import com.ociweb.pronghorn.ring.schema.loader.*;\n");
+        	fragmentClassBody.append("import com.ociweb.pronghorn.ring.schema.loader.*;\n");//TODO: AAA, pick an object and generate the import path
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.util.*;\n");
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.RingBuffer.*;\n");
         	fragmentClassBody.append("import com.ociweb.jfast.stream.*;\n");
