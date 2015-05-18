@@ -1,4 +1,4 @@
-package com.ociweb.jfast.benchmark;
+package com.ociweb.jfast.example;
 
 import static com.ociweb.pronghorn.ring.RingReader.eqASCII;
 import static com.ociweb.pronghorn.ring.RingReader.readASCII;
@@ -40,9 +40,19 @@ import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
 import com.ociweb.pronghorn.ring.RingReader;
 
-public class ThreadingTest {
+public class UsageExample {
 
 	
+    
+    
+    
+    
+    
+    
+    
+    
+    //TODO: AA, this is not complete and needs to be cleaned up.
+    
 	@Ignore //Still in work needs to assert all the right stuff.
 	public void builtInTest() {
 		//this example uses the preamble feature
@@ -588,7 +598,7 @@ public class ThreadingTest {
     
     private static InputStream testDataInputStream(String resource) {
         
-        InputStream resourceInput = ThreadingTest.class.getResourceAsStream(resource);
+        InputStream resourceInput = UsageExample.class.getResourceAsStream(resource);
         if (null!=resourceInput) {
             return resourceInput;            
         }

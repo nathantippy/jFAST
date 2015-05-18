@@ -1,16 +1,15 @@
 package com.ociweb.jfast;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.ByteBuffer;
 
 import com.ociweb.jfast.catalog.loader.ClientConfig;
+import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.catalog.loader.TemplateLoader;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.stream.FASTReaderReactor;
@@ -18,135 +17,27 @@ import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.ring.RingBuffer;
 import com.ociweb.pronghorn.ring.RingBufferConfig;
 import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.stream.StreamingReadVisitor;
-import com.ociweb.pronghorn.ring.stream.StreamingVisitorReader;
+import com.ociweb.pronghorn.ring.RingReader;
+import com.ociweb.pronghorn.ring.stream.StreamingReadVisitorAdapter;
 
 public class TestApp {
 
-    private static final class countingVisitor implements StreamingReadVisitor {
-        @Override
-        public void visitUnsignedLong(String name, long id, long value) {
-            // TODO Auto-generated method stub
-            
-        }
+    private static final class countingVisitor extends StreamingReadVisitorAdapter {
 
-        @Override
-        public void visitUnsignedInteger(String name, long id, long value) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void visitUTF8(String name, long id, Appendable target) {
-            // TODO Auto-generated method stub
-            
-        }
-
+        private int localCount = 0;
+        
         @Override
         public void visitTemplateOpen(String name, long id) {
-            // TODO Auto-generated method stub
-            TestApp.localCount++;
+            localCount++;
+        }
+        
+        public int messageCount() {
+            return localCount;
         }
 
-        @Override
-        public void visitTemplateClose(String name, long id) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void visitSignedLong(String name, long id, long value) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void visitSignedInteger(String name, long id, int value) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void visitSequenceOpen(String name, long id, int length) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void visitSequenceClose(String name, long id) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void visitFragmentOpen(String name, long id, int cursor) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void visitFragmentClose(String name, long id) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void visitDecimal(String name, long id, int exp, long mant) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void visitBytes(String name, long id, ByteBuffer value) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void visitASCII(String name, long id, Appendable value) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public Appendable targetUTF8(String name, long id) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public ByteBuffer targetBytes(String name, long id, int length) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public Appendable targetASCII(String name, long id) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public void startup() {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void shutdown() {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public boolean paused() {
-            // TODO Auto-generated method stub
-            return false;
-        }
     }
 
 
-    static int localCount = 0;
 
     public static void main(String[] args) {
 
@@ -158,8 +49,7 @@ public class TestApp {
         int maxMessagesOnRing = 100;
         int maxStringLength = 8;
         long targetIterators = 200;
-        
-        
+                
         //TODO: AAAA, add args the same as mFAST application.
         
         
@@ -173,14 +63,16 @@ public class TestApp {
         long maxDecode = Long.MIN_VALUE;
         long minDecode = Long.MAX_VALUE;
                 
-        ByteArrayOutputStream catalogBuffer = new ByteArrayOutputStream(4096);
         
         try {
             
             long start = System.currentTimeMillis();
             
+            ByteArrayOutputStream catalogBuffer = new ByteArrayOutputStream(4096);
             FieldReferenceOffsetManager from = TemplateLoader.buildCatalog(catalogBuffer, templateSource, clientConfig);
-                               
+            byte[] catBytes = catalogBuffer.toByteArray();
+            byte[] byteConst = new TemplateCatalogConfig(catBytes).ringByteConstants();            
+            
             long finishedCatalogLoad = System.currentTimeMillis();
             
             FASTInputByteArray input = loadFASTInputSourceData(dataSource);
@@ -189,17 +81,14 @@ public class TestApp {
                        
             long finishedLoadingRawData = System.currentTimeMillis();
             
-            RingBuffer ringBuffer = buildMessageSpecificRingBuffer(maxMessagesOnRing, maxStringLength, from);            
-            FASTReaderReactor reactor = FAST.inputReactor(input, catalogBuffer.toByteArray(), RingBuffers.buildRingBuffers(ringBuffer));
+            RingBuffer ringBuffer = buildMessageSpecificRingBuffer(maxMessagesOnRing, maxStringLength, from, byteConst);            
+            FASTReaderReactor reactor = FAST.inputReactor(input, catBytes, RingBuffers.buildRingBuffers(ringBuffer));
             
             long finishedCompileOfDecoder = System.currentTimeMillis();
                         
+            long localCount = 0;
             long iterationsLeft = targetIterators;
             do {  
-                
-                StreamingVisitorReader reader = new StreamingVisitorReader(ringBuffer, new countingVisitor());
-                                                                                      //BUG: new StreamingReadVisitorToJSON(System.out));
-                reader.startup();
                 
                 long beginDecode = System.currentTimeMillis();
              
@@ -209,27 +98,24 @@ public class TestApp {
                     //TODO: show how to consume the data.
                     
                     
-                    //This would normally be called from a different thead
-                    reader.run();
-                    
-//                    //read message off the ring buffer to make room for more messages                    
-//                    if (RingReader.tryReadFragment(ringBuffer)) {
-//                        
-//                        if (RingReader.isNewMessage(ringBuffer)) {
-//                            localCount++;
-//                            
-//                            final int msgIdx = RingReader.getMsgIdx(ringBuffer);
-//                            long templateId = from.fieldIdScript[msgIdx]; 
-//                            String templateName = from.fieldNameScript[msgIdx];
-//                            
-//                            
-//                            
-//                            
-//                        }
-//                        RingReader.releaseReadLock(ringBuffer);
-//                    } 
+                    //This would normally be called from a different thread!
+                                       
+                    //read message off the ring buffer to make room for more messages                    
+                    if (RingReader.tryReadFragment(ringBuffer)) {
+                        
+                        if (RingReader.isNewMessage(ringBuffer)) {
+                            localCount++;
+                            
+                            final int msgIdx = RingReader.getMsgIdx(ringBuffer);
+                            long templateId = from.fieldIdScript[msgIdx]; 
+                            String templateName = from.fieldNameScript[msgIdx];
+                            //
+                            //NOTE: If this were a real application using the data, read fields here using LOC for each that was constructed earlier
+                            
+                        }
+                        RingReader.releaseReadLock(ringBuffer);
+                    } 
                 }
-                reader.shutdown();
                 
                 long decodeDuration = System.currentTimeMillis()-beginDecode;
                 minDecode = Math.min(minDecode, decodeDuration);
@@ -272,8 +158,8 @@ public class TestApp {
 
     private static RingBuffer buildMessageSpecificRingBuffer(
             int maxMessagesOnRing, int maxStringLength,
-            FieldReferenceOffsetManager from) {
-        RingBufferConfig ringConfig = new RingBufferConfig(from, maxMessagesOnRing, maxStringLength);
+            FieldReferenceOffsetManager from, byte[] byteConst) {        
+        RingBufferConfig ringConfig = new RingBufferConfig(from, maxMessagesOnRing, maxStringLength, byteConst);
         RingBuffer ringBuffer = new RingBuffer(ringConfig);
         ringBuffer.initBuffers();
         return ringBuffer;
@@ -283,22 +169,20 @@ public class TestApp {
     private static FASTInputByteArray loadFASTInputSourceData(String dataSource)
             throws URISyntaxException, IOException {
         File sourceDataFile = new File(dataSource);
+        byte[] fileData;
+        InputStream inputStream;
+        
         if (!sourceDataFile.exists()) {
-            URL sourceData = TestApp.class.getResource(dataSource);
-            sourceDataFile = new File(sourceData.toURI());
-        }            
-        return new FASTInputByteArray(buildInputArrayForTesting(sourceDataFile));
-    }
-
-    
-    private static byte[] buildInputArrayForTesting(File fileSource) throws IOException {
-        byte[] fileData = new byte[(int) fileSource.length()];
-        FileInputStream inputStream = new FileInputStream(fileSource);
-        int readBytes = inputStream.read(fileData);
-        inputStream.close();
-        assertEquals(fileData.length, readBytes);
-
-        return fileData;
+            inputStream = TestApp.class.getResourceAsStream(dataSource);
+            fileData = new byte[inputStream.available()];
+        } else {
+            fileData = new byte[(int) sourceDataFile.length()];
+            inputStream = new FileInputStream(sourceDataFile);
+        }
+        inputStream.read(fileData);
+        inputStream.close();            
+        byte[] loadFileIntoByteArray = fileData;
+        return new FASTInputByteArray(loadFileIntoByteArray);
     }
     
 }

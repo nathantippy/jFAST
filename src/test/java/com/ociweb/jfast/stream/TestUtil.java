@@ -1,4 +1,4 @@
-package com.ociweb.jfast.benchmark;
+package com.ociweb.jfast.stream;
 
 import com.ociweb.pronghorn.ring.token.OperatorMask;
 import com.ociweb.pronghorn.ring.token.TokenBuilder;
