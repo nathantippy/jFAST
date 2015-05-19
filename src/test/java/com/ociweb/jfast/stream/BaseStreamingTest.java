@@ -455,12 +455,10 @@ public abstract class BaseStreamingTest {
      */
     @Deprecated //each write does its  own null now.
     public static void write(int token, PrimitiveWriter writer, FASTWriterInterpreterDispatch fw) {
-    
-        
+            
         
         // only optional field types can use this method.
         assert (0 != (token & (1 << TokenBuilder.SHIFT_TYPE))); 
-       // TODO: T, in testing assert(failOnBadArg())
     
         // select on type, each dictionary will need to remember the null was
         // written

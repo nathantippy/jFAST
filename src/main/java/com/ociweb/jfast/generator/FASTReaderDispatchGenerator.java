@@ -19,7 +19,6 @@ import com.ociweb.pronghorn.ring.util.LocalHeap;
 //This generator makes use of class names whenever possible to allow for obfuscation if needed.
 public class FASTReaderDispatchGenerator extends FASTReaderInterpreterDispatch {
 
-    // TODO: C, code does not support final in signatures, this would be nice to have
     
     private static final String ENTRY_METHOD_NAME = "decode";
     private final GeneratorData generatorData;

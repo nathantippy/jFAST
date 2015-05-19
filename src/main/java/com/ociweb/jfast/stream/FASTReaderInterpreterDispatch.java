@@ -94,7 +94,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         int preambleInts = (prembleBytes+3)>>2;
         genReadTemplateId(preambleInts, maxTemplatePMapSize, reader, this);        
         
-        //TODO: X, add mode for reading the preamble above but NOT writing to ring buffer because it is not needed.
+        //TODO: B, add mode for reading the preamble above but NOT writing to ring buffer because it is not needed.
         //break out into second half of gen.
         p = this.prembleBytes;
         if (p>0) {
@@ -108,9 +108,9 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         RingBuffer rb = RingBuffers.get(ringBuffers,activeScriptCursor);
     }
     
-    //TODO: MUST only call when we know there is room for the biggest known fragment, must avoid additional checks.
     // -1 end of file, 0 no data, 1 loaded
     public int decode(PrimitiveReader reader) {
+        //TODO: B, Add an assert, MUST only call when we know there is room for the biggest known fragment, must avoid additional checks.
 
     	final RingBuffer rbRingBuffer;
         if (activeScriptCursor<0) {

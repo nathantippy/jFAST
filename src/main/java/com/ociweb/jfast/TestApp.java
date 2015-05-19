@@ -95,7 +95,7 @@ public class TestApp {
                 //this pump decodes one message and puts it on the ringBuffer
                 while (FASTReaderReactor.pump(reactor)>=0) {
                     
-                    //TODO: show how to consume the data.
+                    //TODO: AA, show how to consume the data.
                     
                     
                     //This would normally be called from a different thread!
@@ -153,6 +153,47 @@ public class TestApp {
         System.out.println("Bytes      Total : "+totalBytes+"   File Size : "+fileSize+"   Iterations: "+targetIterators);
         System.out.println("Messages   Total : "+messageCount);
                 
+    }
+
+    private static String getReqArg(String longName, String shortName, String[] args) {
+        String prev = null;
+        for (String token : args) {
+            if (longName.equals(prev) || shortName.equals(prev)) {
+                if (token == null || token.trim().length() == 0 || token.startsWith("-")) {
+                    printHelp("Expected value not found");
+                    System.exit(-1);
+                }
+                return token.trim();
+            }
+            prev = token;
+        }
+        printHelp("Expected value not found");
+        System.exit(-1);
+        return null;
+    }
+    
+    private static String getOptArg(String longName, String shortName, String[] args, String defaultValue) {
+        String prev = null;
+        for (String token : args) {
+            if (longName.equals(prev) || shortName.equals(prev)) {
+                if (token == null || token.trim().length() == 0 || token.startsWith("-")) {
+                    return defaultValue;
+                }
+                return token.trim();
+            }
+            prev = token;
+        }
+        return defaultValue;
+    }
+    
+    private static void printHelp(String message) {
+        
+        //  kernel parameters in /etc/sysctl.conf in the format:
+        //      net.ipv4.tcp_tw_reuse=1
+                
+        System.out.println(message);
+        System.out.println();
+        System.out.println("Usage:");
     }
 
 
