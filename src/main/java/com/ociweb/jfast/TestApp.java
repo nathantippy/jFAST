@@ -179,8 +179,18 @@ public class TestApp {
             fileData = new byte[(int) sourceDataFile.length()];
             inputStream = new FileInputStream(sourceDataFile);
         }
-        inputStream.read(fileData);
+        
+        int pos = 0;
+        int len = fileData.length;
+        int bytes;
+        
+        while (pos<len) {
+            bytes = inputStream.read(fileData, pos, len-pos);
+            pos+=bytes;
+        }
+        
         inputStream.close();            
+        
         byte[] loadFileIntoByteArray = fileData;
         return new FASTInputByteArray(loadFileIntoByteArray);
     }

@@ -21,7 +21,10 @@ Please consider getting involved and sponsoring the completion of [jFAST](mailto
 
   mvn install
   
-  todo
+  cd target
+  
+  java -jar jFAST.jar
+
     
 # Add to Maven project
   todo
