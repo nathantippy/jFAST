@@ -1469,7 +1469,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             RingBuffer.addLongValue(rbB,rbMask,rbPos, constDefault);
         } else {
             long value = PrimitiveReader.readLongSigned(reader);
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, value == 0 ? constAbsent : (-1 + (value + (value >>> 63)))); //TODO: AAAA Can this part be done branch free?  mask = ((value>>31)^((value-1)>>31)) 
+            RingBuffer.addLongValue(rbB,rbMask,rbPos, value == 0 ? constAbsent : (-1 + (value + (value >>> 63)))); //TODO: B Can this part be done branch free?  mask = ((value>>31)^((value-1)>>31)) 
         }
     }
 

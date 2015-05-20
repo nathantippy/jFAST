@@ -41,16 +41,18 @@ public class TestApp {
 
     public static void main(String[] args) {
 
+        final int maxMessagesOnRing = 16;
         ClientConfig clientConfig = new ClientConfig();
         
         clientConfig.setPreableBytes((short)4);
-        String templateSource = "/performance/example.xml";
-        String dataSource = "/performance/complex30000.dat";
-        int maxMessagesOnRing = 100;
         int maxStringLength = 8;
         long targetIterators = 200;
                 
-        //TODO: AAAA, add args the same as mFAST application.
+        //TODO: AAAA, add args to modify the preamble, target iterations, and max string 
+
+        final String templateSource = getOptArg("templateFile","-t",args,"/performance/example.xml");
+        final String dataSource = getOptArg("sourceFile","-s",args,"/performance/complex30000.dat");
+        
         
         
         long messageCount = 0;        
@@ -94,10 +96,7 @@ public class TestApp {
              
                 //this pump decodes one message and puts it on the ringBuffer
                 while (FASTReaderReactor.pump(reactor)>=0) {
-                    
-                    //TODO: AA, show how to consume the data.
-                    
-                    
+                                        
                     //This would normally be called from a different thread!
                                        
                     //read message off the ring buffer to make room for more messages                    
@@ -153,23 +152,6 @@ public class TestApp {
         System.out.println("Bytes      Total : "+totalBytes+"   File Size : "+fileSize+"   Iterations: "+targetIterators);
         System.out.println("Messages   Total : "+messageCount);
                 
-    }
-
-    private static String getReqArg(String longName, String shortName, String[] args) {
-        String prev = null;
-        for (String token : args) {
-            if (longName.equals(prev) || shortName.equals(prev)) {
-                if (token == null || token.trim().length() == 0 || token.startsWith("-")) {
-                    printHelp("Expected value not found");
-                    System.exit(-1);
-                }
-                return token.trim();
-            }
-            prev = token;
-        }
-        printHelp("Expected value not found");
-        System.exit(-1);
-        return null;
     }
     
     private static String getOptArg(String longName, String shortName, String[] args, String defaultValue) {

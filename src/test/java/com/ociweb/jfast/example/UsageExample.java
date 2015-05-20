@@ -51,7 +51,7 @@ public class UsageExample {
     
     
     
-    //TODO: AA, this is not complete and needs to be cleaned up.
+    //TODO: AA, this is not complete and needs to be cleaned up. for a simple example of consuming the data.
     
 	@Ignore //Still in work needs to assert all the right stuff.
 	public void builtInTest() {
@@ -356,8 +356,6 @@ public class UsageExample {
             IDX1_AggressorSide = FieldReferenceOffsetManager.lookupFieldLocator("AggressorSide", fragStart, from);
             IDX1_MatchEventIndicator = FieldReferenceOffsetManager.lookupFieldLocator("MatchEventIndicator", fragStart, from);
             
-            
-            //TODO: B, this is the beginning of a unit test.
             validate("ApplVerID", 2, IDX1_AppVerId);
             validate("MessageType", 4, IDX1_MessageType);
             validate("SenderCompID", 6, IDX1_SenderCompID);

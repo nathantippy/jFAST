@@ -186,7 +186,6 @@ public class GeneratorUtils {
         if (isReader) {
             builder.append("    "+RingBuffer.class.getSimpleName()+" rb="+RingBuffers.class.getSimpleName()+".get(ringBuffers,x);\n" ); 
             
-		    //TODO: B, simplify this to do less runtime work.
 			builder.append(" {int fragmentSize = rb.ringWalker.from.fragDataSize[x];\n\r")
 			       .append("if (!RingBuffer.roomToLowLevelWrite(rb, fragmentSize)) {return 0;}\n\r")
 			       .append(" RingBuffer.confirmLowLevelWrite(rb, fragmentSize);")
@@ -461,7 +460,7 @@ public class GeneratorUtils {
         	final StringBuilder fragmentClassBody = new StringBuilder();
         	fragmentClassBody.append("package com.ociweb.jfast.generator;\n");
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.*;\n");
-        	fragmentClassBody.append("import com.ociweb.pronghorn.ring.schema.loader.*;\n");//TODO: AAA, pick an object and generate the import path
+        	fragmentClassBody.append("import com.ociweb.pronghorn.ring.schema.loader.*;\n");//TODO: B, pick an object and generate the import path
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.util.*;\n");
         	fragmentClassBody.append("import com.ociweb.pronghorn.ring.RingBuffer.*;\n");
         	fragmentClassBody.append("import com.ociweb.jfast.stream.*;\n");

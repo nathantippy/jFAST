@@ -1318,14 +1318,14 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
     public void encode(PrimitiveWriter writer, RingBuffer rbRingBuffer) {
         
         //set the cursor positions for the interpreter if we are not generating code
-        if (rbRingBuffer.mask!=0) { //TODO: D, optimize, checks if this is not the code generation
+        if (rbRingBuffer.mask!=0) { //mask !=0, checks if this is not the code generation
             //cursor and limit already set
             setActiveScriptCursor(rbRingBuffer.ringWalker.cursor); 
             fieldPos = 0;//needed for fragments in interpreter but is not called when generating
         }
         
         //start new message with preamble if needed        
-        if (rbRingBuffer.mask!=0 && RingReader.isNewMessage(rbRingBuffer.ringWalker)) {     //TODO: D, optimize, checks that this is not the code generation    
+        if (rbRingBuffer.mask!=0 && RingReader.isNewMessage(rbRingBuffer.ringWalker)) { //mask !=0, checks if this is not the code generation    
             callBeginMessage(writer, rbRingBuffer);
         }
 
