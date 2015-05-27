@@ -131,7 +131,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     }
     
     protected void genReadTotalMessageBytesResetUsed(RingBuffer rbRingBuffer) { 
-    	rbRingBuffer.bytesWriteLastConsumedBytePos = RingBuffer.bytesWorkingHeadPosition(rbRingBuffer);
+        RingBuffer.updateBytesWriteLastConsumedPos(rbRingBuffer);
     }
     
     
@@ -1468,8 +1468,10 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         if (0 == PrimitiveReader.readPMapBit(reader)) {
             RingBuffer.addLongValue(rbB,rbMask,rbPos, constDefault);
         } else {
-            long value = PrimitiveReader.readLongSigned(reader);
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, value == 0 ? constAbsent : (-1 + (value + (value >>> 63)))); //TODO: B Can this part be done branch free?  mask = ((value>>31)^((value-1)>>31)) 
+            long value = PrimitiveReader.readLongSigned(reader);            
+            long maskB = (value-1)>>63;
+            long mask = ((value>>63)^maskB)&maskB;            
+            RingBuffer.addLongValue(rbB,rbMask,rbPos, (constAbsent&mask)|( (-1 + (value + (value >>> 63))) &(~mask)) ); 
         }
     }
 
