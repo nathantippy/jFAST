@@ -132,7 +132,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         }
         RingBuffer.confirmLowLevelWrite(rbRingBuffer, fragDataSize);
            
-        assert(rbRingBuffer.workingHeadPos.value>=RingBuffer.headPosition(rbRingBuffer));
+        assert(RingBuffer.workingHeadPosition(rbRingBuffer)>=RingBuffer.headPosition(rbRingBuffer));
         
         int token;
         do {
@@ -259,8 +259,8 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         genReadGroupCloseMessage(reader, this); //active script cursor is set to end of messge by this call
 
         //this conditional is for the code generator so it need not check
-        if (rbRingBuffer.workingHeadPos.value != RingBuffer.headPosition(rbRingBuffer)) {
-	        assert (fragDataSize == ((int)(rbRingBuffer.workingHeadPos.value-RingBuffer.headPosition(rbRingBuffer)))) : "expected to write "+fragDataSize+" but wrote "+((int)(rbRingBuffer.workingHeadPos.value-RingBuffer.headPosition(rbRingBuffer)));
+        if (RingBuffer.workingHeadPosition(rbRingBuffer) != RingBuffer.headPosition(rbRingBuffer)) {
+	        assert (fragDataSize == ((int)(RingBuffer.workingHeadPosition(rbRingBuffer)-RingBuffer.headPosition(rbRingBuffer)))) : "expected to write "+fragDataSize+" but wrote "+((int)(RingBuffer.workingHeadPosition(rbRingBuffer)-RingBuffer.headPosition(rbRingBuffer)));
 	        RingBuffer.publishWritesBatched(rbRingBuffer);
 	        RingBuffer.publishAllBatchedWrites(rbRingBuffer);  
         }
@@ -1521,7 +1521,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         }
         
         //NOTE: for testing we need to check what was written
-        int value = RingBuffer.peek(ringBuffer.buffer, ringBuffer.workingHeadPos.value-2, ringBuffer.mask);
+        int value = RingBuffer.peek(ringBuffer.buffer, RingBuffer.workingHeadPosition(ringBuffer)-2, ringBuffer.mask);
         //if the value is positive it no longer points to the byteHeap so we need
         //to make a replacement here for testing.
         return value<0? value : token & MAX_BYTE_INSTANCE_MASK;

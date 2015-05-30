@@ -184,7 +184,7 @@ public class TemplateLoaderTest {
 	                        int i = 0;
 	                        int s = preamble.length;
 	                        while (i < s) {
-	                         	RingBuffer.readInt(queue.buffer, queue.mask, queue.workingTailPos.value+bufferIdx);
+	                         	RingBuffer.readInt(queue.buffer, queue.mask, RingBuffer.getWorkingTailPosition(queue)+bufferIdx);
 	                            i += 4;
 	                            bufferIdx++;
 	                        }
@@ -311,7 +311,7 @@ public class TemplateLoaderTest {
 		    //	assert((bufferIdx&0x1E<<RingReader.OFF_BITS)==0x8<<RingReader.OFF_BITS || (bufferIdx&0x1E<<RingReader.OFF_BITS)==0x5<<RingReader.OFF_BITS || (bufferIdx&0x1E<<RingReader.OFF_BITS)==0xE<<RingReader.OFF_BITS) : "Expected to read some type of ASCII/UTF8/BYTE but found "+TypeMask.toString((bufferIdx>>RingReader.OFF_BITS)&TokenBuilder.MASK_TYPE);
 			//	int readDataLength = queue.buffer[queue.mask & (int)(queue.consumerData.activeReadFragmentStack[RingReader.STACK_OFF_MASK&(bufferIdx>>RingReader.STACK_OFF_SHIFT)] + (RingReader.OFF_MASK&bufferIdx) + 1)];
 
-				int readDataLength = RingBuffer.readInt(queue.buffer, queue.mask, queue.workingTailPos.value+bufferIdx+1);
+				int readDataLength = RingBuffer.readInt(queue.buffer, queue.mask, RingBuffer.getWorkingTailPosition(queue)+bufferIdx+1);
 				totalBytesOut.addAndGet(4 * readDataLength);
 		    }
 

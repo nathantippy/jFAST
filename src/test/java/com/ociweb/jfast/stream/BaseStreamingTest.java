@@ -172,7 +172,7 @@ public abstract class BaseStreamingTest {
 			RingBuffer ringBuffer = RingBuffers.get( fr.ringBuffers, 0);			
 			fr.closeGroup(groupToken|(OperatorMask.Group_Bit_Close<<TokenBuilder.SHIFT_OPER),idx, reader);
 			
-			RingBuffer.writeTrailingCountOfBytesConsumed(ringBuffer, ringBuffer.workingHeadPos.value++); //increment because this is the low-level API calling
+			RingBuffer.writeTrailingCountOfBytesConsumed(ringBuffer,   ringBuffer.workingHeadPos.value++); //increment because this is the low-level API calling
 
 	    	//single length field still needs to move this value up, so this is always done
 			RingBuffer.updateBytesWriteLastConsumedPos(ringBuffer);
