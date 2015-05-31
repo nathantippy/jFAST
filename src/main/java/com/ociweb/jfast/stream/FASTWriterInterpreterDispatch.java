@@ -1279,9 +1279,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         if (preambleData.length != 0) {
             int[] buffer = ringBuffer==null?null:ringBuffer.buffer;
             int mask = ringBuffer==null?0:ringBuffer.mask;
-            PaddedLong workingTailPos = ringBuffer==null?null:ringBuffer.workingTailPos;
-            
-            genWritePreamble(fieldPos, writer, buffer, mask, workingTailPos, this);
+            genWritePreamble(fieldPos, writer, buffer, mask, null==ringBuffer? null : ringBuffer.workingTailPos, this);
             
             fieldPos += (preambleData.length+3)>>2;//must adjust this because it is meta data and when generating it will be used.
         };
