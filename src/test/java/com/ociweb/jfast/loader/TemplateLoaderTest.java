@@ -171,8 +171,8 @@ public class TemplateLoaderTest {
                 if (RingReader.tryReadFragment(rb)) {
 	                	
 	                frags++;
-	                if (RingReader.isNewMessage(rb.ringWalker)) {
-	                    final int msgIdx = RingReader.getMsgIdx(rb.ringWalker);
+	                if (RingReader.isNewMessage(rb)) {
+	                    final int msgIdx = RingReader.getMsgIdx(rb);
 	                    
 	                    msgs.incrementAndGet();
 	                    
@@ -372,8 +372,8 @@ public class TemplateLoaderTest {
 
         while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or if a fragment is read.
             if (RingReader.tryReadFragment(rb)) {	
-	            if (RingReader.isNewMessage(rb.ringWalker)) {
-	                int templateId = RingReader.getMsgIdx(rb.ringWalker);
+	            if (RingReader.isNewMessage(rb)) {
+	                int templateId = RingReader.getMsgIdx(rb);
 	                if (templateId<0) {
 	                	break;
 	                }
@@ -519,7 +519,7 @@ public class TemplateLoaderTest {
             
             while (FASTReaderReactor.pump(reactor)>=0) {  
                     if (RingReader.tryReadFragment(queue)) {
-                       if (RingReader.getMsgIdx(queue.ringWalker)>=0) { //skip if we are waiting for more content.
+                       if (RingReader.getMsgIdx(queue)>=0) { //skip if we are waiting for more content.
                                 FASTDynamicWriter.write(dynamicWriter);  
                              //   RingBuffer.releaseReadLock(queue);
                        }
@@ -628,7 +628,7 @@ public class TemplateLoaderTest {
             	
             		//confirms full message to read on the queue            	
                     if (RingReader.tryReadFragment(queue)) {
-                        if (RingReader.isNewMessage(queue.ringWalker)) {
+                        if (RingReader.isNewMessage(queue)) {
                         	int msgIdx = RingReader.getMsgIdx(queue);
 							if (msgIdx<0) {
                         		break;

@@ -154,7 +154,7 @@ public class UsageExample {
                       
                       if (RingReader.tryReadFragment(rb)) {
                           
-                          if (RingReader.isNewMessage(rb.ringWalker)) {
+                          if (RingReader.isNewMessage(rb)) {
                         	  
                         	  if (RingReader.getMsgIdx(rb)<0) {
                         		  break;
@@ -213,7 +213,7 @@ public class UsageExample {
                         //NOTE: the stats object shows that this is empty 75% of the time, eg needs more
 
                         if (RingReader.tryReadFragment(rb)) { 
-                                assert(RingReader.isNewMessage(rb.ringWalker)) : "";
+                                assert(RingReader.isNewMessage(rb)) : "";
                                 if (RingReader.getMsgIdx(rb)<0 ){
                                 	break;
                                 }
@@ -232,7 +232,7 @@ public class UsageExample {
                     
                     //is alive is done writing but we need to empty out
                     while (RingReader.tryReadFragment(rb)) { 
-                        if (RingReader.isNewMessage(rb.ringWalker)) {
+                        if (RingReader.isNewMessage(rb)) {
                         	if (RingReader.getMsgIdx(rb)<0) {
                         		break;
                         	}
@@ -415,13 +415,13 @@ public class UsageExample {
     
     private void processMessage(char[] temp, RingBuffer rb, FASTReaderReactor reactor) {
        
-        populateFieldIDs(rb.ringWalker.from, reactor); 
+        populateFieldIDs(RingBuffer.from(rb), reactor); 
 
 
         templateId = readInt(rb, IDX_TemplateId);
         preamble = readInt(rb, IDX_Preamble);
 
-        switch (RingReader.getMsgIdx(rb.ringWalker)) {
+        switch (RingReader.getMsgIdx(rb)) {
             case 1:
                 
                 if (!eqASCII(rb, IDX1_AppVerId, "1.0")) {
@@ -555,7 +555,7 @@ public class UsageExample {
     
                 break;
             default:
-                System.err.println("Did not expect " + RingReader.getMsgIdx(rb.ringWalker));
+                System.err.println("Did not expect " + RingReader.getMsgIdx(rb));
         }
     }
 

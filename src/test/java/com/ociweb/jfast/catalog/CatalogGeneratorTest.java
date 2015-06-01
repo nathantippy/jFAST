@@ -474,8 +474,7 @@ public class CatalogGeneratorTest {
 	        		
 	        		if (RingReader.tryReadFragment(buffers[k])) {
 	        		    	        		    
-	        			RingWalker r1 = buffers[k].ringWalker;
-						assertTrue(RingReader.isNewMessage(r1));
+						assertTrue(RingReader.isNewMessage(buffers[k]));
 	        			assertEquals(testMessageIdx, RingReader.getMsgIdx(buffers[k]));
 	        			
 	        			int f = fieldCount;

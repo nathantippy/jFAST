@@ -172,8 +172,10 @@ public abstract class BaseStreamingTest {
 			RingBuffer ringBuffer = RingBuffers.get( fr.ringBuffers, 0);			
 			fr.closeGroup(groupToken|(OperatorMask.Group_Bit_Close<<TokenBuilder.SHIFT_OPER),idx, reader);
 			
-			RingBuffer.writeTrailingCountOfBytesConsumed(ringBuffer,   ringBuffer.workingHeadPos.value++); //increment because this is the low-level API calling
-
+			long workingHeadPos = RingBuffer.workingHeadPosition(ringBuffer);
+			RingBuffer.writeTrailingCountOfBytesConsumed(ringBuffer,   workingHeadPos); //increment because this is the low-level API calling
+			RingBuffer.setWorkingHead(ringBuffer, workingHeadPos+1);
+			
 	    	//single length field still needs to move this value up, so this is always done
 			RingBuffer.updateBytesWriteLastConsumedPos(ringBuffer);
 	    	
@@ -472,7 +474,9 @@ public abstract class BaseStreamingTest {
                 RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
                 rbRingBufferLocal.initBuffers();
                 RingBuffer.dump(rbRingBufferLocal);
-                RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos.value++,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                long workingHeadPosition = RingBuffer.workingHeadPosition(rbRingBufferLocal);
+                RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,workingHeadPosition,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                RingBuffer.setWorkingHead(rbRingBufferLocal, workingHeadPosition+1);
                 RingBuffer ringBuffer = rbRingBufferLocal;
                 RingBuffer.publishWrites(ringBuffer);
                 int rbPos = 0;
@@ -537,7 +541,9 @@ public abstract class BaseStreamingTest {
                     RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
                     rbRingBufferLocal.initBuffers();
                     RingBuffer.dump(rbRingBufferLocal);
-                    RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,rbRingBufferLocal.workingHeadPos.value++,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                    long workingHeadPosition = RingBuffer.workingHeadPosition(rbRingBufferLocal);
+                    RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,workingHeadPosition,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                    RingBuffer.setWorkingHead(rbRingBufferLocal, workingHeadPosition+1);
                     RingBuffer ringBuffer = rbRingBufferLocal;
                     RingBuffer.publishWrites(ringBuffer);
                     int rbPos = 0;

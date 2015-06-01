@@ -1323,7 +1323,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         }
         
         //start new message with preamble if needed        
-        if (rbRingBuffer.mask!=0 && RingReader.isNewMessage(rbRingBuffer.ringWalker)) { //mask !=0, checks if this is not the code generation    
+        if (rbRingBuffer.mask!=0 && RingReader.isNewMessage(rbRingBuffer)) { //mask !=0, checks if this is not the code generation    
             callBeginMessage(writer, rbRingBuffer);
         }
 
