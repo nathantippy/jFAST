@@ -131,7 +131,7 @@ public class GeneratorUtils {
             if (isReader) {
                 methodCallArgs = methodCallArgs.replace("rbPos","rb.workingHeadPos"); 
             } else {
-                methodCallArgs = methodCallArgs.replace("rbPos","rb.workingTailPos"); 
+                methodCallArgs = methodCallArgs.replace("rbPos","RingBuffer.getWorkingTailPositionObject(rb)"); 
             }
             
             int k = j;
@@ -174,7 +174,7 @@ public class GeneratorUtils {
             if (preambleLength==0) {
                 builder.append("    beginMessage(this);\n");
             } else {
-                builder.append("    beginMessage(writer, rb.buffer, rb.mask, rb.workingTailPos, this);\n");
+                builder.append("    beginMessage(writer, rb.buffer, rb.mask, RingBuffer.getWorkingTailPositionObject(rb), this);\n");
             }
 
            	builder.append("}\n");            

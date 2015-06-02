@@ -41,7 +41,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         
         int[] buffer = rbRingBuffer==null?null:rbRingBuffer.buffer;
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:rbRingBuffer.workingTailPos;
+        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
         
         int target = (token & longInstanceMask);
         
@@ -93,7 +93,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         
         int[] buffer = rbRingBuffer==null?null:rbRingBuffer.buffer;
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:rbRingBuffer.workingTailPos;
+        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -149,7 +149,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
 
         int[] buffer = rbRingBuffer==null?null:rbRingBuffer.buffer;
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:rbRingBuffer.workingTailPos;
+        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
         
         int target = token & longInstanceMask;
         
@@ -202,7 +202,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         
         int[] buffer = rbRingBuffer==null?null:rbRingBuffer.buffer;
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:rbRingBuffer.workingTailPos;
+        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -258,7 +258,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         
         int[] buffer = rbRingBuffer==null?null:rbRingBuffer.buffer;
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:rbRingBuffer.workingTailPos;
+        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -312,7 +312,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         
         int[] buffer = rbRingBuffer==null?null:rbRingBuffer.buffer;
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:rbRingBuffer.workingTailPos;
+        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
 
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -365,7 +365,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         
         int[] buffer = rbRingBuffer==null?null:rbRingBuffer.buffer;
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:rbRingBuffer.workingTailPos;
+        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -413,7 +413,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
        
         int[] buffer = rbRingBuffer==null?null:rbRingBuffer.buffer;
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:rbRingBuffer.workingTailPos;
+        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -1254,7 +1254,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         assert (0 == (token & (OperatorMask.Group_Bit_Close << TokenBuilder.SHIFT_OPER)));
         assert (0 != (token & (OperatorMask.Group_Bit_Templ << TokenBuilder.SHIFT_OPER)));
 
-       	genWriteOpenTemplatePMap(pmapSize, fieldPos, activeScriptCursor, writer, rb.buffer, rb.mask, rb.workingTailPos, this);
+       	genWriteOpenTemplatePMap(pmapSize, fieldPos, activeScriptCursor, writer, rb.buffer, rb.mask, RingBuffer.getWorkingTailPositionObject(rb), this);
 
         if (0 == (token & (OperatorMask.Group_Bit_PMap << TokenBuilder.SHIFT_OPER))) {
             //group does not require PMap so we will close our 1 bit PMap now when we use it.
@@ -1279,7 +1279,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         if (preambleData.length != 0) {
             int[] buffer = ringBuffer==null?null:ringBuffer.buffer;
             int mask = ringBuffer==null?0:ringBuffer.mask;
-            genWritePreamble(fieldPos, writer, buffer, mask, null==ringBuffer? null : ringBuffer.workingTailPos, this);
+            genWritePreamble(fieldPos, writer, buffer, mask, null==ringBuffer? null : RingBuffer.getWorkingTailPositionObject(ringBuffer), this);
             
             fieldPos += (preambleData.length+3)>>2;//must adjust this because it is meta data and when generating it will be used.
         };

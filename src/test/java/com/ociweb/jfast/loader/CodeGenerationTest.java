@@ -107,6 +107,11 @@ public class CodeGenerationTest {
     
     @Test
     public void testCodeGenerator() {
+        
+        System.setProperty("FAST.forceCompile", "true");        
+        //-DFAST.exportSource=true
+        //-DFAST.forceCompile=true
+        
         FASTClassLoader.deleteFiles();
         
         byte[] buildRawCatalogData = TemplateLoaderTest.buildRawCatalogData(new ClientConfig());
@@ -129,6 +134,11 @@ public class CodeGenerationTest {
     
     @Test
     public void testDecodeGenVsInterp30000() {
+        
+        System.setProperty("FAST.forceCompile", "true");        
+        //-DFAST.exportSource=true
+        //-DFAST.forceCompile=true
+                
         int rbPrimaryRingBits = 9;
         int rbTextRingBits = 16;
         
