@@ -167,7 +167,7 @@ public class GeneratorUtils {
             
             builder.append("fieldPos = 0;\n");
             builder.append("\n");
-            builder.append("setActiveScriptCursor(rb.ringWalker.cursor);\n");        
+            builder.append("setActiveScriptCursor(RingBuffer.cursor(rb));\n");        
 
             builder.append("if ("+RingReader.class.getCanonicalName()+".isNewMessage(rb)) {\n");                
             
@@ -186,7 +186,7 @@ public class GeneratorUtils {
         if (isReader) {
             builder.append("    "+RingBuffer.class.getSimpleName()+" rb="+RingBuffers.class.getSimpleName()+".get(ringBuffers,x);\n" ); 
             
-			builder.append(" {int fragmentSize = rb.ringWalker.from.fragDataSize[x];\n\r")
+			builder.append(" {int fragmentSize = RingBuffer.from(rb).fragDataSize[x];\n\r")
 			       .append("if (!RingBuffer.roomToLowLevelWrite(rb, fragmentSize)) {return 0;}\n\r")
 			       .append(" RingBuffer.confirmLowLevelWrite(rb, fragmentSize);")
 			       .append("}\n\r");

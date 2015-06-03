@@ -1318,7 +1318,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         //set the cursor positions for the interpreter if we are not generating code
         if (rbRingBuffer.mask!=0) { //mask !=0, checks if this is not the code generation
             //cursor and limit already set
-            setActiveScriptCursor(rbRingBuffer.ringWalker.cursor); 
+            setActiveScriptCursor(RingBuffer.cursor(rbRingBuffer));
             fieldPos = 0;//needed for fragments in interpreter but is not called when generating
         }
         
