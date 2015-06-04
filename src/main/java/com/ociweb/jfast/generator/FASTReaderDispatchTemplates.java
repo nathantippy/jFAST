@@ -98,14 +98,18 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genWritePreambleB(FASTDecoder dispatch) {
         {
         RingBuffer rb = RingBuffers.get(dispatch.ringBuffers,dispatch.activeScriptCursor);  
-        RingBuffer.setValue(rb.buffer,rb.mask,rb.workingHeadPos.value++,dispatch.preambleB);
+        long whp = RingBuffer.workingHeadPosition(rb);
+        RingBuffer.setValue(rb.buffer,rb.mask,whp++,dispatch.preambleB);
+        RingBuffer.setWorkingHead(rb,whp);
         }
     }
 
     protected void genWritePreambleA(FASTDecoder dispatch) {
         {
         RingBuffer rb = RingBuffers.get(dispatch.ringBuffers,dispatch.activeScriptCursor);
-        RingBuffer.setValue(rb.buffer,rb.mask,rb.workingHeadPos.value++,dispatch.preambleA);
+        long whp = RingBuffer.workingHeadPosition(rb);
+        RingBuffer.setValue(rb.buffer,rb.mask,whp++,dispatch.preambleA);
+        RingBuffer.setWorkingHead(rb,whp);
         }
     }
 

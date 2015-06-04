@@ -135,7 +135,9 @@ public class CodeGenerationTest {
     @Test
     public void testDecodeGenVsInterp30000() {
         
-        System.setProperty("FAST.forceCompile", "true");        
+        System.err.println(    System.getProperties().toString()  );
+        
+        //System.setProperty("FAST.forceCompile", "true");        
         //-DFAST.exportSource=true
         //-DFAST.forceCompile=true
                 

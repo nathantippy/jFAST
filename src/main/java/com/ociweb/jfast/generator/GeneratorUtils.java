@@ -129,7 +129,7 @@ public class GeneratorUtils {
                                     .replace("rbMask", "rb.mask");
             
             if (isReader) {
-                methodCallArgs = methodCallArgs.replace("rbPos","rb.workingHeadPos"); 
+                methodCallArgs = methodCallArgs.replace("rbPos","RingBuffer.getWorkingHeadPositionObject(rb)"); 
             } else {
                 methodCallArgs = methodCallArgs.replace("rbPos","RingBuffer.getWorkingTailPositionObject(rb)"); 
             }
