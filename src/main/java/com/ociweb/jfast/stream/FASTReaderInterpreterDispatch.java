@@ -1565,7 +1565,8 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // default
                 int initId = LocalHeap.INIT_VALUE_MASK|idx;
                 int initIdx = LocalHeap.initStartOffset(initId, byteHeap) |LocalHeap.INIT_VALUE_MASK;
-                genReadASCIIDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), rbRingBuffer.mask, rbRingBuffer.buffer, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer.byteBuffer, rbRingBuffer.byteMask, rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer)); //dynamic or constant
+                genReadASCIIDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), rbRingBuffer.mask, rbRingBuffer.buffer, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), 
+                        RingBuffer.byteBuffer(rbRingBuffer), rbRingBuffer.byteMask, rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer)); //dynamic or constant
             }
         }
     }
@@ -1647,7 +1648,8 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     // for ASCII we don't need special behavior for optional
                     int initId = LocalHeap.INIT_VALUE_MASK|idx;
                     int initIdx = LocalHeap.initStartOffset(initId, byteHeap) |LocalHeap.INIT_VALUE_MASK;
-                    genReadASCIIDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), rbRingBuffer.mask, rbRingBuffer.buffer, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer.byteBuffer, rbRingBuffer.byteMask, rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
+                    genReadASCIIDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), rbRingBuffer.mask, rbRingBuffer.buffer, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer),
+                            RingBuffer.byteBuffer(rbRingBuffer), rbRingBuffer.byteMask, rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
                 }
             }
         }
