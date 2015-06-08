@@ -143,7 +143,7 @@ public class StreamingLongTest extends BaseStreamingTest {
         assert (0 != (token & (4 << TokenBuilder.SHIFT_TYPE)));
         //  solution as the ring buffer is introduce into all the APIs
         RingBuffer.dump(rbRingBufferLocal);            
-        RingBuffer.addLongValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,RingBuffer.getWorkingHeadPositionObject(rbRingBufferLocal),value); 
+        RingBuffer.addLongValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,RingBuffer.getWorkingHeadPositionObject(rbRingBufferLocal),value); 
         RingBuffer.publishWrites(rbRingBufferLocal);
         int rbPos = 0;                    
         

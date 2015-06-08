@@ -643,7 +643,7 @@ public class CatalogGeneratorTest {
                             }
                             
                             long whp = RingBuffer.workingHeadPosition(ringBuffer);                            
-                            RingBuffer.setValue(ringBuffer.buffer,ringBuffer.mask,whp,value);
+                            RingBuffer.setValue(RingBuffer.primaryBuffer(ringBuffer),ringBuffer.mask,whp,value);
                             RingBuffer.setWorkingHead(ringBuffer, whp+1);
                             
                             if (0 == intDataIndex) {
@@ -683,7 +683,7 @@ public class CatalogGeneratorTest {
 //                                value = TokenBuilder.absentValue64(TokenBuilder.MASK_ABSENT_DEFAULT);
 //                            }
                             
-                            RingBuffer.addLongValue(ringBuffer.buffer, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), value);
+                            RingBuffer.addLongValue(RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), value);
                             if (0==longDataIndex) {
                                 longDataIndex = ReaderWriterPrimitiveTest.unsignedLongData.length;
                             }

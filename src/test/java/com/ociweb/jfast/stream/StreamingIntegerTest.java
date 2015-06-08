@@ -169,7 +169,7 @@ public class StreamingIntegerTest extends BaseStreamingTest {
         //temp solution as the ring buffer is introduce into all the APIs
         RingBuffer.dump(rbRingBufferLocal);
         long whp = RingBuffer.workingHeadPosition(rbRingBufferLocal);
-        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,whp++,value);
+        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,value);
         RingBuffer.setWorkingHead(rbRingBufferLocal,whp);
         RingBuffer.publishWrites(rbRingBufferLocal);
         int rbPos = 0;

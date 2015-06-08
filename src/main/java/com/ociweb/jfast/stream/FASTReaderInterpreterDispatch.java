@@ -380,17 +380,17 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // none, delta
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadDecimalDefaultOptionalMantissaNone(expoConstAbsent, expoConstDefault, mantissaTarget, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalDefaultOptionalMantissaNone(expoConstAbsent, expoConstDefault, mantissaTarget, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 } else {
                     // delta
                     int mantissaSource = readFromIdx > 0 ? readFromIdx & MAX_LONG_INSTANCE_MASK : mantissaTarget;
-                    genReadDecimalDefaultOptionalMantissaDelta(expoConstAbsent, expoConstDefault, mantissaTarget, mantissaSource, rbRingBuffer.buffer, rLongDictionary, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalDefaultOptionalMantissaDelta(expoConstAbsent, expoConstDefault, mantissaTarget, mantissaSource, RingBuffer.primaryBuffer(rbRingBuffer), rLongDictionary, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 }
             } else {
                 // constant
                 // always return this required value.
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalDefaultOptionalMantissaConstant(expoConstAbsent, expoConstDefault, mantissaConstDefault, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalDefaultOptionalMantissaConstant(expoConstAbsent, expoConstDefault, mantissaConstDefault, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
 
         } else {
@@ -401,16 +401,16 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalDefaultOptionalMantissaCopy(expoConstAbsent, expoConstDefault, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalDefaultOptionalMantissaCopy(expoConstAbsent, expoConstDefault, mantissaTarget, mantissaSource, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 } else {
                     // increment
-                    genReadDecimalDefaultOptionalMantissaIncrement(expoConstAbsent, expoConstDefault, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalDefaultOptionalMantissaIncrement(expoConstAbsent, expoConstDefault, mantissaTarget, mantissaSource, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 }
             } else {
 
                 // default
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalDefaultOptionalMantissaDefault(expoConstAbsent, expoConstDefault, mantissaConstDefault, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalDefaultOptionalMantissaDefault(expoConstAbsent, expoConstDefault, mantissaConstDefault, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
         }
         
@@ -425,17 +425,17 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // none, delta
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadDecimalIncrementOptionalMantissaNone(expoTarget, expoSource, expoConstAbsent, mantissaTarget, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalIncrementOptionalMantissaNone(expoTarget, expoSource, expoConstAbsent, mantissaTarget, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 } else {
                     // delta
                     int mantissaSource = readFromIdx > 0 ? readFromIdx & MAX_LONG_INSTANCE_MASK : mantissaTarget;
-                    genReadDecimalIncrementOptionalMantissaDelta(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalIncrementOptionalMantissaDelta(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 }
             } else {
                 // constant
                 // always return this required value.
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalIncrementOptionalMantissaConstant(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalIncrementOptionalMantissaConstant(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
 
         } else {
@@ -446,16 +446,16 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalIncrementOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalIncrementOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 } else {
                     // increment
-                    genReadDecimalIncrementOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalIncrementOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 }
             } else {
 
                 // default
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalIncrementOptionalMantissaDefault(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalIncrementOptionalMantissaDefault(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
         }
     }
@@ -472,17 +472,17 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // none, delta
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadDecimalCopyOptionalMantissaNone(expoTarget, expoSource, expoConstAbsent, mantissaTarget, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalCopyOptionalMantissaNone(expoTarget, expoSource, expoConstAbsent, mantissaTarget, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 } else {
                     // delta
                     int mantissaSource = readFromIdx > 0 ? readFromIdx & MAX_LONG_INSTANCE_MASK : mantissaTarget;
-                    genReadDecimalCopyOptionalMantissaDelta(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalCopyOptionalMantissaDelta(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 }
             } else {
                 // constant
                 // always return this required value.
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalCopyOptionalMantissaConstant(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalCopyOptionalMantissaConstant(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
 
         } else {
@@ -493,16 +493,16 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalCopyOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalCopyOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 } else {
                     // increment
-                    genReadDecimalCopyOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalCopyOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 }
             } else {
 
                 // default
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalCopyOptionalMantissaDefault(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalCopyOptionalMantissaDefault(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
         }
     }
@@ -515,17 +515,17 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // none, delta
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadDecimalConstantOptionalMantissaNone(expoConstAbsent, expoConstConst, mantissaTarget, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalConstantOptionalMantissaNone(expoConstAbsent, expoConstConst, mantissaTarget, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 } else {
                     // delta
                     int mantissaSource = readFromIdx > 0 ? readFromIdx & MAX_LONG_INSTANCE_MASK : mantissaTarget;
-                    genReadDecimalConstantOptionalMantissaDelta(expoConstAbsent, expoConstConst, mantissaTarget, mantissaSource, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalConstantOptionalMantissaDelta(expoConstAbsent, expoConstConst, mantissaTarget, mantissaSource, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 }
             } else {
                 // constant
                 // always return this required value.
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalConstantOptionalMantissaConstant(expoConstAbsent, expoConstConst, mantissaConstDefault, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalConstantOptionalMantissaConstant(expoConstAbsent, expoConstConst, mantissaConstDefault, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
 
         } else {
@@ -536,16 +536,16 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalConstantOptionalMantissaCopy(expoConstAbsent, expoConstConst, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalConstantOptionalMantissaCopy(expoConstAbsent, expoConstConst, mantissaTarget, mantissaSource, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 } else {
                     // increment
-                    genReadDecimalConstantOptionalMantissaIncrement(expoConstAbsent, expoConstConst, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalConstantOptionalMantissaIncrement(expoConstAbsent, expoConstConst, mantissaTarget, mantissaSource, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 }
             } else {
 
                 // default
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalConstantOptionalMantissaDefault(expoConstAbsent, expoConstConst, mantissaConstDefault, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalConstantOptionalMantissaDefault(expoConstAbsent, expoConstConst, mantissaConstDefault, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
         }
     }
@@ -559,17 +559,17 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // none, delta
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadDecimalDeltaOptionalMantissaNone(expoTarget, expoSource, expoConstAbsent, mantissaTarget, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalDeltaOptionalMantissaNone(expoTarget, expoSource, expoConstAbsent, mantissaTarget, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 } else {
                     // delta
                     int mantissaSource = readFromIdx > 0 ? readFromIdx & MAX_LONG_INSTANCE_MASK : mantissaTarget;
-                    genReadDecimalDeltaOptionalMantissaDelta(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalDeltaOptionalMantissaDelta(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 }
             } else {
                 // constant
                 // always return this required value.
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalDeltaOptionalMantissaConstant(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalDeltaOptionalMantissaConstant(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
 
         } else {
@@ -580,16 +580,16 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalDeltaOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalDeltaOptionalMantissaCopy(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 } else {
                     // increment
-                    genReadDecimalDeltaOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalDeltaOptionalMantissaIncrement(expoTarget, expoSource, expoConstAbsent, mantissaTarget, mantissaSource, rIntDictionary, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 }
             } else {
 
                 // default
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalDeltaOptionalMantissaDefault(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalDeltaOptionalMantissaDefault(expoTarget, expoSource, expoConstAbsent, mantissaConstDefault, rIntDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
         }
     }
@@ -603,17 +603,17 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // none, delta
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadDecimalOptionalMantissaNone(expoConstAbsent, mantissaTarget, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalOptionalMantissaNone(expoConstAbsent, mantissaTarget, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 } else {
                     // delta
                     int mantissaSource = readFromIdx > 0 ? readFromIdx & MAX_LONG_INSTANCE_MASK : mantissaTarget;
-                    genReadDecimalOptionalMantissaDelta(expoConstAbsent, mantissaTarget, mantissaSource, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
+                    genReadDecimalOptionalMantissaDelta(expoConstAbsent, mantissaTarget, mantissaSource, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rLongDictionary);
                 }
             } else {
                 // constant
                 // always return this required value.
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalOptionalMantissaConstant(expoConstAbsent, mantissaConstDefault, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalOptionalMantissaConstant(expoConstAbsent, mantissaConstDefault, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
         } else {
             // copy, default, increment
@@ -623,16 +623,16 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // copy, increment
                 if (0 == (mantToken & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy      
-                    genReadDecimalOptionalMantissaCopy(expoConstAbsent, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalOptionalMantissaCopy(expoConstAbsent, mantissaTarget, mantissaSource, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 } else {
                     // increment
-                    genReadDecimalOptionalMantissaIncrement(expoConstAbsent, mantissaTarget, mantissaSource, rLongDictionary, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadDecimalOptionalMantissaIncrement(expoConstAbsent, mantissaTarget, mantissaSource, rLongDictionary, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 }
             } else {
 
                 // default
                 long mantissaConstDefault = rLongDictionary[mantToken & MAX_LONG_INSTANCE_MASK];
-                genReadDecimalOptionalMantissaDefault(expoConstAbsent, mantissaConstDefault, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                genReadDecimalOptionalMantissaDefault(expoConstAbsent, mantissaConstDefault, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
             }
         }
     }
@@ -788,7 +788,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
 					long constAbsent = FieldReferenceOffsetManager.getAbsent64Value(r);
 
-                    genReadLongSignedNoneOptional(constAbsent, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongSignedNoneOptional(constAbsent, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // delta
                     int target = token & instanceMask;
@@ -796,7 +796,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     long constAbsent = FieldReferenceOffsetManager.getAbsent64Value(r);
 
-                    genReadLongSignedDeltaOptional(target, source, constAbsent, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongSignedDeltaOptional(target, source, constAbsent, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // constant
@@ -804,7 +804,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 				long constAbsent = FieldReferenceOffsetManager.getAbsent64Value(r);
                 long constConst = rLongDictionary[token & instanceMask];
 
-                genReadLongSignedConstantOptional(constAbsent, constConst, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadLongSignedConstantOptional(constAbsent, constConst, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
 
         } else {
@@ -818,7 +818,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     long constAbsent = FieldReferenceOffsetManager.getAbsent64Value(r);
 
-                    genReadLongSignedCopyOptional(target, source, constAbsent, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongSignedCopyOptional(target, source, constAbsent, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // increment
                     int target = token & instanceMask;
@@ -826,7 +826,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     long constAbsent = FieldReferenceOffsetManager.getAbsent64Value(r);
 
-                    genReadLongSignedIncrementOptional(target, source, constAbsent, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongSignedIncrementOptional(target, source, constAbsent, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // default
@@ -835,7 +835,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 long constDefault = rLongDictionary[token & instanceMask] == 0 ? constAbsent
                         : rLongDictionary[token & instanceMask];
 
-                genReadLongSignedDefaultOptional(constAbsent, constDefault, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadLongSignedDefaultOptional(constAbsent, constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
         }
 
@@ -851,21 +851,21 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 if (0 == (token & (4 << TokenBuilder.SHIFT_OPER))) {
                     // none
                     
-                    genReadLongSignedNone(target, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));  
+                    genReadLongSignedNone(target, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));  
                 } else {
                     // delta
                     int source = readFromIdx > 0 ? readFromIdx & instanceMask : target;
                     if (source==target) {
-                        genReadLongSignedDeltaTS(target, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                        genReadLongSignedDeltaTS(target, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                     } else {
-                        genReadLongSignedDelta(target, source, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                        genReadLongSignedDelta(target, source, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                     }
                 }
             } else {
                 // constant
                 // always return this required value.
                 long constDefault = rLongDictionary[token & instanceMask];
-                genReadLongSignedConstant(constDefault, ringBuffer.buffer, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadLongSignedConstant(constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
 
         } else {
@@ -877,17 +877,17 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 if (0 == (token & (4 << TokenBuilder.SHIFT_OPER))) {
                     // copy
 
-                    genReadLongSignedCopy(target, source, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongSignedCopy(target, source, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // increment
 
-                    genReadLongSignedIncrement(target, source, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongSignedIncrement(target, source, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // default
                 long constDefault = rLongDictionary[token & instanceMask];
 
-                genReadLongSignedDefault(constDefault, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadLongSignedDefault(constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
         }
     }
@@ -903,7 +903,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
 					long constAbsent = FieldReferenceOffsetManager.getAbsent64Value(r);
 
-                    genReadLongUnsignedOptional(constAbsent, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongUnsignedOptional(constAbsent, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // delta
                     int target = token & MAX_LONG_INSTANCE_MASK;
@@ -911,7 +911,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     long constAbsent = FieldReferenceOffsetManager.getAbsent64Value(r);
 
-                    genReadLongUnsignedDeltaOptional(target, source, constAbsent, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongUnsignedDeltaOptional(target, source, constAbsent, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // constant
@@ -919,7 +919,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 				long constAbsent = FieldReferenceOffsetManager.getAbsent64Value(r);
                 long constConst = rLongDictionary[token & MAX_LONG_INSTANCE_MASK];
 
-                genReadLongUnsignedConstantOptional(constAbsent, constConst, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadLongUnsignedConstantOptional(constAbsent, constConst, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
 
         } else {
@@ -933,7 +933,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     long constAbsent = FieldReferenceOffsetManager.getAbsent64Value(r);
 
-                    genReadLongUnsignedCopyOptional(target, source, constAbsent, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongUnsignedCopyOptional(target, source, constAbsent, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // increment
                     int target = token & MAX_LONG_INSTANCE_MASK;
@@ -941,7 +941,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     long constAbsent = FieldReferenceOffsetManager.getAbsent64Value(r);
 
-                    genReadLongUnsignedIncrementOptional(target, source, constAbsent, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongUnsignedIncrementOptional(target, source, constAbsent, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // default
@@ -950,7 +950,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 long constDefault = rLongDictionary[token & MAX_LONG_INSTANCE_MASK] == 0 ? constAbsent
                         : rLongDictionary[token & MAX_LONG_INSTANCE_MASK];
 
-                genReadLongUnsignedDefaultOptional(constAbsent, constDefault, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadLongUnsignedDefaultOptional(constAbsent, constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
         }
 
@@ -966,19 +966,19 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     // none
                     int target = token & MAX_LONG_INSTANCE_MASK;
 
-                    genReadLongUnsignedNone(target, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongUnsignedNone(target, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // delta
                     int target = token & MAX_LONG_INSTANCE_MASK;
                     int source = readFromIdx > 0 ? readFromIdx & MAX_LONG_INSTANCE_MASK : target;
 
-                    genReadLongUnsignedDelta(target, source, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongUnsignedDelta(target, source, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // constant
                 // always return this required value.
                 long constDefault = rLongDictionary[token & MAX_LONG_INSTANCE_MASK];
-                genReadLongConstant(constDefault, ringBuffer.buffer, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadLongConstant(constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
 
         } else {
@@ -990,19 +990,19 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     int target = token & MAX_LONG_INSTANCE_MASK;
                     int source = readFromIdx > 0 ? readFromIdx & MAX_LONG_INSTANCE_MASK : target;
 
-                    genReadLongUnsignedCopy(target, source, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongUnsignedCopy(target, source, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // increment
                     int target = token & MAX_LONG_INSTANCE_MASK;
                     int source = readFromIdx > 0 ? readFromIdx & MAX_LONG_INSTANCE_MASK : target;
 
-                    genReadLongUnsignedIncrement(target, source, rLongDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadLongUnsignedIncrement(target, source, rLongDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // default
                 long constDefault = rLongDictionary[token & MAX_LONG_INSTANCE_MASK];
 
-                genReadLongUnsignedDefault(constDefault, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadLongUnsignedDefault(constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
         }
 
@@ -1019,7 +1019,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
 					int constAbsent = FieldReferenceOffsetManager.getAbsent32Value(r);
 
-                    genReadIntegerSignedOptional(constAbsent, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerSignedOptional(constAbsent, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // delta
                     int target = token & instanceMask;
@@ -1027,7 +1027,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     int constAbsent = FieldReferenceOffsetManager.getAbsent32Value(r);
 
-                    genReadIntegerSignedDeltaOptional(target, source, constAbsent, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerSignedDeltaOptional(target, source, constAbsent, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // constant
@@ -1035,7 +1035,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 				int constAbsent = FieldReferenceOffsetManager.getAbsent32Value(r);
                 int constConst = rIntDictionary[token & instanceMask];
 
-                genReadIntegerSignedConstantOptional(constAbsent, constConst, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadIntegerSignedConstantOptional(constAbsent, constConst, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
 
         } else {
@@ -1049,7 +1049,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     int constAbsent = FieldReferenceOffsetManager.getAbsent32Value(r);
 
-                    genReadIntegerSignedCopyOptional(target, source, constAbsent, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerSignedCopyOptional(target, source, constAbsent, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // increment
                     int target = token & instanceMask;
@@ -1057,7 +1057,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     int constAbsent = FieldReferenceOffsetManager.getAbsent32Value(r);
 
-                    genReadIntegerSignedIncrementOptional(target, source, constAbsent, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerSignedIncrementOptional(target, source, constAbsent, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // default
@@ -1066,7 +1066,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 int constDefault = rIntDictionary[token & instanceMask] == 0 ? constAbsent
                         : rIntDictionary[token & instanceMask];
 
-                genReadIntegerSignedDefaultOptional(constAbsent, constDefault, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadIntegerSignedDefaultOptional(constAbsent, constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
         }
 
@@ -1081,18 +1081,18 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 if (0 == (token & (4 << TokenBuilder.SHIFT_OPER))) {
                     // none
                     int target = token & instanceMask;
-                    genReadIntegerSignedNone(target, ringBuffer.buffer, ringBuffer.mask, reader, rIntDictionary, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerSignedNone(target, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, rIntDictionary, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // delta
                     int target = token & instanceMask;
                     int source = readFromIdx > 0 ? readFromIdx & instanceMask : target;
-                    genReadIntegerSignedDelta(target, source, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerSignedDelta(target, source, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // constant
                 // always return this required value.
                 int constDefault = rIntDictionary[token & instanceMask];
-                genReadIntegerConstant(constDefault, ringBuffer.buffer, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadIntegerConstant(constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
 
         } else {
@@ -1103,17 +1103,17 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     // copy
                     int target = token & instanceMask;
                     int source = readFromIdx > 0 ? readFromIdx & instanceMask : target;
-                    genReadIntegerSignedCopy(target, source, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerSignedCopy(target, source, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // increment
                     int target = token & instanceMask;
                     int source = readFromIdx > 0 ? readFromIdx & instanceMask : target;
-                    genReadIntegerSignedIncrement(target, source, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerSignedIncrement(target, source, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // default
                 int constDefault = rIntDictionary[token & instanceMask];
-                genReadIntegerSignedDefault(constDefault, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadIntegerSignedDefault(constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
         }
     }
@@ -1130,7 +1130,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     int constAbsent = FieldReferenceOffsetManager.getAbsent32Value(r);
 
-                    genReadIntegerUnsignedOptional(constAbsent, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerUnsignedOptional(constAbsent, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // delta
                     int target = token & MAX_INT_INSTANCE_MASK;
@@ -1138,7 +1138,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     int constAbsent = FieldReferenceOffsetManager.getAbsent32Value(r);
 
-                    genReadIntegerUnsignedDeltaOptional(target, source, constAbsent, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerUnsignedDeltaOptional(target, source, constAbsent, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // constant
@@ -1146,7 +1146,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 				int constAbsent = FieldReferenceOffsetManager.getAbsent32Value(r);
                 int constConst = rIntDictionary[token & MAX_INT_INSTANCE_MASK];
 
-                genReadIntegerUnsignedConstantOptional(constAbsent, constConst, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadIntegerUnsignedConstantOptional(constAbsent, constConst, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
 
         } else {
@@ -1160,7 +1160,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 					FieldReferenceOffsetManager r = RingBuffer.from(ringBuffer);
                     int constAbsent = FieldReferenceOffsetManager.getAbsent32Value(r);
 
-                    genReadIntegerUnsignedCopyOptional(target, source, constAbsent, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerUnsignedCopyOptional(target, source, constAbsent, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // increment
                     int target = token & MAX_INT_INSTANCE_MASK;
@@ -1169,9 +1169,9 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     int constAbsent = FieldReferenceOffsetManager.getAbsent32Value(r);
 
                     if (target==source) {
-                        genReadIntegerUnsignedIncrementOptionalTS(target, constAbsent, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                        genReadIntegerUnsignedIncrementOptionalTS(target, constAbsent, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                     } else {
-                        genReadIntegerUnsignedIncrementOptional(target, source, constAbsent, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                        genReadIntegerUnsignedIncrementOptional(target, source, constAbsent, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                     }
                 }
             } else {
@@ -1183,7 +1183,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 int t = rIntDictionary[source];
                 int constDefault = t == 0 ? constAbsent : t - 1;
 
-                genReadIntegerUnsignedDefaultOptional(constAbsent, constDefault, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadIntegerUnsignedDefaultOptional(constAbsent, constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
         }
 
@@ -1198,17 +1198,17 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 int target = token & MAX_INT_INSTANCE_MASK;
                 if (0 == (token & (4 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadIntegerUnsigned(target, ringBuffer.buffer, ringBuffer.mask, reader, rIntDictionary, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerUnsigned(target, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, rIntDictionary, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 } else {
                     // delta
                     int source = readFromIdx >= 0 ? readFromIdx & MAX_INT_INSTANCE_MASK : target;
-                    genReadIntegerUnsignedDelta(target, source, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                    genReadIntegerUnsignedDelta(target, source, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                 }
             } else {
                 // constant
                 // always return this required value.
                 int constDefault = rIntDictionary[token & MAX_INT_INSTANCE_MASK];
-                genReadIntegerUnsignedConstant(constDefault, ringBuffer.buffer, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadIntegerUnsignedConstant(constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
 
         } else {
@@ -1221,9 +1221,9 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     int source = readFromIdx >= 0 ? readFromIdx & MAX_INT_INSTANCE_MASK : target;
                     
                     if (target==source) {
-                        genReadIntegerUnsignedCopyTS(target, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                        genReadIntegerUnsignedCopyTS(target, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                     } else {
-                        genReadIntegerUnsignedCopy(target, source, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                        genReadIntegerUnsignedCopy(target, source, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                     }
                     
                 } else {
@@ -1232,9 +1232,9 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     int source = readFromIdx >= 0 ? readFromIdx & MAX_INT_INSTANCE_MASK : target;
 
                     if (target==source) {
-                        genReadIntegerUnsignedIncrementTS(target, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                        genReadIntegerUnsignedIncrementTS(target, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                     } else {
-                        genReadIntegerUnsignedIncrement(target, source, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                        genReadIntegerUnsignedIncrement(target, source, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
                     }
                 }
             } else {
@@ -1243,7 +1243,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 int source = readFromIdx >= 0 ? readFromIdx & MAX_INT_INSTANCE_MASK : target;
                 int constDefault = rIntDictionary[source];
 
-                genReadIntegerUnsignedDefault(constDefault, ringBuffer.buffer, ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
+                genReadIntegerUnsignedDefault(constDefault, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, reader, RingBuffer.getWorkingHeadPositionObject(ringBuffer));
             }
         }
     }
@@ -1259,17 +1259,17 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 int target = token & MAX_INT_INSTANCE_MASK;
                 if (0 == (token & (4 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadLength(target, jumpToTarget, jumpToNext, ringBuffer.buffer, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), rIntDictionary, reader, this);
+                    genReadLength(target, jumpToTarget, jumpToNext, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), rIntDictionary, reader, this);
                 } else {
                     // delta
                     int source = readFromIdx >= 0 ? readFromIdx & MAX_INT_INSTANCE_MASK : target;
-                    genReadLengthDelta(target, source, jumpToTarget, jumpToNext, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), reader, this);
+                    genReadLengthDelta(target, source, jumpToTarget, jumpToNext, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), reader, this);
                 }
             } else {
                 // constant
                 // always return this required value.
                 int constDefault = rIntDictionary[token & MAX_INT_INSTANCE_MASK];
-                genReadLengthConstant(constDefault, jumpToTarget, jumpToNext, ringBuffer.buffer, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), this);
+                genReadLengthConstant(constDefault, jumpToTarget, jumpToNext, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), this);
             }
 
         } else {
@@ -1281,13 +1281,13 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     int target = token & MAX_INT_INSTANCE_MASK;
                     int source = readFromIdx >= 0 ? readFromIdx & MAX_INT_INSTANCE_MASK : target;
 
-                    genReadLengthCopy(target, source, jumpToTarget, jumpToNext, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), reader, this);
+                    genReadLengthCopy(target, source, jumpToTarget, jumpToNext, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), reader, this);
                 } else {
                     // increment
                     int target = token & MAX_INT_INSTANCE_MASK;
                     int source = readFromIdx >= 0 ? readFromIdx & MAX_INT_INSTANCE_MASK : target;
 
-                    genReadLengthIncrement(target, source, jumpToTarget, jumpToNext, rIntDictionary, ringBuffer.buffer, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), reader, this);
+                    genReadLengthIncrement(target, source, jumpToTarget, jumpToNext, rIntDictionary, RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), reader, this);
                 }
             } else {
                 // default
@@ -1295,7 +1295,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 int source = readFromIdx >= 0 ? readFromIdx & MAX_INT_INSTANCE_MASK : target;
                 int constDefault = rIntDictionary[source];
 
-                genReadLengthDefault(constDefault, jumpToTarget, jumpToNext, ringBuffer.buffer, reader, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), this);
+                genReadLengthDefault(constDefault, jumpToTarget, jumpToNext, RingBuffer.primaryBuffer(ringBuffer), reader, ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), this);
             }
         }
 
@@ -1316,7 +1316,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         }
         
         //NOTE: for testing we need to check what was written
-        int value = RingBuffer.peek(ringBuffer.buffer, RingBuffer.workingHeadPosition(ringBuffer)-2, ringBuffer.mask);
+        int value = RingBuffer.peek(RingBuffer.primaryBuffer(ringBuffer), RingBuffer.workingHeadPosition(ringBuffer)-2, ringBuffer.mask);
         //if the value is positive it no longer points to the byteHeap so we need
         //to make a replacement here for testing.
         return value<0? value : token & MAX_BYTE_INSTANCE_MASK;
@@ -1332,11 +1332,11 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 if (0 == (token & (8 << TokenBuilder.SHIFT_OPER))) {
                     // none
                     int idx = token & MAX_BYTE_INSTANCE_MASK;
-                    genReadBytesNone(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
+                    genReadBytesNone(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
                 } else {
                     // tail
                     int idx = token & MAX_BYTE_INSTANCE_MASK;
-                    genReadBytesTail(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
+                    genReadBytesTail(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
                 }
             } else {
                 // constant delta
@@ -1344,11 +1344,11 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     // constant
                     int id =  token & MAX_BYTE_INSTANCE_MASK;
                     int idLength = LocalHeap.length(id,byteHeap);
-                    genReadBytesConstant(id, idLength, rbRingBuffer.buffer, rbRingBuffer.mask, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadBytesConstant(id, idLength, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 } else {
                     // delta
                     int idx = token & MAX_BYTE_INSTANCE_MASK;
-                    genReadBytesDelta(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
+                    genReadBytesDelta(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
                 }
             }
         } else {
@@ -1357,7 +1357,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
             if (0 == (token & (2 << TokenBuilder.SHIFT_OPER))) {// compiler does
                                                                 // all the work.
                 // copy
-                genReadBytesCopy(idx, 0, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
+                genReadBytesCopy(idx, 0, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
                 //TODO: T, need unit tests to cover null vs zero length optional copy byte arrays, this case may not be 100% covered
             } else {
                 // default
@@ -1365,7 +1365,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 int idLength = LocalHeap.length(initId,byteHeap);
                 int initIdx = LocalHeap.initStartOffset(initId, byteHeap);
                 
-                genReadBytesDefault(idx,initIdx, idLength, 0, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
+                genReadBytesDefault(idx,initIdx, idLength, 0, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
             }
         }
     }
@@ -1382,10 +1382,10 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // none tail
                 if (0 == (token & (8 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadBytesNoneOptional(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
+                    genReadBytesNoneOptional(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
                 } else {
                     // tail
-                    genReadBytesTailOptional(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
+                    genReadBytesTailOptional(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
                 }
             } else {
                 // constant delta
@@ -1398,10 +1398,10 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     int constValue =    idx;
                     int constValueLen = LocalHeap.length(constValue,byteHeap);
                     
-                    genReadBytesConstantOptional(constInit, constInitLen, constValue, constValueLen, rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadBytesConstantOptional(constInit, constInitLen, constValue, constValueLen, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 } else {
                     // delta
-                    genReadBytesDeltaOptional(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
+                    genReadBytesDeltaOptional(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
                 }
             }
         } else {
@@ -1410,7 +1410,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                                                                 // all the work.
                 // copy
                 int idx = token & MAX_BYTE_INSTANCE_MASK;
-                genReadBytesCopy(idx, 1, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
+                genReadBytesCopy(idx, 1, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
             } else {
                 // default
                 int constValue =    token & MAX_BYTE_INSTANCE_MASK;
@@ -1419,7 +1419,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 int constValueLen = LocalHeap.length(initId,byteHeap);
                 int initIdx = LocalHeap.initStartOffset(initId, byteHeap)|LocalHeap.INIT_VALUE_MASK;
                 
-                genReadBytesDefault(constValue,initIdx, constValueLen,1, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
+                genReadBytesDefault(constValue,initIdx, constValueLen,1, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
             }
         }
     }
@@ -1467,11 +1467,11 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // none tail
                 if (0 == (token & (8 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadBytesNoneOptional(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
+                    genReadBytesNoneOptional(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
                     
                 } else {
                     // tail
-                    genReadBytesTailOptional(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
+                    genReadBytesTailOptional(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
                     
                 }
             } else {
@@ -1483,11 +1483,11 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     
                     int constValue = idx;
                    
-                    genReadBytesConstantOptional(constInit, LocalHeap.initLength(constId, byteHeap), constValue, LocalHeap.initLength(constValue, byteHeap), rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadBytesConstantOptional(constInit, LocalHeap.initLength(constId, byteHeap), constValue, LocalHeap.initLength(constValue, byteHeap), RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                                 
                 } else {
                     // delta   
-                    genReadBytesDeltaOptional(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
+                    genReadBytesDeltaOptional(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
                     
                 }
             }
@@ -1496,13 +1496,13 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
             if (0 == (token & (2 << TokenBuilder.SHIFT_OPER))) {// compiler does
                                                                 // all the work.
                 // copy
-                genReadBytesCopy(idx,1, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
+                genReadBytesCopy(idx,1, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
             } else {
                 // default
                 int initId = LocalHeap.INIT_VALUE_MASK | idx;
                 int initIdx = LocalHeap.initStartOffset(initId, byteHeap)|LocalHeap.INIT_VALUE_MASK;
                 
-                genReadBytesDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), 1, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer) , rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
+                genReadBytesDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), 1, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer) , rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
                 
             }
         }
@@ -1521,7 +1521,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         }
         
         //NOTE: for testing we need to check what was written
-        int value = RingBuffer.peek(ringBuffer.buffer, RingBuffer.workingHeadPosition(ringBuffer)-2, ringBuffer.mask);
+        int value = RingBuffer.peek(RingBuffer.primaryBuffer(ringBuffer), RingBuffer.workingHeadPosition(ringBuffer)-2, ringBuffer.mask);
         //if the value is positive it no longer points to the byteHeap so we need
         //to make a replacement here for testing.
         return value<0? value : token & MAX_BYTE_INSTANCE_MASK;
@@ -1538,10 +1538,10 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // none tail
                 if (0 == (token & (8 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadASCIINone(idx, rbRingBuffer.buffer, rbRingBuffer.mask, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);//always dynamic
+                    genReadASCIINone(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);//always dynamic
                 } else {
                     // tail
-                    genReadASCIITail(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);//always dynamic
+                    genReadASCIITail(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);//always dynamic
                 }
             } else {
                 // constant delta
@@ -1549,10 +1549,10 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     // constant
                     int constId = idx | LocalHeap.INIT_VALUE_MASK;
                     int constInit = LocalHeap.initStartOffset(constId, byteHeap)| LocalHeap.INIT_VALUE_MASK;
-                    genReadTextConstant(constInit, LocalHeap.initLength(constId, byteHeap), rbRingBuffer.buffer, rbRingBuffer.mask, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer)); //always fixed length
+                    genReadTextConstant(constInit, LocalHeap.initLength(constId, byteHeap), RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer)); //always fixed length
                 } else {
                     // delta
-                    genReadASCIIDelta(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);//always dynamic
+                    genReadASCIIDelta(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);//always dynamic
                 }
             }
         } else {
@@ -1560,12 +1560,12 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
             if (0 == (token & (2 << TokenBuilder.SHIFT_OPER))) {// compiler does
                                                                 // all the work.
                 // copy
-                genReadASCIICopy(idx, rbRingBuffer.mask, rbRingBuffer.buffer, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer); //always dynamic
+                genReadASCIICopy(idx, rbRingBuffer.mask, RingBuffer.primaryBuffer(rbRingBuffer), reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer); //always dynamic
             } else {
                 // default
                 int initId = LocalHeap.INIT_VALUE_MASK|idx;
                 int initIdx = LocalHeap.initStartOffset(initId, byteHeap) |LocalHeap.INIT_VALUE_MASK;
-                genReadASCIIDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), rbRingBuffer.mask, rbRingBuffer.buffer, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), 
+                genReadASCIIDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), rbRingBuffer.mask, RingBuffer.primaryBuffer(rbRingBuffer), reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), 
                         RingBuffer.byteBuffer(rbRingBuffer), rbRingBuffer.byteMask, rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer)); //dynamic or constant
             }
         }
@@ -1581,11 +1581,11 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                 // none tail
                 if (0 == (token & (8 << TokenBuilder.SHIFT_OPER))) {
                     // none
-                    genReadBytesNone(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
+                    genReadBytesNone(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
          
                 } else {
                     // tail
-                    genReadBytesTail(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
+                    genReadBytesTail(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
                 }
             } else {
                 // constant delta
@@ -1594,11 +1594,11 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
                     int constId = idx | LocalHeap.INIT_VALUE_MASK;
                     int constInit = LocalHeap.initStartOffset(constId, byteHeap)| LocalHeap.INIT_VALUE_MASK;
                     
-                    genReadBytesConstant(constInit, LocalHeap.initLength(constId, byteHeap), rbRingBuffer.buffer, rbRingBuffer.mask, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadBytesConstant(constInit, LocalHeap.initLength(constId, byteHeap), RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                     
                 } else {
                     // delta 
-                    genReadBytesDelta(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
+                    genReadBytesDelta(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), reader, rbRingBuffer);
                 }
             }
         } else {
@@ -1606,14 +1606,14 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
             if (0 == (token & (2 << TokenBuilder.SHIFT_OPER))) {// compiler does
                                                                 // all the work.
                 // copy
-                genReadBytesCopy(idx,0, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
+                genReadBytesCopy(idx,0, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
                 
             } else {
                 // default
                 int initId = LocalHeap.INIT_VALUE_MASK | idx;
                 int initIdx = LocalHeap.initStartOffset(initId, byteHeap)|LocalHeap.INIT_VALUE_MASK;
                 
-                genReadBytesDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), 0, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
+                genReadBytesDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), 0, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
                 
             }
         }
@@ -1624,31 +1624,31 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
         if (0 == (token & ((4 | 2 | 1) << TokenBuilder.SHIFT_OPER))) {
             if (0 == (token & (8 << TokenBuilder.SHIFT_OPER))) {
                 // none
-                genReadASCIINone(idx, rbRingBuffer.buffer, rbRingBuffer.mask, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
+                genReadASCIINone(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
             } else {
                 // tail
-                genReadASCIITailOptional(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
+                genReadASCIITailOptional(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
             }
         } else {
             if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
                 if (0 == (token & (2 << TokenBuilder.SHIFT_OPER))) {
-                    genReadASCIIDeltaOptional(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
+                    genReadASCIIDeltaOptional(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
                 } else {
                     int constId = (token & MAX_BYTE_INSTANCE_MASK) | LocalHeap.INIT_VALUE_MASK;
                     int constInit = LocalHeap.initStartOffset(constId, byteHeap)| LocalHeap.INIT_VALUE_MASK;
                     
                     //TODO: B, redo text to avoid copy and have usage counter in text heap and, not sure we know which array to read from.
                     int constValue = token & MAX_BYTE_INSTANCE_MASK; 
-                    genReadTextConstantOptional(constInit, constValue, LocalHeap.initLength(constId, byteHeap), LocalHeap.initLength(constValue, byteHeap), rbRingBuffer.buffer, rbRingBuffer.mask, reader, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
+                    genReadTextConstantOptional(constInit, constValue, LocalHeap.initLength(constId, byteHeap), LocalHeap.initLength(constValue, byteHeap), RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, reader, RingBuffer.bytesWriteBase(rbRingBuffer), RingBuffer.getWorkingHeadPositionObject(rbRingBuffer));
                 }
             } else {
                 if (0 == (token & (2 << TokenBuilder.SHIFT_OPER))) {
-                    genReadASCIICopyOptional(idx, rbRingBuffer.buffer, rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
+                    genReadASCIICopyOptional(idx, RingBuffer.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, byteHeap, reader, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer), rbRingBuffer);
                 } else {
                     // for ASCII we don't need special behavior for optional
                     int initId = LocalHeap.INIT_VALUE_MASK|idx;
                     int initIdx = LocalHeap.initStartOffset(initId, byteHeap) |LocalHeap.INIT_VALUE_MASK;
-                    genReadASCIIDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), rbRingBuffer.mask, rbRingBuffer.buffer, reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer),
+                    genReadASCIIDefault(idx, initIdx, LocalHeap.initLength(initId, byteHeap), rbRingBuffer.mask, RingBuffer.primaryBuffer(rbRingBuffer), reader, byteHeap, RingBuffer.getWorkingHeadPositionObject(rbRingBuffer),
                             RingBuffer.byteBuffer(rbRingBuffer), rbRingBuffer.byteMask, rbRingBuffer, RingBuffer.bytesWriteBase(rbRingBuffer));
                 }
             }

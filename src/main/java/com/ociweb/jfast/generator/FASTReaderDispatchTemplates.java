@@ -99,7 +99,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
         RingBuffer rb = RingBuffers.get(dispatch.ringBuffers,dispatch.activeScriptCursor);  
         long whp = RingBuffer.workingHeadPosition(rb);
-        RingBuffer.setValue(rb.buffer,rb.mask,whp++,dispatch.preambleB);
+        RingBuffer.setValue(RingBuffer.primaryBuffer(rb),rb.mask,whp++,dispatch.preambleB);
         RingBuffer.setWorkingHead(rb,whp);
         }
     }
@@ -108,7 +108,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
         RingBuffer rb = RingBuffers.get(dispatch.ringBuffers,dispatch.activeScriptCursor);
         long whp = RingBuffer.workingHeadPosition(rb);
-        RingBuffer.setValue(rb.buffer,rb.mask,whp++,dispatch.preambleA);
+        RingBuffer.setValue(RingBuffer.primaryBuffer(rb),rb.mask,whp++,dispatch.preambleA);
         RingBuffer.setWorkingHead(rb,whp);
         }
     }

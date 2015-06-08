@@ -123,9 +123,9 @@ public class GeneratorUtils {
                             		.replace("rbRingBuffer","rb") //NOTE: Must be first because rb is used by following replacements
                             		.replace("bytesBasePos", "RingBuffer.bytesWriteBase(rb)") //must be second
                             		.replace("dispatch","this")
-                                    .replace("byteBuffer", "rb.byteBuffer")
+                                    .replace("byteBuffer", "RingBuffer.byteBuffer(rb)")
                                     .replace("byteMask", "rb.byteMask")                                    
-                                    .replace("rbB","rb.buffer")
+                                    .replace("rbB","RingBuffer.primaryBuffer(rb)")
                                     .replace("rbMask", "rb.mask");
             
             if (isReader) {
@@ -174,7 +174,7 @@ public class GeneratorUtils {
             if (preambleLength==0) {
                 builder.append("    beginMessage(this);\n");
             } else {
-                builder.append("    beginMessage(writer, rb.buffer, rb.mask, RingBuffer.getWorkingTailPositionObject(rb), this);\n");
+                builder.append("    beginMessage(writer, RingBuffer.primaryBuffer(rb), rb.mask, RingBuffer.getWorkingTailPositionObject(rb), this);\n");
             }
 
            	builder.append("}\n");            

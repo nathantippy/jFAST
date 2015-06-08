@@ -129,9 +129,9 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                         RingBuffer.dump(rbRingBufferLocal);
                        
                         long whp = RingBuffer.workingHeadPosition(rbRingBufferLocal);
-                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,whp++,testExpConst);
-                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,whp++,(int) (testValue >>> 32));
-                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,whp++,(int) (testValue & 0xFFFFFFFF)); 
+                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,testExpConst);
+                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (testValue >>> 32));
+                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (testValue & 0xFFFFFFFF)); 
                         RingBuffer.setWorkingHead(rbRingBufferLocal,whp);
                         
                         RingBuffer.publishWrites(rbRingBufferLocal);
@@ -163,9 +163,9 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                         RingBuffer.dump(rbRingBufferLocal);
                         
                         long whp = RingBuffer.workingHeadPosition(rbRingBufferLocal);
-                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,whp++,1);
-                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,whp++,(int) (mantissa >>> 32));
-                        RingBuffer.setValue(rbRingBufferLocal.buffer,rbRingBufferLocal.mask,whp++,(int) (mantissa & 0xFFFFFFFF)); 
+                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,1);
+                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (mantissa >>> 32));
+                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (mantissa & 0xFFFFFFFF)); 
                         RingBuffer.setWorkingHead(rbRingBufferLocal,whp);
                         
                         RingBuffer.publishWrites(rbRingBufferLocal);
@@ -337,7 +337,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
         }
         
         //must return what was written
-        return RingBuffer.peekLong(ringBuffer.buffer, RingBuffer.workingHeadPosition(ringBuffer)-2, ringBuffer.mask);
+        return RingBuffer.peekLong(RingBuffer.primaryBuffer(ringBuffer), RingBuffer.workingHeadPosition(ringBuffer)-2, ringBuffer.mask);
     }
 
     public static int readDecimalExponent(int token, PrimitiveReader reader, FASTReaderInterpreterDispatch decoder, RingBuffer ringBuffer) {
@@ -353,7 +353,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
             decoder.readIntegerSignedOptional(token, decoder.rIntDictionary, decoder.MAX_INT_INSTANCE_MASK, decoder.readFromIdx, reader, RingBuffers.get(decoder.ringBuffers,0));
         }
         //NOTE: for testing we need to check what was written
-        return RingBuffer.peek(ringBuffer.buffer, RingBuffer.workingHeadPosition(ringBuffer)-1, ringBuffer.mask);
+        return RingBuffer.peek(RingBuffer.primaryBuffer(ringBuffer), RingBuffer.workingHeadPosition(ringBuffer)-1, ringBuffer.mask);
     }
 
 }

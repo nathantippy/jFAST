@@ -192,8 +192,8 @@ public class CodeGenerationTest {
             assertEquals(RingBuffer.contentRemaining(queue1),RingBuffer.contentRemaining(queue2));
             
             while (RingBuffer.contentRemaining(queue1)>0 && RingBuffer.contentRemaining(queue2)>0) {
-				int int1 = RingBuffer.readInt(queue1.buffer, queue1.mask, RingBuffer.addAndGetWorkingTail(queue1, 1));
-                int int2 = RingBuffer.readInt(queue2.buffer, queue2.mask, RingBuffer.addAndGetWorkingTail(queue2, 1));
+				int int1 = RingBuffer.readInt(RingBuffer.primaryBuffer(queue1), queue1.mask, RingBuffer.addAndGetWorkingTail(queue1, 1));
+                int int2 = RingBuffer.readInt(RingBuffer.primaryBuffer(queue2), queue2.mask, RingBuffer.addAndGetWorkingTail(queue2, 1));
 
                 //System.err.println(i+" "+int1+"  "+int2);
                 
