@@ -43,7 +43,8 @@ Please consider getting involved and sponsoring the completion of [jFAST](mailto
     </repository>
 
 # Code example
-  todo
-
+  
+  Review code found in TestApp and com.ociweb.jfast.example.UsageExample
+  todo, more notes to follow
 
 

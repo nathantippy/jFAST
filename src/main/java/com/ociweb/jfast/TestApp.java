@@ -44,16 +44,16 @@ public class TestApp {
         final int maxMessagesOnRing = 16;
         ClientConfig clientConfig = new ClientConfig();
         
-        clientConfig.setPreableBytes((short)4);
-        int maxStringLength = 8;
-        long targetIterators = 200;
-                
-        //TODO: AAAA, add args to modify the preamble, target iterations, and max string 
-
         final String templateSource = getOptArg("templateFile","-t",args,"/performance/example.xml");
         final String dataSource = getOptArg("sourceFile","-s",args,"/performance/complex30000.dat");
+        final String stringPreamble = getOptArg("preamble","-p",args,dataSource.endsWith("complex30000.dat")?"4":"0");
+        final String stringIterations = getOptArg("iterations","-i",args,"200");
+        final String stringMaxTextBytesLength = getOptArg("maxLength","-m",args,"64");
         
         
+        clientConfig.setPreableBytes(Integer.valueOf(stringPreamble).shortValue());
+        final int targetIterations = Integer.valueOf(stringIterations);
+        final int maxStringLength = Integer.valueOf(stringMaxTextBytesLength);       
         
         long messageCount = 0;        
         long msCatLoad = -1;
@@ -74,12 +74,13 @@ public class TestApp {
             FieldReferenceOffsetManager from = TemplateLoader.buildCatalog(catalogBuffer, templateSource, clientConfig);
             byte[] catBytes = catalogBuffer.toByteArray();
             byte[] byteConst = new TemplateCatalogConfig(catBytes).ringByteConstants();            
+            //System.nanoTime()
             
             long finishedCatalogLoad = System.currentTimeMillis();
             
             FASTInputByteArray input = loadFASTInputSourceData(dataSource);
             fileSize = input.remaining();
-            totalBytes = fileSize*targetIterators;
+            totalBytes = fileSize*targetIterations;
                        
             long finishedLoadingRawData = System.currentTimeMillis();
             
@@ -89,7 +90,7 @@ public class TestApp {
             long finishedCompileOfDecoder = System.currentTimeMillis();
                         
             long localCount = 0;
-            long iterationsLeft = targetIterators;
+            long iterationsLeft = targetIterations;
             do {  
                 
                 long beginDecode = System.currentTimeMillis();
@@ -144,12 +145,12 @@ public class TestApp {
         System.out.println("CatalogLoad Time : "+msCatLoad+"ms");
         System.out.println("DiskIO      Time : "+msDiskIO+"ms");
         System.out.println("Compile     Time : "+msCompile+"ms");
-        System.out.println("AvgDecode   Time : "+(msDecode/(float)targetIterators)+"ms    "+bytesPerMs+"bytes/ms   "+msgPerMs+"msg/ms");
+        System.out.println("AvgDecode   Time : "+(msDecode/(float)targetIterations)+"ms    "+bytesPerMs+"bytes/ms   "+msgPerMs+"msg/ms");
         System.out.println("MaxDecode   Time : "+maxDecode+"ms (before warmup)");
         System.out.println("MinDecode   Time : "+minDecode+"ms (after warmup)");
         
         
-        System.out.println("Bytes      Total : "+totalBytes+"   File Size : "+fileSize+"   Iterations: "+targetIterators);
+        System.out.println("Bytes      Total : "+totalBytes+"   File Size : "+fileSize+"   Iterations: "+targetIterations);
         System.out.println("Messages   Total : "+messageCount);
                 
     }
@@ -166,16 +167,6 @@ public class TestApp {
             prev = token;
         }
         return defaultValue;
-    }
-    
-    private static void printHelp(String message) {
-        
-        //  kernel parameters in /etc/sysctl.conf in the format:
-        //      net.ipv4.tcp_tw_reuse=1
-                
-        System.out.println(message);
-        System.out.println();
-        System.out.println("Usage:");
     }
 
 

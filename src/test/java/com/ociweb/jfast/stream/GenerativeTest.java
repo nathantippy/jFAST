@@ -56,7 +56,7 @@ public class GenerativeTest {
         
         FASTDynamicWriter dynamicWriter = new FASTDynamicWriter(writer, generatedTestData, writerDispatch);
         
-////        TODO: AAAAAA, this test reveals a problem with sequence of zero, need to find problem and fix it.
+////        TODO: B, this test reveals a problem with sequence of zero, problem was tracked down to tryReadFragment, must fix in that project
 //        while (RingReader.tryReadFragment(generatedTestData)) {
 ////            
 //            RingReader.printFragment(generatedTestData);
