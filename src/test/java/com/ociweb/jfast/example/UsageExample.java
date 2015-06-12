@@ -42,14 +42,7 @@ import com.ociweb.pronghorn.ring.RingReader;
 
 public class UsageExample {
 
-	
-    
-    
-    
-    
-    
-    
-    
+ 
     
     //TODO: AA, this is not complete and needs to be cleaned up. for a simple example of consuming the data.
     

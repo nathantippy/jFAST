@@ -89,9 +89,9 @@ public class TestApp {
             
             long finishedCompileOfDecoder = System.currentTimeMillis();
                         
-            long localCount = 0;
             long iterationsLeft = targetIterations;
             do {  
+                long localCount = 0;
                 
                 long beginDecode = System.currentTimeMillis();
              

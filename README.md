@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/nathantippy/jFAST.svg?branch=master)](https://travis-ci.org/nathantippy/jFAST)
 
 jFAST
 =====
@@ -27,7 +26,16 @@ Please consider getting involved and sponsoring the completion of [jFAST](mailto
 
     
 # Add to Maven project
-  todo
+  
+  To use this in your maven project add the following dependency.
+  
+    <dependency>
+      <groupId>com.ociweb</groupId>
+      <artifactId>jFAST</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+   
+  Also add this public repository to your pom or settings.
 
     <repository>
       <releases>
@@ -42,9 +50,10 @@ Please consider getting involved and sponsoring the completion of [jFAST](mailto
       <layout>default</layout>
     </repository>
 
+
+
+
 # Code example
   
-  Review code found in TestApp and com.ociweb.jfast.example.UsageExample
-  todo, more notes to follow
-
-
+  Review code found in com.ociweb.jfast.TestApp and com.ociweb.jfast.example.UsageExample
+ 
