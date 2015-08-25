@@ -37,7 +37,7 @@ public class TemplateCatalogConfig {
     private final int maxTemplatePMapSize;
     private final int maxNonTemplatePMapSize;
     private final int maxPMapDepth;
-    private final int maxFieldId; 
+    private final long maxFieldId; 
  
     private final LongHashTable templateToStartIdx;
     
@@ -95,7 +95,7 @@ public class TemplateCatalogConfig {
 
         loadDictionaryMembers(reader);
 
-        maxFieldId = PrimitiveReader.readIntegerUnsigned(reader);
+        maxFieldId = PrimitiveReader.readLongUnsigned(reader);
         // it is assumed that template PMaps are smaller or larger than the
         // other PMaps so these are kept separate
         maxTemplatePMapSize = PrimitiveReader.readIntegerUnsigned(reader);
@@ -203,7 +203,7 @@ public class TemplateCatalogConfig {
     // //* delta IntegerDelta | ScaledNumberDelta | ASCIIStringDelta
     // |ByteVectorDelta
 
-    public static void save(PrimitiveWriter writer, int biggestId, int uniqueTemplateIds, long biggestTemplateId,
+    public static void save(PrimitiveWriter writer, long biggestId, int uniqueTemplateIds, long biggestTemplateId,
             DictionaryFactory df, int maxTemplatePMap, int maxNonTemplatePMap, int[][] tokenIdxMembers,
             int[] tokenIdxMemberHeads, int[] catalogScriptTokens, long[] catalogScriptFieldIds, String[] catalogScriptFieldNames, String[] dictionaryNames,
             int scriptLength,  LongHashTable templateToOffset, LongHashTable templateToLimit , int maxPMapDepth, ClientConfig clientConfig) {    
@@ -214,7 +214,7 @@ public class TemplateCatalogConfig {
 
         saveDictionaryMembers(writer, tokenIdxMembers, tokenIdxMemberHeads);
 
-        PrimitiveWriter.writeIntegerUnsigned(biggestId, writer);
+        PrimitiveWriter.writeLongUnsigned(biggestId, writer);
         // System.err.println("save pmap sizes "+maxTemplatePMap+" "+maxNonTemplatePMap);
         PrimitiveWriter.writeIntegerUnsigned(maxTemplatePMap, writer);
         PrimitiveWriter.writeIntegerUnsigned(maxNonTemplatePMap, writer);
@@ -379,7 +379,7 @@ public class TemplateCatalogConfig {
         return maxTemplatePMapSize;
     }
 
-    public int maxFieldId() {
+    public long maxFieldId() {
         return maxFieldId;
     }
 

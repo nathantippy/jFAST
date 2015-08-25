@@ -681,13 +681,25 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
       int x = 0;
     
     private boolean dispatchWriteByToken(PrimitiveWriter writer, RingBuffer rbRingBuffer) {
-
         int token = fullScript[activeScriptCursor];
-       
-        assert (gatherWriteData(writer, token, activeScriptCursor, fieldPos, rbRingBuffer));
-                   
-        
-   // System.err.println(x+" FASTWriterInterpreterDispatch: "+TokenBuilder.tokenToString(token)+" fieldPos "+fieldPos+"   cursor "+activeScriptCursor);
+        try {            
+            assert (gatherWriteData(writer, token, activeScriptCursor, fieldPos, rbRingBuffer));
+            
+            return dispatchWriteByToken2(writer,rbRingBuffer,token);
+        } catch (Exception e) {
+            //TODO: change to propper logging            
+            System.err.println("ERROR in FASTWriterInterpreterDispatch: while processing token "+TokenBuilder.tokenToString(token)+
+                                  " name "+RingBuffer.from(rbRingBuffer).fieldNameScript[activeScriptCursor]+   
+                                  " fieldPos "+fieldPos+"   cursor "+activeScriptCursor+ "   bytes finished:"+  (writer.bytesReadyToWrite(writer)+writer.totalWritten(writer)));
+           
+            FieldReferenceOffsetManager.debugFROM( RingBuffer.from(rbRingBuffer));
+            throw new RuntimeException(e);
+        }
+    }
+      
+    private boolean dispatchWriteByToken2(PrimitiveWriter writer, RingBuffer rbRingBuffer, int token) {
+
+                           
 
               
         if (0 == (token & (16 << TokenBuilder.SHIFT_TYPE))) {
