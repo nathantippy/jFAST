@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.ociweb.jfast.FAST;
@@ -774,7 +775,7 @@ public class TemplateLoaderTest {
     }
 
 
-    @Test
+    @Ignore
     public void testDecodeTemplateRefMinimal() {
 
 
@@ -786,7 +787,7 @@ public class TemplateLoaderTest {
 
         int field1locator = lookupFieldLocator("field1", MSG_TEST_LOC, catalog.getFROM());
         int field2locator = lookupFieldLocator("field2", MSG_TEST_LOC, catalog.getFROM());
-                int field3locator = lookupFieldLocator("field3", MSG_TEST_LOC, catalog.getFROM());
+        int field3locator = lookupFieldLocator("field3", MSG_TEST_LOC, catalog.getFROM());
 
         System.err.println("cat bytes:"+catBytes.length);
 
