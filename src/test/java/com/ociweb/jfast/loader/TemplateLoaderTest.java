@@ -1,7 +1,7 @@
 package com.ociweb.jfast.loader;
 
-import static com.ociweb.pronghorn.ring.FieldReferenceOffsetManager.lookupFieldLocator;
-import static com.ociweb.pronghorn.ring.FieldReferenceOffsetManager.lookupTemplateLocator;
+import static com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager.lookupFieldLocator;
+import static com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager.lookupTemplateLocator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -46,17 +46,17 @@ import com.ociweb.jfast.stream.FASTDynamicWriter;
 import com.ociweb.jfast.stream.FASTEncoder;
 import com.ociweb.jfast.stream.FASTReaderReactor;
 import com.ociweb.jfast.util.Profile;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.RingReader;
-import com.ociweb.pronghorn.ring.schema.loader.DictionaryFactory;
-import com.ociweb.pronghorn.ring.token.OperatorMask;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
-import com.ociweb.pronghorn.ring.token.TypeMask;
-import com.ociweb.pronghorn.ring.util.Histogram;
-import com.ociweb.pronghorn.ring.util.LocalHeap;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.PipeReader;
+import com.ociweb.pronghorn.pipe.schema.loader.DictionaryFactory;
+import com.ociweb.pronghorn.pipe.token.OperatorMask;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.token.TypeMask;
+import com.ociweb.pronghorn.pipe.util.Histogram;
+import com.ociweb.pronghorn.pipe.util.LocalHeap;
 
 
 public class TemplateLoaderTest {
@@ -131,8 +131,8 @@ public class TemplateLoaderTest {
 
         final FieldReferenceOffsetManager from = catalog.getFROM();
         
-        RingBuffer queue = new RingBuffer(new RingBufferConfig((byte)7, (byte)15, catalog.ringByteConstants(), from));
-		RingBuffers buildNoFanRingBuffers = RingBuffers.buildRingBuffers(queue.initBuffers());
+        Pipe queue = new Pipe(new PipeConfig((byte)7, (byte)15, catalog.ringByteConstants(), from));
+		PipeBundle buildNoFanRingBuffers = PipeBundle.buildRingBuffers(queue.initBuffers());
 		
 		FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, buildNoFanRingBuffers);
 
@@ -164,16 +164,16 @@ public class TemplateLoaderTest {
             frags = 0;
 
             reactor = new FASTReaderReactor(readerDispatch,reader);
-            RingBuffer rb = reactor.ringBuffers()[0];
+            Pipe rb = reactor.ringBuffers()[0];
             rb.reset();
-            RingBuffer.setPublishBatchSize(rb, 0);
+            Pipe.setPublishBatchSize(rb, 0);
 
             while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or if a fragment is read.
-                if (RingReader.tryReadFragment(rb)) {
+                if (PipeReader.tryReadFragment(rb)) {
 	                	
 	                frags++;
-	                if (RingReader.isNewMessage(rb)) {
-	                    final int msgIdx = RingReader.getMsgIdx(rb);
+	                if (PipeReader.isNewMessage(rb)) {
+	                    final int msgIdx = PipeReader.getMsgIdx(rb);
 	                    
 	                    msgs.incrementAndGet();
 	                    
@@ -185,7 +185,7 @@ public class TemplateLoaderTest {
 	                        int i = 0;
 	                        int s = preamble.length;
 	                        while (i < s) {
-	                         	RingBuffer.readInt(RingBuffer.primaryBuffer(queue), queue.mask, RingBuffer.getWorkingTailPosition(queue)+bufferIdx);
+	                         	Pipe.readInt(Pipe.primaryBuffer(queue), queue.mask, Pipe.getWorkingTailPosition(queue)+bufferIdx);
 	                            i += 4;
 	                            bufferIdx++;
 	                        }
@@ -196,8 +196,12 @@ public class TemplateLoaderTest {
 	                    assertTrue("found " + msgIdx, 36 == msgIdx || 3 == msgIdx || 0 == msgIdx);
 
 	                    accumTotals(queue, fullScript, totalBytesOut, totalRingInts, msgIdx, bufferIdx);
-
+	                    
 	                }
+	                
+	                //TODO: AAAA, investigate, only if we finished a message?
+	                PipeReader.releaseReadLock(rb);
+	                
                 } else {
                 	fail("No data?");
                 }
@@ -209,7 +213,7 @@ public class TemplateLoaderTest {
             //fastInput.reset();
             PrimitiveReader.reset(reader);
             readerDispatch.sequenceCountStackHead = -1;
-            RingBuffers.reset(readerDispatch.ringBuffers);
+            PipeBundle.reset(readerDispatch.ringBuffers);
 
   //          System.err.println(reactor.stats.toString()+" ns");
 
@@ -229,8 +233,8 @@ public class TemplateLoaderTest {
 
             reactor = new FASTReaderReactor(readerDispatch,reader);
 
-            RingBuffer rb = null;
-            rb =  RingBuffers.get(readerDispatch.ringBuffers,0);
+            Pipe rb = null;
+            rb =  PipeBundle.get(readerDispatch.ringBuffers,0);
             rb.reset();
             double duration = 0;
 
@@ -244,15 +248,15 @@ public class TemplateLoaderTest {
                     FASTReaderReactor.pump(reactor);
                 }
                 while (FASTReaderReactor.pump(reactor)>=0) {
-                    if (RingReader.tryReadFragment(rb)) {
+                    if (PipeReader.tryReadFragment(rb)) {
                       
-                        RingReader.releaseReadLock(rb);
+                        PipeReader.releaseReadLock(rb);
                     };
                 }
                 //the buffer has extra records in it so we must clean them out here.
-                while (RingReader.tryReadFragment(rb)) {
+                while (PipeReader.tryReadFragment(rb)) {
                     
-                    RingReader.releaseReadLock(rb);
+                    PipeReader.releaseReadLock(rb);
                 }
 
                 duration = System.nanoTime() - start;
@@ -297,7 +301,7 @@ public class TemplateLoaderTest {
 
     }
 
-	private void accumTotals(RingBuffer queue, final int[] fullScript,
+	private void accumTotals(Pipe queue, final int[] fullScript,
 			final AtomicLong totalBytesOut, final AtomicLong totalRingInts,
 			final int msgIdx, int bufferIdx) {
 		int i = msgIdx;
@@ -312,7 +316,7 @@ public class TemplateLoaderTest {
 		    //	assert((bufferIdx&0x1E<<RingReader.OFF_BITS)==0x8<<RingReader.OFF_BITS || (bufferIdx&0x1E<<RingReader.OFF_BITS)==0x5<<RingReader.OFF_BITS || (bufferIdx&0x1E<<RingReader.OFF_BITS)==0xE<<RingReader.OFF_BITS) : "Expected to read some type of ASCII/UTF8/BYTE but found "+TypeMask.toString((bufferIdx>>RingReader.OFF_BITS)&TokenBuilder.MASK_TYPE);
 			//	int readDataLength = queue.buffer[queue.mask & (int)(queue.consumerData.activeReadFragmentStack[RingReader.STACK_OFF_MASK&(bufferIdx>>RingReader.STACK_OFF_SHIFT)] + (RingReader.OFF_MASK&bufferIdx) + 1)];
 
-				int readDataLength = RingBuffer.readInt(RingBuffer.primaryBuffer(queue), queue.mask, RingBuffer.getWorkingTailPosition(queue)+bufferIdx+1);
+				int readDataLength = Pipe.readInt(Pipe.primaryBuffer(queue), queue.mask, Pipe.getWorkingTailPosition(queue)+bufferIdx+1);
 				totalBytesOut.addAndGet(4 * readDataLength);
 		    }
 
@@ -365,21 +369,23 @@ public class TemplateLoaderTest {
         final AtomicInteger msgs = new AtomicInteger();
 		ClientConfig r = catalog.clientConfig();
 
-        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers())); 
+        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers())); 
         
         assertEquals(1,reactor.ringBuffers().length);
-        RingBuffer rb = reactor.ringBuffers()[0];
+        Pipe rb = reactor.ringBuffers()[0];
         rb.reset();
 
         while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or if a fragment is read.
-            if (RingReader.tryReadFragment(rb)) {	
-	            if (RingReader.isNewMessage(rb)) {
-	                int templateId = RingReader.getMsgIdx(rb);
+            if (PipeReader.tryReadFragment(rb)) {	
+	            if (PipeReader.isNewMessage(rb)) {
+	                int templateId = PipeReader.getMsgIdx(rb);
 	                if (templateId<0) {
 	                	break;
 	                }
 	                msgs.incrementAndGet();
 	            }
+                //TODO: AAAA, investigate, only if we finished a message?
+                PipeReader.releaseReadLock(rb);
             }
         }
         System.out.println("total messages:"+msgs);
@@ -432,7 +438,7 @@ public class TemplateLoaderTest {
         PrimitiveReader reader = new PrimitiveReader(2048, fastInput, maxPMapCountInBytes);
 		ClientConfig r = catalog.clientConfig();
 
-        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
 
        // readerDispatch = new FASTReaderInterpreterDispatch(catBytes);//not using compiled code
 
@@ -442,9 +448,9 @@ public class TemplateLoaderTest {
 
         FASTReaderReactor reactor = new FASTReaderReactor(readerDispatch,reader);
 
-        RingBuffer queue = RingBuffers.get(readerDispatch.ringBuffers,0);
+        Pipe queue = PipeBundle.get(readerDispatch.ringBuffers,0);
 
-        FASTOutputByteArrayEquals fastOutput = new FASTOutputByteArrayEquals(testBytesData,RingBuffer.from(queue).tokens);
+        FASTOutputByteArrayEquals fastOutput = new FASTOutputByteArrayEquals(testBytesData,Pipe.from(queue).tokens);
 
         int writeBuffer = 256;
         PrimitiveWriter writer = new PrimitiveWriter(writeBuffer, fastOutput, false);
@@ -477,18 +483,20 @@ public class TemplateLoaderTest {
             
             while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or a fragment is read
 
-                    if (RingReader.tryReadFragment(queue)) {
-                        if (RingReader.isNewMessage(queue)) {
+                    if (PipeReader.tryReadFragment(queue)) {
+                        if (PipeReader.isNewMessage(queue)) {
                             msgs.incrementAndGet();   	
                         }
                         try{   
                             FASTDynamicWriter.write(dynamicWriter);
                         } catch (FASTException e) {
-                            System.err.println("ERROR: cursor at "+writerDispatch.getActiveScriptCursor()+" "+TokenBuilder.tokenToString(RingBuffer.from(queue).tokens[writerDispatch.getActiveScriptCursor()]));
+                            System.err.println("ERROR: cursor at "+writerDispatch.getActiveScriptCursor()+" "+TokenBuilder.tokenToString(Pipe.from(queue).tokens[writerDispatch.getActiveScriptCursor()]));
                             throw e;
                         }    
                        
                         grps++;
+                        //TODO: AAAA, investigate, only if we finished a message?
+                        PipeReader.releaseReadLock(queue);
                     }
             }            
 
@@ -519,8 +527,8 @@ public class TemplateLoaderTest {
             double start = System.nanoTime();
             
             while (FASTReaderReactor.pump(reactor)>=0) {  
-                    if (RingReader.tryReadFragment(queue)) {
-                       if (RingReader.getMsgIdx(queue)>=0) { //skip if we are waiting for more content.
+                    if (PipeReader.tryReadFragment(queue)) {
+                       if (PipeReader.getMsgIdx(queue)>=0) { //skip if we are waiting for more content.
                                 FASTDynamicWriter.write(dynamicWriter);  
                              //   RingBuffer.releaseReadLock(queue);
                        }
@@ -580,14 +588,14 @@ public class TemplateLoaderTest {
 
         PrimitiveReader reader = new PrimitiveReader(4096, fastInput, maxPMapCountInBytes);
 
-        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)22, (byte)20, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)22, (byte)20, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
         FASTReaderReactor reactor = new FASTReaderReactor(readerDispatch,reader);
 
         System.err.println("usingReader: "+readerDispatch.getClass().getSimpleName());
 
-        RingBuffer queue = RingBuffers.get(readerDispatch.ringBuffers,0);
+        Pipe queue = PipeBundle.get(readerDispatch.ringBuffers,0);
 
-        FASTOutputByteArrayEquals fastOutput = new FASTOutputByteArrayEquals(testBytesData,RingBuffer.from(queue).tokens);
+        FASTOutputByteArrayEquals fastOutput = new FASTOutputByteArrayEquals(testBytesData,Pipe.from(queue).tokens);
 
 
         int writeBuffer = 16384;
@@ -625,26 +633,28 @@ public class TemplateLoaderTest {
             //read from reader and puts messages on the queue
             while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or a fragment is read
 
-            	assert(RingBuffer.bytesWorkingTailPosition(queue)<=RingBuffer.bytesHeadPosition(queue));
+            	assert(Pipe.bytesWorkingTailPosition(queue)<=Pipe.bytesHeadPosition(queue));
             	
             		//confirms full message to read on the queue            	
-                    if (RingReader.tryReadFragment(queue)) {
-                        if (RingReader.isNewMessage(queue)) {
-                        	int msgIdx = RingReader.getMsgIdx(queue);
+                    if (PipeReader.tryReadFragment(queue)) {
+                        if (PipeReader.isNewMessage(queue)) {
+                        	int msgIdx = PipeReader.getMsgIdx(queue);
 							if (msgIdx<0) {
                         		break;
                         	}
                             msgs.incrementAndGet();
                         }
-                        assert(RingBuffer.bytesWorkingTailPosition(queue)<=RingBuffer.bytesHeadPosition(queue));
+                        assert(Pipe.bytesWorkingTailPosition(queue)<=Pipe.bytesHeadPosition(queue));
                         try{
                         	//write message found on the queue to the output writer
                         	FASTDynamicWriter.write(dynamicWriter);
                         } catch (FASTException e) {
-                            System.err.println("ERROR: cursor at "+writerDispatch.getActiveScriptCursor()+" "+TokenBuilder.tokenToString(RingBuffer.from(queue).tokens[writerDispatch.getActiveScriptCursor()]));
+                            System.err.println("ERROR: cursor at "+writerDispatch.getActiveScriptCursor()+" "+TokenBuilder.tokenToString(Pipe.from(queue).tokens[writerDispatch.getActiveScriptCursor()]));
                             throw e;
                         }
                         grps++;
+                        //TODO: AAAA, investigate, only if we finished a message?
+                        PipeReader.releaseReadLock(queue);
                     }
 
             }
@@ -696,11 +706,11 @@ public class TemplateLoaderTest {
             if (concurrent) {
                 start = System.nanoTime();
                 while (isAlive.get()) {
-                    while (RingReader.tryReadFragment(queue)) {
+                    while (PipeReader.tryReadFragment(queue)) {
                         FASTDynamicWriter.write(dynamicWriter);
                     }
                 }
-                while (RingReader.tryReadFragment(queue)) {
+                while (PipeReader.tryReadFragment(queue)) {
                     FASTDynamicWriter.write(dynamicWriter);
                 }
 
@@ -712,7 +722,7 @@ public class TemplateLoaderTest {
                 //now start the timer
                 start = System.nanoTime();
 
-                while (RingReader.tryReadFragment(queue)) {
+                while (PipeReader.tryReadFragment(queue)) {
                         FASTDynamicWriter.write(dynamicWriter);
                 }
             }
@@ -801,22 +811,22 @@ public class TemplateLoaderTest {
         final AtomicInteger msgs = new AtomicInteger();
 		ClientConfig r = catalog.clientConfig();
 
-        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
 
         assertEquals(1,reactor.ringBuffers().length);
-        RingBuffer rb = reactor.ringBuffers()[0];
+        Pipe rb = reactor.ringBuffers()[0];
         rb.reset();
 
         while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or if a fragment is read.
-            if (RingReader.tryReadFragment(rb)) {
-	            if (RingReader.isNewMessage(rb)) {
-	                int templateId = RingReader.getMsgIdx(rb);
+            if (PipeReader.tryReadFragment(rb)) {
+	            if (PipeReader.isNewMessage(rb)) {
+	                int templateId = PipeReader.getMsgIdx(rb);
 	                if (templateId<0) {
 	                	break;
 	                }
-                    assertEquals(1, RingReader.readInt(rb, field1locator));
-                    assertEquals(2, RingReader.readInt(rb, field2locator));
-                    assertEquals(3, RingReader.readInt(rb, field3locator));
+                    assertEquals(1, PipeReader.readInt(rb, field1locator));
+                    assertEquals(2, PipeReader.readInt(rb, field2locator));
+                    assertEquals(3, PipeReader.readInt(rb, field3locator));
 	                msgs.incrementAndGet();
 	            }
             }

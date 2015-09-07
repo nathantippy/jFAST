@@ -14,14 +14,14 @@ import com.ociweb.jfast.error.FASTException;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputStream;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.schema.loader.DictionaryFactory;
-import com.ociweb.pronghorn.ring.schema.loader.TemplateHandler;
-import com.ociweb.pronghorn.ring.util.hash.LongHashTable;
-import com.ociweb.pronghorn.ring.util.hash.LongHashTableVisitor;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.schema.loader.DictionaryFactory;
+import com.ociweb.pronghorn.pipe.schema.loader.TemplateHandler;
+import com.ociweb.pronghorn.pipe.util.hash.LongHashTable;
+import com.ociweb.pronghorn.pipe.util.hash.LongHashTableVisitor;
 
 public class TemplateCatalogConfig {
 
@@ -183,7 +183,7 @@ public class TemplateCatalogConfig {
 		        
 		        long charAndPos = 0;  //convert bytes to chars
 		        while (charAndPos>>32 < len  ) { 
-		            charAndPos = RingBuffer.decodeUTF8Fast(tmp, charAndPos, Integer.MAX_VALUE);
+		            charAndPos = Pipe.decodeUTF8Fast(tmp, charAndPos, Integer.MAX_VALUE);
 		            builder.append((char)charAndPos);
 
 		        }
@@ -240,7 +240,7 @@ public class TemplateCatalogConfig {
                 int limit = writer.limit;
                 int c = 0;
                 while (c < len) {
-                    limit = RingBuffer.encodeSingleChar((int) key.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
+                    limit = Pipe.encodeSingleChar((int) key.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
                 }
                 writer.limit = limit;
             }
@@ -256,7 +256,7 @@ public class TemplateCatalogConfig {
                 int limit = writer.limit;
                 int c = 0;
                 while (c < len) {
-                    limit = RingBuffer.encodeSingleChar((int) prop.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
+                    limit = Pipe.encodeSingleChar((int) prop.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
                 }
                 writer.limit = limit;
             }
@@ -365,7 +365,7 @@ public class TemplateCatalogConfig {
 		    int limit = writer.limit;
 		    int c = 0;
 		    while (c < len1) {
-		        limit = RingBuffer.encodeSingleChar((int) name.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
+		        limit = Pipe.encodeSingleChar((int) name.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
 		    }
 		    writer.limit = limit;
 		}
@@ -426,8 +426,8 @@ public class TemplateCatalogConfig {
         return from;
     }
 
-    public static RingBuffers buildRingBuffers(TemplateCatalogConfig catalog, byte primaryBits, byte secondaryBits) {
-		return RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig(primaryBits, secondaryBits, catalog.ringByteConstants(), catalog.getFROM())).initBuffers());
+    public static PipeBundle buildRingBuffers(TemplateCatalogConfig catalog, byte primaryBits, byte secondaryBits) {
+		return PipeBundle.buildRingBuffers(new Pipe(new PipeConfig(primaryBits, secondaryBits, catalog.ringByteConstants(), catalog.getFROM())).initBuffers());
 	}
     
 	public static FieldReferenceOffsetManager createFieldReferenceOffsetManager(TemplateCatalogConfig config) {

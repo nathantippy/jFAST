@@ -1,9 +1,9 @@
 package com.ociweb.jfast.generator;
 
 import com.ociweb.jfast.primitive.PrimitiveReader;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBuffer.PaddedLong;
-import com.ociweb.pronghorn.ring.util.LocalHeap;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.Pipe.PaddedLong;
+import com.ociweb.pronghorn.pipe.util.LocalHeap;
 
 public class StaticGlue {
 
@@ -175,7 +175,7 @@ public class StaticGlue {
     public static void readLongSignedDeltaOptional(int idx, int source, long[] rLongDictionary, int[] rbB, int rbMask,
             PaddedLong rbPos, long value) {
         long tmpLng = rLongDictionary[idx] = (rLongDictionary[source] + (value > 0 ? value - 1 : value));
-        RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+        Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
     }
 
 }

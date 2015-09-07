@@ -3,7 +3,7 @@ package com.ociweb.jfast.catalog.loader;
 import com.ociweb.jfast.error.FASTException;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
 
 public class ClientConfig {
 

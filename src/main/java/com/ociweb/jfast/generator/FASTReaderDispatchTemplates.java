@@ -4,12 +4,12 @@ import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.error.FASTException;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.stream.FASTDecoder;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBuffer.PaddedLong;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.util.LocalHeap;
-import com.ociweb.pronghorn.ring.util.hash.LongHashTable;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.Pipe.PaddedLong;
+import com.ociweb.pronghorn.pipe.util.LocalHeap;
+import com.ociweb.pronghorn.pipe.util.hash.LongHashTable;
 
 //TODO: B, needs support for messageRef where we can inject template in another and return to the previouslocation. Needs STACK in dispatch!
 //TODO: B, set the default template for the case when it is undefined in catalog.
@@ -37,14 +37,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     */
     public FASTReaderDispatchTemplates(TemplateCatalogConfig catalog) {
 		super(catalog, 
-        	  RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+        	  PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
     }
     
-    public FASTReaderDispatchTemplates(TemplateCatalogConfig catalog, RingBuffers ringBuffers) {
+    public FASTReaderDispatchTemplates(TemplateCatalogConfig catalog, PipeBundle ringBuffers) {
         super(catalog, ringBuffers);
     }
     
-    public FASTReaderDispatchTemplates(byte[] catBytes, RingBuffers ringBuffers) {
+    public FASTReaderDispatchTemplates(byte[] catBytes, PipeBundle ringBuffers) {
         this(new TemplateCatalogConfig(catBytes), ringBuffers);
     }
     
@@ -78,12 +78,12 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
            	dispatch.activeScriptCursor = dispatch.msgIdx; 
             
             //we know the templateId so we now know which ring buffer to use.
-            RingBuffer rb = RingBuffers.get(dispatch.ringBuffers,dispatch.activeScriptCursor);          
+            Pipe rb = PipeBundle.get(dispatch.ringBuffers,dispatch.activeScriptCursor);          
             
             //confirm that this ring buffer has enough room to hold the new results, and wait if it does not
             
             //TODO: C, convert to non blocking.
-            while(!RingBuffer.roomToLowLevelWrite(rb,1+preambleDataLength)) {
+            while(!Pipe.roomToLowLevelWrite(rb,1+preambleDataLength)) {
             	Thread.yield();
             };
             //RingBuffer.confirmLowLevelWrite(rb, 1+preambleDataLength);
@@ -92,24 +92,24 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     }
     
     protected void genWriteTemplateId(FASTDecoder dispatch) {
-        RingBuffer.addMsgIdx(RingBuffers.get(dispatch.ringBuffers,dispatch.activeScriptCursor), dispatch.msgIdx);
+        Pipe.addMsgIdx(PipeBundle.get(dispatch.ringBuffers,dispatch.activeScriptCursor), dispatch.msgIdx);
     }
 
     protected void genWritePreambleB(FASTDecoder dispatch) {
         {
-        RingBuffer rb = RingBuffers.get(dispatch.ringBuffers,dispatch.activeScriptCursor);  
-        long whp = RingBuffer.workingHeadPosition(rb);
-        RingBuffer.setValue(RingBuffer.primaryBuffer(rb),rb.mask,whp++,dispatch.preambleB);
-        RingBuffer.setWorkingHead(rb,whp);
+        Pipe rb = PipeBundle.get(dispatch.ringBuffers,dispatch.activeScriptCursor);  
+        long whp = Pipe.workingHeadPosition(rb);
+        Pipe.setValue(Pipe.primaryBuffer(rb),rb.mask,whp++,dispatch.preambleB);
+        Pipe.setWorkingHead(rb,whp);
         }
     }
 
     protected void genWritePreambleA(FASTDecoder dispatch) {
         {
-        RingBuffer rb = RingBuffers.get(dispatch.ringBuffers,dispatch.activeScriptCursor);
-        long whp = RingBuffer.workingHeadPosition(rb);
-        RingBuffer.setValue(RingBuffer.primaryBuffer(rb),rb.mask,whp++,dispatch.preambleA);
-        RingBuffer.setWorkingHead(rb,whp);
+        Pipe rb = PipeBundle.get(dispatch.ringBuffers,dispatch.activeScriptCursor);
+        long whp = Pipe.workingHeadPosition(rb);
+        Pipe.setValue(Pipe.primaryBuffer(rb),rb.mask,whp++,dispatch.preambleA);
+        Pipe.setWorkingHead(rb,whp);
         }
     }
 
@@ -130,12 +130,12 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     }
     
     
-    protected void genReadTotalMessageBytesUsed(PaddedLong rbPos, RingBuffer rbRingBuffer) {  
-    	RingBuffer.writeTrailingCountOfBytesConsumed(rbRingBuffer, rbPos.value++);
+    protected void genReadTotalMessageBytesUsed(PaddedLong rbPos, Pipe rbRingBuffer) {  
+    	Pipe.writeTrailingCountOfBytesConsumed(rbRingBuffer, rbPos.value++);
     }
     
-    protected void genReadTotalMessageBytesResetUsed(RingBuffer rbRingBuffer) { 
-        RingBuffer.updateBytesWriteLastConsumedPos(rbRingBuffer);
+    protected void genReadTotalMessageBytesResetUsed(Pipe rbRingBuffer) { 
+        Pipe.updateBytesWriteLastConsumedPos(rbRingBuffer);
     }
     
     
@@ -176,7 +176,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int length;
             int value = length = (0 == PrimitiveReader.readPMapBit(reader) ? constDefault : PrimitiveReader.readIntegerUnsigned(reader));
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,value);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,value);
             if (length == 0) {
                 // jumping over sequence (forward) it was skipped (rare case)
                 return jumpToTarget;
@@ -196,7 +196,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             int length;
             int value = length = (0 == PrimitiveReader.readPMapBit(reader) ? (rIntDictionary[target] = rIntDictionary[source] + 1)
             : (rIntDictionary[target] = PrimitiveReader.readIntegerUnsigned(reader)));
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,value);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,value);
             if (length == 0) {
                 // jumping over sequence (forward) it was skipped (rare case)
                 dispatch.activeScriptCursor = jumpToTarget;
@@ -213,7 +213,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int length;
             int value = length = rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] : PrimitiveReader.readIntegerUnsigned(reader));
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,value);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,value);
             if (length == 0) {
                 // jumping over sequence (forward) it was skipped (rare case)
                 dispatch.activeScriptCursor = jumpToTarget;
@@ -227,7 +227,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     }
 
     protected void genReadLengthConstant(int constDefault,  int jumpToTarget, int jumpToNext, int[] rbB, int rbMask, PaddedLong rbPos, FASTDecoder dispatch) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+        Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
         if (constDefault == 0) {
             // jumping over sequence (forward) it was skipped (rare case)
             dispatch.activeScriptCursor = jumpToTarget;
@@ -242,7 +242,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadLengthDelta(int target, int source,  int jumpToTarget, int jumpToNext, int[] rIntDictionary, int[] rbB, int rbMask, PaddedLong rbPos, PrimitiveReader reader, FASTDecoder dispatch) {
         {
             int length = (rIntDictionary[target] = (int) (rIntDictionary[source] + PrimitiveReader.readLongSigned(reader)));
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,length);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,length);
             if (length == 0) {
                 // jumping over sequence (forward) it was skipped (rare case)
                 dispatch.activeScriptCursor = jumpToTarget;
@@ -260,7 +260,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             int length;
             int value = length = PrimitiveReader.readIntegerUnsigned(reader);
 
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,value);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,value);
             if (length == 0) {
                 // jumping over sequence (forward) it was skipped (rare case)
                 dispatch.activeScriptCursor = jumpToTarget;
@@ -279,11 +279,11 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadIntegerUnsignedDefaultOptional(int constAbsent, int constDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
 
         if (0 == PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
         } else {
            int value = PrimitiveReader.readIntegerUnsigned(reader)-1;
            int mask = value>>31;
-           RingBuffer.setValue(rbB,rbMask,rbPos.value++,(constAbsent&mask) | ((~mask)&value));           
+           Pipe.setValue(rbB,rbMask,rbPos.value++,(constAbsent&mask) | ((~mask)&value));           
         }
 
     }
@@ -292,17 +292,17 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadIntegerUnsignedIncrementOptional(int target, int source, int constAbsent, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         if (0 == PrimitiveReader.readPMapBit(reader)) {
             if (rIntDictionary[target] == 0) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
             }
         } else {
             int value;
             if ((value = PrimitiveReader.readIntegerUnsigned(reader)) == 0) {
                 rIntDictionary[target] = 0;
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
             }
         }
     }
@@ -310,17 +310,17 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadIntegerUnsignedIncrementOptionalTS(int targsrc, int constAbsent, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         if (0 == PrimitiveReader.readPMapBit(reader)) {
             if (rIntDictionary[targsrc] == 0) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,++rIntDictionary[targsrc]);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,++rIntDictionary[targsrc]);
             }
         } else {
             int value;
             if ((value = PrimitiveReader.readIntegerUnsigned(reader)) == 0) {
                 rIntDictionary[targsrc] = 0;
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[targsrc] = value) - 1);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[targsrc] = value) - 1);
             }
         }
     }
@@ -329,12 +329,12 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int value = (rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] : PrimitiveReader.readIntegerUnsigned(reader)))-1;
             int mask = value>>31;
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,(constAbsent&mask) | ((~mask)&value));
+            Pipe.setValue(rbB,rbMask,rbPos.value++,(constAbsent&mask) | ((~mask)&value));
         }
     }
 
     protected void genReadIntegerUnsignedConstantOptional(int constAbsent, int constConst, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? constAbsent : constConst));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? constAbsent : constConst));
     }
 
 //        {
@@ -353,11 +353,11 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             
             if (0 == value) {
                 rIntDictionary[target] = 0;// set to absent
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
 
             } else {
                 //
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 63)))));    
+                Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 63)))));    
             }
         }
         
@@ -368,7 +368,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int value = PrimitiveReader.readIntegerUnsigned(reader)-1;
             int mask = value>>31;
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,(constAbsent&mask) | ((~mask)&value));  
+            Pipe.setValue(rbB,rbMask,rbPos.value++,(constAbsent&mask) | ((~mask)&value));  
                                     
         }
     }
@@ -381,72 +381,72 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
 //            }
 
     protected void genReadIntegerUnsignedDefault(int constDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? constDefault : PrimitiveReader.readIntegerUnsigned(reader)));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? constDefault : PrimitiveReader.readIntegerUnsigned(reader)));
     }
 
     protected void genReadIntegerUnsignedIncrement(int target, int source, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? (rIntDictionary[target] = rIntDictionary[source] + 1)
+        Pipe.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? (rIntDictionary[target] = rIntDictionary[source] + 1)
           : (rIntDictionary[target] = PrimitiveReader.readIntegerUnsigned(reader))));
     }
     
     protected void genReadIntegerUnsignedIncrementTS(int targsrc, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? (++rIntDictionary[targsrc])
+        Pipe.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? (++rIntDictionary[targsrc])
           : (rIntDictionary[targsrc] = PrimitiveReader.readIntegerUnsigned(reader))));
     }
 
     protected void genReadIntegerUnsignedCopy(int target, int source, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] : PrimitiveReader.readIntegerUnsigned(reader)));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] : PrimitiveReader.readIntegerUnsigned(reader)));
     }
     
     protected void genReadIntegerUnsignedCopyTS(int target, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[target] : (rIntDictionary[target] = PrimitiveReader.readIntegerUnsigned(reader)));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[target] : (rIntDictionary[target] = PrimitiveReader.readIntegerUnsigned(reader)));
     }
 
     protected void genReadIntegerUnsignedConstant(int constDefault, int[] rbB, int rbMask, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+        Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
     }
 
     protected void genReadIntegerUnsignedDelta(int target, int source, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = (int) (rIntDictionary[source] + PrimitiveReader.readLongSigned(reader))));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = (int) (rIntDictionary[source] + PrimitiveReader.readLongSigned(reader))));
     }
 
     protected void genReadIntegerUnsigned(int target, int[] rbB, int rbMask, PrimitiveReader reader, int[] rIntDictionary, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = PrimitiveReader.readIntegerUnsigned(reader));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = PrimitiveReader.readIntegerUnsigned(reader));
     }
 
     protected void genReadIntegerSignedDefault(int constDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? constDefault : PrimitiveReader.readIntegerSigned(reader)));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? constDefault : PrimitiveReader.readIntegerSigned(reader)));
     }
 
     protected void genReadIntegerSignedIncrement(int target, int source, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? (rIntDictionary[target] = rIntDictionary[source] + 1)
+        Pipe.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? (rIntDictionary[target] = rIntDictionary[source] + 1)
         : (rIntDictionary[target] = PrimitiveReader.readIntegerSigned(reader))));
     }
 
     protected void genReadIntegerSignedCopy(int target, int source, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] :  PrimitiveReader.readIntegerSigned(reader)));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] :  PrimitiveReader.readIntegerSigned(reader)));
     }
 
     protected void genReadIntegerConstant(int constDefault, int[] rbB, int rbMask, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+        Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
 
     }
 
     protected void genReadIntegerSignedDelta(int target, int source, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = (int) (rIntDictionary[source] + PrimitiveReader.readLongSigned(reader))));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = (int) (rIntDictionary[source] + PrimitiveReader.readLongSigned(reader))));
     }
 
     protected void genReadIntegerSignedNone(int target, int[] rbB, int rbMask, PrimitiveReader reader, int[] rIntDictionary, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = PrimitiveReader.readIntegerSigned(reader));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = PrimitiveReader.readIntegerSigned(reader));
     }
 
     protected void genReadIntegerSignedDefaultOptional(int constAbsent, int constDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
 
         if (0 == PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
         } else {
             int value = PrimitiveReader.readIntegerSigned(reader);
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,value == 0 ? constAbsent : (-1 + (value + (value >>> 31))));
+            Pipe.setValue(rbB,rbMask,rbPos.value++,value == 0 ? constAbsent : (-1 + (value + (value >>> 31))));
         }
     }
 
@@ -454,14 +454,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadIntegerSignedIncrementOptional(int target, int source, int constAbsent, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
 
         if (0 == PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] == 0 ? constAbsent : (rIntDictionary[target] = rIntDictionary[source] + 1)));
+            Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] == 0 ? constAbsent : (rIntDictionary[target] = rIntDictionary[source] + 1)));
         } else {
             int value;
             if ((value = PrimitiveReader.readIntegerSigned(reader)) == 0) {
                 rIntDictionary[target] = 0;
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
             }
         }
     }
@@ -471,15 +471,15 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int xi1 = rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] :  PrimitiveReader.readIntegerSigned(reader));
             if (0==xi1) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
             }
         }
     }
 
     protected void genReadIntegerSignedConstantOptional(int constAbsent, int constConst, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
-        RingBuffer.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? constAbsent : constConst));
+        Pipe.setValue(rbB,rbMask,rbPos.value++,(0 == PrimitiveReader.readPMapBit(reader) ? constAbsent : constConst));
     }
 
     protected void genReadIntegerSignedDeltaOptional(int target, int source, int constAbsent, int[] rIntDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
@@ -487,9 +487,9 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0 == value) {
                 rIntDictionary[target] = 0;// set to absent
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] +  (-1 + (value + (value >>> 63))) ));  
+                Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] +  (-1 + (value + (value >>> 63))) ));  
             }
         }
         
@@ -500,9 +500,9 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int value = PrimitiveReader.readIntegerSigned(reader);
             if (0 == value) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31)))); 
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31)))); 
             }
         }
     }
@@ -537,24 +537,24 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadDecimalDefaultOptionalMantissaDefault(int constAbsent, int constDefault, long mantissaConstDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {            
             if (0 == PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
             } else {
                 int value = PrimitiveReader.readIntegerSigned(reader);
                 if (0==value) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
                 }
             }            
             //Long signed default
             if (0==PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+                Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
             } else {
                 long tmpLng = PrimitiveReader.readLongSigned(reader);
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }            
         }
     }
@@ -563,32 +563,32 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {   
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 if (0==rIntDictionary[target]) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);  
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);  
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
                 }    
                 
             } else {
                 int value;
                 if ((value = PrimitiveReader.readIntegerSigned(reader)) == 0) {
                     rIntDictionary[target] = 0;
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
                 }
             }
             //Long signed default
             if (0==PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+                Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
             } else {
                 long tmpLng = PrimitiveReader.readLongSigned(reader);
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
          
         }
@@ -599,17 +599,17 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             
             int xi1 = rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] :  PrimitiveReader.readIntegerSigned(reader));
             if (0==xi1) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
                 //Long signed default
                 if (0==PrimitiveReader.readPMapBit(reader)) {
-                    RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+                    Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
                 } else {
                     long tmpLng = PrimitiveReader.readLongSigned(reader);
-                    RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                    Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
                 }
             }
  
@@ -618,17 +618,17 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     
     protected void genReadDecimalConstantOptionalMantissaDefault(int constAbsent, int constConst, long mantissaConstDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         if (0 == PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
             //must still write long even when we skipped reading its pmap bit. but value is undefined.
             rbPos.value+=2;
         } else {
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,constConst);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,constConst);
             //Long signed default
            if (0==PrimitiveReader.readPMapBit(reader)) {
-               RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+               Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
            } else {
                long tmpLng = PrimitiveReader.readLongSigned(reader);
-               RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+               Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
            }
         }
         
@@ -638,17 +638,17 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0==value) {
                 rIntDictionary[target] = 0;// set to absent
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 31)))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 31)))));
                 //Long signed default
                 if (0==PrimitiveReader.readPMapBit(reader)) {
-                    RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+                    Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
                 } else {
                     long tmpLng = PrimitiveReader.readLongSigned(reader);
-                    RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                    Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
                 }
             }
         }
@@ -658,17 +658,17 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int value = PrimitiveReader.readIntegerSigned(reader);
             if (0==value) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {                
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
               //Long signed default
                 if (0==PrimitiveReader.readPMapBit(reader)) {
-                    RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+                    Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
                 } else {
                     long tmpLng = PrimitiveReader.readLongSigned(reader);
-                    RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                    Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
                 }
             }
             
@@ -682,20 +682,20 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadDecimalDefaultOptionalMantissaIncrement(int constAbsent, int constDefault, int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
             } else {
                 int value = PrimitiveReader.readIntegerSigned(reader);
                 if (0==value) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
                 }
             }
             //Long signed increment
             long tmpLng=(0 == PrimitiveReader.readPMapBit(reader) ? (rLongDictionary[mantissaTarget] = rLongDictionary[mantissaSource] + 1) : (rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader)));
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }
     }
     
@@ -703,28 +703,28 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 if (0==rIntDictionary[target]) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);  
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);  
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
                 }    
             } else {
                 int value;
                 if ((value = PrimitiveReader.readIntegerSigned(reader)) == 0) {
                     rIntDictionary[target] = 0;
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
                 }
             }
             //Long signed increment
             long tmpLng=(0 == PrimitiveReader.readPMapBit(reader) ? (rLongDictionary[mantissaTarget] = rLongDictionary[mantissaSource] + 1) : (rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader)));
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng); 
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng); 
             
         }
     }
@@ -734,14 +734,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             
             int xi1 = rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] :  PrimitiveReader.readIntegerSigned(reader));
             if (0==xi1) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
                 //Long signed increment
                 long tmpLng=(0 == PrimitiveReader.readPMapBit(reader) ? (rLongDictionary[mantissaTarget] = rLongDictionary[mantissaSource] + 1) : (rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader)));
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
  
         }
@@ -750,14 +750,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadDecimalConstantOptionalMantissaIncrement(int constAbsent, int constConst, int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
 
             if (0 == PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constConst);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constConst);
                 //Long signed increment
                long tmpLng=(0 == PrimitiveReader.readPMapBit(reader) ? (rLongDictionary[mantissaTarget] = rLongDictionary[mantissaSource] + 1) : (rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader)));
-               RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+               Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
 
     }
@@ -766,14 +766,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0==value) {
                 rIntDictionary[target] = 0;// set to absent
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 31)))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 31)))));
                 //Long signed increment
                 long tmpLng=(0 == PrimitiveReader.readPMapBit(reader) ? (rLongDictionary[mantissaTarget] = rLongDictionary[mantissaSource] + 1) : (rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader)));
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
             
         }
@@ -783,14 +783,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int value = PrimitiveReader.readIntegerSigned(reader);
             if (0==value) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {                
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
                 //Long signed increment
                long tmpLng=(0 == PrimitiveReader.readPMapBit(reader) ? (rLongDictionary[mantissaTarget] = rLongDictionary[mantissaSource] + 1) : (rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader)));
-               RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+               Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
      
         }
@@ -801,20 +801,20 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadDecimalDefaultOptionalMantissaCopy(int constAbsent, int constDefault, int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {            
             if (0 == PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
             } else {
                 int value = PrimitiveReader.readIntegerSigned(reader);
                 if (0==value) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
                 }                
             }
             //Long signed copy
             long tmpLng=rLongDictionary[mantissaTarget] = (0 == PrimitiveReader.readPMapBit(reader) ? rLongDictionary[mantissaSource] : PrimitiveReader.readLongSigned(reader));
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
 
         }
     }
@@ -825,30 +825,30 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 
                 if (0==rIntDictionary[target]) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);  
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);  
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
                 }    
                 
             } else {
                 int value;
                 if ((value = PrimitiveReader.readIntegerSigned(reader)) == 0) {
                     rIntDictionary[target] = 0;
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
                 }
             }
             
             //Long signed copy
             long tmpLng=rLongDictionary[mantissaTarget] = (0 == PrimitiveReader.readPMapBit(reader) ? rLongDictionary[mantissaSource] : PrimitiveReader.readLongSigned(reader));
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }    
             
          
@@ -858,14 +858,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int xi1 = rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] :  PrimitiveReader.readIntegerSigned(reader));
             if (0==xi1) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
                 //Long signed copy
                 long tmpLng=rLongDictionary[mantissaTarget] = (0 == PrimitiveReader.readPMapBit(reader) ? rLongDictionary[mantissaSource] : PrimitiveReader.readLongSigned(reader));
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
               }
  
         }
@@ -874,14 +874,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadDecimalConstantOptionalMantissaCopy(int constAbsent, int constConst, int mantissaTarget, int mantissaSource, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
 
             if (0 == PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constConst);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constConst);
                 //Long signed copy
                long tmpLng=rLongDictionary[mantissaTarget] = (0 == PrimitiveReader.readPMapBit(reader) ? rLongDictionary[mantissaSource] : PrimitiveReader.readLongSigned(reader));
-               RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+               Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }             
 
     }
@@ -890,14 +890,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0==value) {
                 rIntDictionary[target] = 0;// set to absent
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 31)))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 31)))));
                 //Long signed copy
                 long tmpLng=rLongDictionary[mantissaTarget] = (0 == PrimitiveReader.readPMapBit(reader) ? rLongDictionary[mantissaSource] : PrimitiveReader.readLongSigned(reader));
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
             
         }
@@ -908,14 +908,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             
             int value = PrimitiveReader.readIntegerSigned(reader);
             if (0==value) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {                
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
                 //Long signed copy
                long tmpLng=rLongDictionary[mantissaTarget] = (0 == PrimitiveReader.readPMapBit(reader) ? rLongDictionary[mantissaSource] : PrimitiveReader.readLongSigned(reader));
-               RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+               Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
                     
         }
@@ -926,19 +926,19 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadDecimalDefaultOptionalMantissaConstant(int constAbsent, int constDefault, long mantissaConstDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
             } else {
                 int value = PrimitiveReader.readIntegerSigned(reader);
                 if (0==value) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
                 }                
             }
             //Long signed constant
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+            Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
 
        }
     }
@@ -948,29 +948,29 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 
                 if (0==rIntDictionary[target]) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);  
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);  
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
                 }    
                 
             } else {
                 int value;
                 if ((value = PrimitiveReader.readIntegerSigned(reader)) == 0) {
                     rIntDictionary[target] = 0;
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
                 }
             }
             
             //Long signed constant
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+            Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
 
         }
     }
@@ -979,13 +979,13 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int xi1 = rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] :  PrimitiveReader.readIntegerSigned(reader));
             if (0==xi1) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
                 //Long signed constant
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+                Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
            }
  
         }
@@ -994,13 +994,13 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadDecimalConstantOptionalMantissaConstant(int constAbsent, int constConst, long mantissaConstDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         
             if (0 == PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-               RingBuffer.setValue(rbB,rbMask,rbPos.value++,constConst);
+               Pipe.setValue(rbB,rbMask,rbPos.value++,constConst);
                 //Long signed constant
-                 RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+                 Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
 
                
             } 
@@ -1012,13 +1012,13 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0==value) {
                 rIntDictionary[target] = 0;// set to absent
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 31)))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 31)))));
                 //Long signed constant
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+                Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
            }
             
         }
@@ -1029,13 +1029,13 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             
             int value = PrimitiveReader.readIntegerSigned(reader);
             if (0==value) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {                
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
                 //Long signed constant
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
+                Pipe.addLongValue(rbB,rbMask,rbPos, mantissaConstDefault);
 
             }
                         
@@ -1047,20 +1047,20 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadDecimalDefaultOptionalMantissaDelta(int constAbsent, int constDefault, int mantissaTarget, int mantissaSource, int[] rbB, long[] rLongDictionary, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
             } else {
                 int value = PrimitiveReader.readIntegerSigned(reader);
                 if (0==value) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
                 }                
             }
             //Long signed delta
             long tmpLng=(rLongDictionary[mantissaTarget] = (rLongDictionary[mantissaSource] + PrimitiveReader.readLongSigned(reader)));
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }
     }
     
@@ -1071,30 +1071,30 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             if (0 == PrimitiveReader.readPMapBit(reader)) {                
                 if (0==rIntDictionary[target]) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);  
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);  
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = rIntDictionary[source] + 1));
                 }    
                 
             } else {
                 int value;
                 if ((value = PrimitiveReader.readIntegerSigned(reader)) == 0) {
                     rIntDictionary[target] = 0;
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[target] = value) - 1);
                 }
             }
             
             //Long signed delta
             long tmpLng=(rLongDictionary[mantissaTarget] = (rLongDictionary[mantissaSource] + PrimitiveReader.readLongSigned(reader)));
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             
         }
     }
@@ -1103,28 +1103,28 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int xi1 = rIntDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rIntDictionary[source] :  PrimitiveReader.readIntegerSigned(reader));
             if (0==xi1) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31)))); 
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31)))); 
                 //Long signed delta
                 long tmpLng=(rLongDictionary[mantissaTarget] = (rLongDictionary[mantissaSource] + PrimitiveReader.readLongSigned(reader)));
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }           
         }
     }
     
     protected void genReadDecimalConstantOptionalMantissaDelta(int constAbsent, int constConst, int mantissaTarget, int mantissaSource, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos, long[] rLongDictionary) {
         if (0 == PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
             //must still write long even when we skipped reading its pmap bit. but value is undefined.
             rbPos.value+=2;
         } else {
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,constConst);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,constConst);
             //Long signed delta
            long tmpLng=(rLongDictionary[mantissaTarget] = (rLongDictionary[mantissaSource] + PrimitiveReader.readLongSigned(reader)));
-           RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+           Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }         
     }
     
@@ -1133,14 +1133,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0==value) {
                 rIntDictionary[target] = 0;// set to absent
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 31)))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[target] = (int) (rIntDictionary[source] + (-1 + (value + (value >>> 31)))));
                 //Long signed delta
                 long tmpLng=(rLongDictionary[mantissaTarget] = (rLongDictionary[mantissaSource] + PrimitiveReader.readLongSigned(reader)));
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
             
         }
@@ -1150,14 +1150,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int value = PrimitiveReader.readIntegerSigned(reader);
             if (0==value) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);                
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {                
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
                 //Long signed delta
                 long tmpLng=(rLongDictionary[mantissaTarget] = (rLongDictionary[mantissaSource] + PrimitiveReader.readLongSigned(reader)));
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
             
         }
@@ -1168,20 +1168,20 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadDecimalDefaultOptionalMantissaNone(int constAbsent, int constDefault, int mantissaTarget, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos, long[] rLongDictionary) {
         {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,constDefault);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,constDefault);
             } else {
                 int value = PrimitiveReader.readIntegerSigned(reader);
                 if (0==value) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,constAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,constAbsent);
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));
                 }                
             }
             //Long signed none
             long tmpLng=rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader);
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }
     }
     
@@ -1190,29 +1190,29 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
                 
                 if (0==rIntDictionary[expoTarget]) {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);  
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);  
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[expoTarget] = rIntDictionary[expoSource] + 1));
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[expoTarget] = rIntDictionary[expoSource] + 1));
                 }        
                
             } else {
                 int value;
                 if ((value = PrimitiveReader.readIntegerSigned(reader)) == 0) {
                     rIntDictionary[expoTarget] = 0;
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);
                     //must still write long even when we skipped reading its pmap bit. but value is undefined.
                     rbPos.value+=2;
                     return;
                 } else {
-                    RingBuffer.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[expoTarget] = value) - 1);
+                    Pipe.setValue(rbB,rbMask,rbPos.value++,(rIntDictionary[expoTarget] = value) - 1);
                 }
             }
                 //Long signed none
                 long tmpLng=rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader);
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
            
         }
     }
@@ -1224,7 +1224,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             boolean theBit = 0 == PrimitiveReader.readPMapBit(reader);
 			int xi1 = rIntDictionary[expoTarget] = (theBit ? rIntDictionary[expoSource] :  PrimitiveReader.readIntegerSigned(reader));
             if (0==xi1) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
@@ -1236,10 +1236,10 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             		throw new FASTException();
             	}
             	
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (xi1 + (xi1 >>> 31))));
                 //Long signed none
                 long tmpLng=rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader);
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
       
         }
@@ -1247,14 +1247,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     
     protected void genReadDecimalConstantOptionalMantissaNone(int expoConstAbsent, int expoConstConst, int mantissaTarget, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos, long[] rLongDictionary) {
         if (0 == PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);
             //must still write long even when we skipped reading its pmap bit. but value is undefined.
             rbPos.value+=2;
         } else {
-            RingBuffer.setValue(rbB,rbMask,rbPos.value++,expoConstConst);
+            Pipe.setValue(rbB,rbMask,rbPos.value++,expoConstConst);
             //Long signed none
            long tmpLng=rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader);
-           RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+           Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         } 
 
     }
@@ -1263,14 +1263,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0==value) {
                 rIntDictionary[expoTarget] = 0;// set to absent
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);
+                Pipe.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[expoTarget] = (int) (rIntDictionary[expoSource] + (-1 + (value + (value >>> 31)))));
+                Pipe.setValue(rbB,rbMask,rbPos.value++,rIntDictionary[expoTarget] = (int) (rIntDictionary[expoSource] + (-1 + (value + (value >>> 31)))));
                 //Long signed none
                 long tmpLng=rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader);
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
             
         }
@@ -1281,14 +1281,14 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             
             int value = PrimitiveReader.readIntegerSigned(reader);
             if (0==value) {
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);                
+                Pipe.setValue(rbB,rbMask,rbPos.value++,expoConstAbsent);                
                 //must still write long even when we skipped reading its pmap bit. but value is undefined.
                 rbPos.value+=2;
             } else {                
-                RingBuffer.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
+                Pipe.setValue(rbB,rbMask,rbPos.value++,(-1 + (value + (value >>> 31))));                    
                 //Long signed none
                 long tmpLng=rLongDictionary[mantissaTarget] = PrimitiveReader.readLongSigned(reader);
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }                      
     
         }
@@ -1305,7 +1305,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     protected void genReadLongUnsignedDefault(long constDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             long tmpLng=(0 == PrimitiveReader.readPMapBit(reader) ? constDefault : PrimitiveReader.readLongUnsigned(reader));
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }
     }
 
@@ -1313,32 +1313,32 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             long tmpLng=(0 == PrimitiveReader.readPMapBit(reader) ? (rLongDictionary[target] = rLongDictionary[source] + 1)
                                                                 : (rLongDictionary[target] = PrimitiveReader.readLongUnsigned(reader)));
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }
     }
 
     protected void genReadLongUnsignedCopy(int target, int source, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             long tmpLng=rLongDictionary[target] =(0 == PrimitiveReader.readPMapBit(reader) ? rLongDictionary[source] : PrimitiveReader.readLongUnsigned(reader));
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }
     }
 
     protected void genReadLongConstant(long constDefault, int[] rbB, int rbMask, PaddedLong rbPos) {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, constDefault);
+            Pipe.addLongValue(rbB,rbMask,rbPos, constDefault);
     }
 
     protected void genReadLongUnsignedDelta(int target, int source, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             long tmpLng=(rLongDictionary[target] = (rLongDictionary[source] + PrimitiveReader.readLongSigned(reader)));
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }
     }
 
     protected void genReadLongUnsignedNone(int target, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
             long tmpLng=rLongDictionary[target] = PrimitiveReader.readLongUnsigned(reader);
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }
     }
 
@@ -1356,7 +1356,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
                 }
             }
             long tmpLng=result;
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }
     }
 
@@ -1364,19 +1364,19 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
 
         if (0 == PrimitiveReader.readPMapBit(reader)) {
             if (0 == rLongDictionary[target]) {
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);
+                Pipe.addLongValue(rbB,rbMask,rbPos, constAbsent);
             } else {
                 long tmpLng = (rLongDictionary[target] = rLongDictionary[source] + 1);
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
         } else {
             long value;
             if ((value = PrimitiveReader.readLongUnsigned(reader)) == 0) {
                 rLongDictionary[target] = 0;
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);
+                Pipe.addLongValue(rbB,rbMask,rbPos, constAbsent);
             } else {
                 long tmpLng = (rLongDictionary[target] = value) - 1;
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
         }
 
@@ -1386,15 +1386,15 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             long xl1;
             long tmpLng=(0 == (xl1 = rLongDictionary[target] =(0 == PrimitiveReader.readPMapBit(reader) ? rLongDictionary[source] : PrimitiveReader.readLongUnsigned(reader))) ? constAbsent : xl1 - 1);
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+            Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
         }
     }
 
     protected void genReadLongUnsignedConstantOptional(long constAbsent, long constConst, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         if (0 == PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);
+            Pipe.addLongValue(rbB,rbMask,rbPos, constAbsent);
         } else {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, constConst);
+            Pipe.addLongValue(rbB,rbMask,rbPos, constConst);
         }
     }
 
@@ -1403,9 +1403,9 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0 == value) {
                 rLongDictionary[target] = 0;// set to absent
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent); //TODO: B, this design would be faster/simpler if we used the constAbsent instead of zero?
+                Pipe.addLongValue(rbB,rbMask,rbPos, constAbsent); //TODO: B, this design would be faster/simpler if we used the constAbsent instead of zero?
             } else {
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, rLongDictionary[target] = (rLongDictionary[source] + (-1 + (value + (value >>> 63)))));
+                Pipe.addLongValue(rbB,rbMask,rbPos, rLongDictionary[target] = (rLongDictionary[source] + (-1 + (value + (value >>> 63)))));
             }
         }
     }
@@ -1414,22 +1414,22 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             long value = PrimitiveReader.readLongUnsigned(reader)-1;
             long mask = value>>63;
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, (constAbsent&mask) | ((~mask)&value));
+            Pipe.addLongValue(rbB,rbMask,rbPos, (constAbsent&mask) | ((~mask)&value));
             
         }
     }
 
     protected void genReadLongSignedDefault(long constDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         if (0 == PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, constDefault);
+            Pipe.addLongValue(rbB,rbMask,rbPos, constDefault);
         } else {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, PrimitiveReader.readLongSigned(reader));
+            Pipe.addLongValue(rbB,rbMask,rbPos, PrimitiveReader.readLongSigned(reader));
         }        
     }
 
     protected void genReadLongSignedIncrement(int target, int source, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, 
+            Pipe.addLongValue(rbB,rbMask,rbPos, 
                     (0 == PrimitiveReader.readPMapBit(reader) ? 
                             (rLongDictionary[target] = rLongDictionary[source] + 1) : 
                             (rLongDictionary[target] = PrimitiveReader.readLongSigned(reader))));
@@ -1438,7 +1438,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
 
     protected void genReadLongSignedCopy(int target, int source, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, 
+            Pipe.addLongValue(rbB,rbMask,rbPos, 
                       rLongDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? 
                                                        rLongDictionary[source] : 
                                                        PrimitiveReader.readLongSigned(reader)));
@@ -1446,36 +1446,36 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     }
 
     protected void genReadLongSignedConstant(long constDefault, int[] rbB, int rbMask, PaddedLong rbPos) {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, constDefault);
+            Pipe.addLongValue(rbB,rbMask,rbPos, constDefault);
     }
 
     protected void genReadLongSignedDelta(int target, int source, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, (rLongDictionary[target] = (rLongDictionary[source] + PrimitiveReader.readLongSigned(reader))));
+            Pipe.addLongValue(rbB,rbMask,rbPos, (rLongDictionary[target] = (rLongDictionary[source] + PrimitiveReader.readLongSigned(reader))));
         }
     }
     
     protected void genReadLongSignedDeltaTS(int targsrc, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, (rLongDictionary[targsrc]+=PrimitiveReader.readLongSigned(reader)));
+            Pipe.addLongValue(rbB,rbMask,rbPos, (rLongDictionary[targsrc]+=PrimitiveReader.readLongSigned(reader)));
         }
     }
   
     protected void genReadLongSignedNone(int target, long[] rLongDictionary, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, rLongDictionary[target] = PrimitiveReader.readLongSigned(reader));
+            Pipe.addLongValue(rbB,rbMask,rbPos, rLongDictionary[target] = PrimitiveReader.readLongSigned(reader));
         }
     }
 
     protected void genReadLongSignedDefaultOptional(long constAbsent, long constDefault, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
 
         if (0 == PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, constDefault);
+            Pipe.addLongValue(rbB,rbMask,rbPos, constDefault);
         } else {
             long value = PrimitiveReader.readLongSigned(reader);            
             long maskB = (value-1)>>63;
             long mask = ((value>>63)^maskB)&maskB;            
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, (constAbsent&mask)|( (-1 + (value + (value >>> 63))) &(~mask)) ); 
+            Pipe.addLongValue(rbB,rbMask,rbPos, (constAbsent&mask)|( (-1 + (value + (value >>> 63))) &(~mask)) ); 
         }
     }
 
@@ -1483,19 +1483,19 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
 
         if (0 == PrimitiveReader.readPMapBit(reader)) {
             if (0 == rLongDictionary[target]) {
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);
+                Pipe.addLongValue(rbB,rbMask,rbPos, constAbsent);
             } else {
                 long tmpLng = (rLongDictionary[target] = rLongDictionary[source] + 1);
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
         } else {
             long value;
             if ((value = PrimitiveReader.readLongSigned(reader)) == 0) {
                 rLongDictionary[target] = 0;
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);
+                Pipe.addLongValue(rbB,rbMask,rbPos, constAbsent);
             } else {
                 long tmpLng = (rLongDictionary[target] = value) - 1;
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }
         }
 
@@ -1505,18 +1505,18 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             long xl1 = rLongDictionary[target] = (0 == PrimitiveReader.readPMapBit(reader) ? rLongDictionary[source] : PrimitiveReader.readLongSigned(reader));
             if (0 == xl1) {
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);   
+                Pipe.addLongValue(rbB,rbMask,rbPos, constAbsent);   
             } else {
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, (-1 + (xl1 + (xl1 >>> 63))));
+                Pipe.addLongValue(rbB,rbMask,rbPos, (-1 + (xl1 + (xl1 >>> 63))));
             }
         }
     }
 
     protected void genReadLongSignedConstantOptional(long constAbsent, long constConst, int[] rbB, int rbMask, PrimitiveReader reader, PaddedLong rbPos) {
         if (0==PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);
+            Pipe.addLongValue(rbB,rbMask,rbPos, constAbsent);
         } else {
-            RingBuffer.addLongValue(rbB,rbMask,rbPos, constConst);
+            Pipe.addLongValue(rbB,rbMask,rbPos, constConst);
         }
     }
 
@@ -1525,7 +1525,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0 == value) {
                 rLongDictionary[target] = 0;// set to absent
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);
+                Pipe.addLongValue(rbB,rbMask,rbPos, constAbsent);
             } else {
                 StaticGlue.readLongSignedDeltaOptional(target, source, rLongDictionary, rbB, rbMask, rbPos, value);
             }
@@ -1536,17 +1536,17 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             long value = PrimitiveReader.readLongSigned(reader);
             if (0==value) {
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, constAbsent);
+                Pipe.addLongValue(rbB,rbMask,rbPos, constAbsent);
             } else {
                 long tmpLng= (-1 + (value + (value >>> 63)));
-                RingBuffer.addLongValue(rbB,rbMask,rbPos, tmpLng);
+                Pipe.addLongValue(rbB,rbMask,rbPos, tmpLng);
             }        
         }
     }
 
     // text methods.
    
-    protected void genReadASCIITail(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, RingBuffer rbRingBuffer) {
+    protected void genReadASCIITail(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, Pipe rbRingBuffer) {
         {
             StaticGlue.readASCIITail(target, byteHeap, reader, PrimitiveReader.readIntegerUnsigned(reader));
             LocalHeap.addLocalHeapValue(target,LocalHeap.valueLength(target,byteHeap),byteHeap,rbRingBuffer);
@@ -1554,11 +1554,11 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     }
 
     protected void genReadTextConstant(int constIdx, int constLen, int[] rbB, int rbMask, int bytesBasePos, PaddedLong rbPos) {
-            RingBuffer.setBytePosAndLen(rbB, rbMask, rbPos.value, constIdx, constLen, bytesBasePos);
+            Pipe.setBytePosAndLen(rbB, rbMask, rbPos.value, constIdx, constLen, bytesBasePos);
             PaddedLong.add(rbPos, 2);
     }
 
-    protected void genReadASCIIDelta(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, RingBuffer rbRingBuffer) {
+    protected void genReadASCIIDelta(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, Pipe rbRingBuffer) {
     	{
 	    	int trim = PrimitiveReader.readIntegerSigned(reader);
 	        if (trim >=0) {
@@ -1570,15 +1570,15 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     	}
     }
 
-    protected void genReadASCIICopy(int target, int rbMask, int[] rbB, PrimitiveReader reader, LocalHeap byteHeap, PaddedLong rbPos, RingBuffer rbRingBuffer) {
+    protected void genReadASCIICopy(int target, int rbMask, int[] rbB, PrimitiveReader reader, LocalHeap byteHeap, PaddedLong rbPos, Pipe rbRingBuffer) {
             LocalHeap.addLocalHeapValue(target,((0 == PrimitiveReader.readPMapBit(reader)) ? LocalHeap.valueLength(target,byteHeap) : StaticGlue.readASCIIToHeap(target, reader, byteHeap)),byteHeap,rbRingBuffer);
     }
     
-    protected void genReadASCIICopyOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, RingBuffer rbRingBuffer) {
+    protected void genReadASCIICopyOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, Pipe rbRingBuffer) {
             LocalHeap.addLocalHeapValue(target,((0 == PrimitiveReader.readPMapBit(reader)) ? LocalHeap.valueLength(target,byteHeap) : StaticGlue.readASCIIToHeap(target, reader, byteHeap)),byteHeap,rbRingBuffer);
     }
     
-    protected void genReadASCIINone(int target, int[] rbB, int rbMask, PrimitiveReader reader, LocalHeap byteHeap, PaddedLong rbPos, RingBuffer rbRingBuffer) {
+    protected void genReadASCIINone(int target, int[] rbB, int rbMask, PrimitiveReader reader, LocalHeap byteHeap, PaddedLong rbPos, Pipe rbRingBuffer) {
         {
             byte val;
             int tmp;
@@ -1592,7 +1592,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
 
-    protected void genReadASCIITailOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, RingBuffer rbRingBuffer) {
+    protected void genReadASCIITailOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, Pipe rbRingBuffer) {
         {
             int tail = PrimitiveReader.readIntegerUnsigned(reader);
             if (0 == tail) {
@@ -1604,7 +1604,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
     
-    protected void genReadASCIIDeltaOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, RingBuffer rbRingBuffer) {
+    protected void genReadASCIIDeltaOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, Pipe rbRingBuffer) {
         {
             int optionalTrim = PrimitiveReader.readIntegerSigned(reader);
             int tempId = (0 == optionalTrim ? 
@@ -1617,51 +1617,51 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
 
     protected void genReadTextConstantOptional(int constInit, int constValue, int constInitLen, int constValueLen, int[] rbB, int rbMask, PrimitiveReader reader, int bytesBasePos, PaddedLong rbPos) {
         if (0 != PrimitiveReader.readPMapBit(reader) ) {
-            RingBuffer.setBytePosAndLen(rbB, rbMask, rbPos.value, constInit, constInitLen, bytesBasePos);
+            Pipe.setBytePosAndLen(rbB, rbMask, rbPos.value, constInit, constInitLen, bytesBasePos);
             PaddedLong.add(rbPos, 2);
         } else {
-            RingBuffer.setBytePosAndLen(rbB, rbMask, rbPos.value, constValue, constValueLen, bytesBasePos);
+            Pipe.setBytePosAndLen(rbB, rbMask, rbPos.value, constValue, constValueLen, bytesBasePos);
             PaddedLong.add(rbPos, 2);
         }
     }
     
-    protected void genReadASCIIDefault(int target, int defIdx, int defLen, int rbMask, int[] rbB, PrimitiveReader reader, LocalHeap byteHeap, PaddedLong rbPos, byte[] byteBuffer, int byteMask, RingBuffer rbRingBuffer, int bytesBasePos) {
+    protected void genReadASCIIDefault(int target, int defIdx, int defLen, int rbMask, int[] rbB, PrimitiveReader reader, LocalHeap byteHeap, PaddedLong rbPos, byte[] byteBuffer, int byteMask, Pipe rbRingBuffer, int bytesBasePos) {
             if (0 == PrimitiveReader.readPMapBit(reader)) {
-                RingBuffer.setBytePosAndLen(rbB, rbMask, rbPos.value, defIdx, defLen, bytesBasePos);
+                Pipe.setBytePosAndLen(rbB, rbMask, rbPos.value, defIdx, defLen, bytesBasePos);
                 PaddedLong.add(rbPos, 2);
             } else {
-                int bytePos = RingBuffer.bytesWorkingHeadPosition(rbRingBuffer);                
+                int bytePos = Pipe.bytesWorkingHeadPosition(rbRingBuffer);                
                 int lenTemp = PrimitiveReader.readTextASCIIIntoRing(byteBuffer,
                                                                     bytePos, 
                                                                     byteMask,
                                                                     reader);
-                RingBuffer.setBytePosAndLen(rbB, rbMask, rbPos.value, bytePos, lenTemp, bytesBasePos);
+                Pipe.setBytePosAndLen(rbB, rbMask, rbPos.value, bytePos, lenTemp, bytesBasePos);
                 PaddedLong.add(rbPos, 2);
 
-                RingBuffer.addAndGetBytesWorkingHeadPosition(rbRingBuffer, lenTemp);      
+                Pipe.addAndGetBytesWorkingHeadPosition(rbRingBuffer, lenTemp);      
             }
     }    
     
     protected void genReadBytesConstant(int constIdx, int constLen, int[] rbB, int rbMask, int bytesBasePos, PaddedLong rbPos) {
-            RingBuffer.setBytePosAndLen(rbB, rbMask, rbPos.value, constIdx, constLen, bytesBasePos);
+            Pipe.setBytePosAndLen(rbB, rbMask, rbPos.value, constIdx, constLen, bytesBasePos);
             PaddedLong.add(rbPos, 2);
     }
 
     protected void genReadBytesConstantOptional(int constInit, int constInitLen, int constValue, int constValueLen, int[] rbB, int rbMask, PrimitiveReader reader, int bytesBasePos, PaddedLong rbPos) {
         
         if (0 == PrimitiveReader.readPMapBit(reader) ) {
-            RingBuffer.setBytePosAndLen(rbB, rbMask, rbPos.value, constValue, constValueLen, bytesBasePos);
+            Pipe.setBytePosAndLen(rbB, rbMask, rbPos.value, constValue, constValueLen, bytesBasePos);
             PaddedLong.add(rbPos, 2);
         } else {
-            RingBuffer.setBytePosAndLen(rbB, rbMask, rbPos.value, constInit, constInitLen, bytesBasePos);
+            Pipe.setBytePosAndLen(rbB, rbMask, rbPos.value, constInit, constInitLen, bytesBasePos);
             PaddedLong.add(rbPos, 2);
         }
     }
 
-    protected void genReadBytesDefault(int target, int defIdx, int defLen, int optOff, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, RingBuffer rbRingBuffer, int bytesBasePos) {
+    protected void genReadBytesDefault(int target, int defIdx, int defLen, int optOff, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, Pipe rbRingBuffer, int bytesBasePos) {
         
         if (0 == PrimitiveReader.readPMapBit(reader)) {
-            RingBuffer.setBytePosAndLen(rbB, rbMask, rbPos.value, defIdx, defLen, bytesBasePos);
+            Pipe.setBytePosAndLen(rbB, rbMask, rbPos.value, defIdx, defLen, bytesBasePos);
             PaddedLong.add(rbPos, 2);
         } else {
             int length = PrimitiveReader.readIntegerUnsigned(reader) - optOff;
@@ -1671,7 +1671,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
 
-    protected void genReadBytesCopy(int target, int optOff, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, RingBuffer rbRingBuffer) {
+    protected void genReadBytesCopy(int target, int optOff, int[] rbB, int rbMask, LocalHeap byteHeap, PrimitiveReader reader, PaddedLong rbPos, Pipe rbRingBuffer) {
         {
             if (PrimitiveReader.readPMapBit(reader) != 0) {
                 int length = PrimitiveReader.readIntegerUnsigned(reader) - optOff;                
@@ -1681,7 +1681,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
 
-    protected void genReadBytesDeltaOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, RingBuffer rbRingBuffer) {
+    protected void genReadBytesDeltaOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, Pipe rbRingBuffer) {
         {
             int trim = PrimitiveReader.readIntegerSigned(reader);
             if (0 == trim) {
@@ -1701,7 +1701,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
 
-    protected void genReadBytesTailOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, RingBuffer rbRingBuffer) {
+    protected void genReadBytesTailOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, Pipe rbRingBuffer) {
         {
             int trim = PrimitiveReader.readIntegerUnsigned(reader);
             if (trim == 0) {
@@ -1716,7 +1716,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
 
     }
 
-    protected void genReadBytesDelta(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, RingBuffer rbRingBuffer) {
+    protected void genReadBytesDelta(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, Pipe rbRingBuffer) {
         {
             int trim = PrimitiveReader.readIntegerSigned(reader);
             int utfLength = PrimitiveReader.readIntegerUnsigned(reader);
@@ -1732,7 +1732,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     }
     
     
-    protected void genReadBytesTail(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, RingBuffer rbRingBuffer) {
+    protected void genReadBytesTail(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, Pipe rbRingBuffer) {
         {
             int trim = PrimitiveReader.readIntegerUnsigned(reader);
             int length = PrimitiveReader.readIntegerUnsigned(reader);
@@ -1745,12 +1745,12 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
     }
 
     
-    protected void genReadBytesNoneOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, RingBuffer rbRingBuffer, int bytesBasePos) {
+    protected void genReadBytesNoneOptional(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, Pipe rbRingBuffer, int bytesBasePos) {
         {
             int length = PrimitiveReader.readIntegerUnsigned(reader) - 1;
                 
             if (length<0) {
-                RingBuffer.setBytePosAndLen(rbB, rbMask, rbPos.value, RingBuffer.bytesWorkingHeadPosition(rbRingBuffer), length, bytesBasePos);
+                Pipe.setBytePosAndLen(rbB, rbMask, rbPos.value, Pipe.bytesWorkingHeadPosition(rbRingBuffer), length, bytesBasePos);
                 PaddedLong.add(rbPos, 2);
                 return;
             }
@@ -1761,7 +1761,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         }
     }
 
-    protected void genReadBytesNone(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, RingBuffer rbRingBuffer) {
+    protected void genReadBytesNone(int target, int[] rbB, int rbMask, LocalHeap byteHeap, PaddedLong rbPos, PrimitiveReader reader, Pipe rbRingBuffer) {
         {
             int length = PrimitiveReader.readIntegerUnsigned(reader) - 0;
             PrimitiveReader.readByteData(LocalHeap.rawAccess(byteHeap), LocalHeap.allocate(target, length, byteHeap), length, reader);

@@ -1,10 +1,10 @@
 package com.ociweb.jfast.stream;
 
-import com.ociweb.pronghorn.ring.RingBuffer;
+import com.ociweb.pronghorn.pipe.Pipe;
 
 public interface FASTListener {
 
-    void fragment(int templateId, RingBuffer buffer);
+    void fragment(int templateId, Pipe buffer);
     void fragment();
     
 }

@@ -31,17 +31,16 @@ import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
 import com.ociweb.jfast.stream.FASTDynamicWriter;
 import com.ociweb.jfast.stream.FASTEncoder;
 import com.ociweb.jfast.stream.FASTReaderReactor;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.RingReader;
-import com.ociweb.pronghorn.ring.RingWalker;
-import com.ociweb.pronghorn.ring.schema.generator.CatalogGenerator;
-import com.ociweb.pronghorn.ring.schema.generator.TemplateGenerator;
-import com.ociweb.pronghorn.ring.token.OperatorMask;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
-import com.ociweb.pronghorn.ring.token.TypeMask;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.PipeReader;
+import com.ociweb.pronghorn.pipe.schema.generator.CatalogGenerator;
+import com.ociweb.pronghorn.pipe.schema.generator.TemplateGenerator;
+import com.ociweb.pronghorn.pipe.token.OperatorMask;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.token.TypeMask;
 
 
 public class CatalogGeneratorTest {
@@ -401,7 +400,7 @@ public class CatalogGeneratorTest {
         FASTClassLoader.deleteFiles();
         
 		FieldReferenceOffsetManager from = catalog.getFROM();
-        RingBuffers ringBuffers= RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)10, (byte)16, catalog.ringByteConstants(), from)).initBuffers());
+        PipeBundle ringBuffers= PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)10, (byte)16, catalog.ringByteConstants(), from)).initBuffers());
                 
        // FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriter(catBytes);
         FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriterDebug(catBytes);
@@ -425,7 +424,7 @@ public class CatalogGeneratorTest {
         FASTOutput fastOutput = new FASTOutputByteArray(buffer );
         PrimitiveWriter writer = new PrimitiveWriter(writeBuffer, fastOutput, true);
 
-        RingBuffer ringBuffer = RingBuffers.get(ringBuffers,0);
+        Pipe ringBuffer = PipeBundle.get(ringBuffers,0);
         FASTDynamicWriter dynamicWriter = new FASTDynamicWriter(writer, ringBuffer, writerDispatch);
              
         dynamicWriter.reset(true);
@@ -461,7 +460,7 @@ public class CatalogGeneratorTest {
 
         
         //read all the data off the ring and confirm its what we expected.
-        RingBuffer[] buffers = reactor.ringBuffers();
+        Pipe[] buffers = reactor.ringBuffers();
         int buffersCount = buffers.length;
         try {
             int constIntValue = Integer.MIN_VALUE;
@@ -472,10 +471,10 @@ public class CatalogGeneratorTest {
 	        	int k = buffersCount;
 	        	while (j>0 && --k>=0) {
 	        		
-	        		if (RingReader.tryReadFragment(buffers[k])) {
+	        		if (PipeReader.tryReadFragment(buffers[k])) {
 	        		    	        		    
-						assertTrue(RingReader.isNewMessage(buffers[k]));
-	        			assertEquals(testMessageIdx, RingReader.getMsgIdx(buffers[k]));
+						assertTrue(PipeReader.isNewMessage(buffers[k]));
+	        			assertEquals(testMessageIdx, PipeReader.getMsgIdx(buffers[k]));
 	        			
 	        			int f = fieldCount;
 	        			while (--f>=0) {
@@ -487,7 +486,7 @@ public class CatalogGeneratorTest {
     	        			    case TypeMask.IntegerSignedOptional:
     	        			        
     	        			        int expectedIntValue = ReaderWriterPrimitiveTest.unsignedIntData[--intDataIndex];
-    	        			        int actualIntValue = RingReader.readInt(buffers[k], TEMPLATE_FIELDS[f]);
+    	        			        int actualIntValue = PipeReader.readInt(buffers[k], TEMPLATE_FIELDS[f]);
     	        			        
     	        			        if (fieldWillBeAbsent(isOptional, j-1, f)) {
     	        			            //the last field of even records
@@ -520,7 +519,7 @@ public class CatalogGeneratorTest {
                                 case TypeMask.LongSignedOptional:
                                     
                                     long expectedLongValue = ReaderWriterPrimitiveTest.unsignedLongData[--longDataIndex];
-                                    long actualLongValue = RingReader.readLong(buffers[k], TEMPLATE_FIELDS[f]);
+                                    long actualLongValue = PipeReader.readLong(buffers[k], TEMPLATE_FIELDS[f]);
                                     
 //                                    if (fieldWillBeAbsent(isOptional, j-1, f)) {
 //                                        //the last field of even records
@@ -615,7 +614,7 @@ public class CatalogGeneratorTest {
 	}
 
 	 
-    private float timeEncoding(int fieldType, final int fieldCount, RingBuffer ringBuffer, FASTDynamicWriter dynamicWriter) {
+    private float timeEncoding(int fieldType, final int fieldCount, Pipe ringBuffer, FASTDynamicWriter dynamicWriter) {
 
     	    	
         boolean isOptional = 0!=(1&fieldType);
@@ -631,7 +630,7 @@ public class CatalogGeneratorTest {
                     long start = System.nanoTime();
                     
                     while (--i>=0) {
-                        RingBuffer.addMsgIdx(ringBuffer, testMessageIdx);
+                        Pipe.addMsgIdx(ringBuffer, testMessageIdx);
                         
                         int j = fieldCount;
                         while (--j>=0) {
@@ -642,20 +641,20 @@ public class CatalogGeneratorTest {
                                 value = TokenBuilder.absentValue32(TokenBuilder.MASK_ABSENT_DEFAULT);
                             }
                             
-                            long whp = RingBuffer.workingHeadPosition(ringBuffer);                            
-                            RingBuffer.setValue(RingBuffer.primaryBuffer(ringBuffer),ringBuffer.mask,whp,value);
-                            RingBuffer.setWorkingHead(ringBuffer, whp+1);
+                            long whp = Pipe.workingHeadPosition(ringBuffer);                            
+                            Pipe.setValue(Pipe.primaryBuffer(ringBuffer),ringBuffer.mask,whp,value);
+                            Pipe.setWorkingHead(ringBuffer, whp+1);
                             
                             if (0 == intDataIndex) {
                                 intDataIndex = ReaderWriterPrimitiveTest.unsignedIntData.length;
                             }
                             
                         }
-                        RingBuffer.publishWrites(ringBuffer);
+                        Pipe.publishWrites(ringBuffer);
                         
-                        if (RingReader.tryReadFragment(ringBuffer)) {//without move next we get no stats.
+                        if (PipeReader.tryReadFragment(ringBuffer)) {//without move next we get no stats.
                         	
-                        	RingReader.getMsgIdx(ringBuffer);
+                        	PipeReader.getMsgIdx(ringBuffer);
                         	
                             FASTDynamicWriter.write(dynamicWriter);
                         }
@@ -672,7 +671,7 @@ public class CatalogGeneratorTest {
                     
                   
                     while (--i>=0) {
-                    	RingBuffer.addMsgIdx(ringBuffer, testMessageIdx);
+                    	Pipe.addMsgIdx(ringBuffer, testMessageIdx);
                     	 
                         int j = fieldCount;
                         while (--j>=0) {
@@ -683,13 +682,13 @@ public class CatalogGeneratorTest {
 //                                value = TokenBuilder.absentValue64(TokenBuilder.MASK_ABSENT_DEFAULT);
 //                            }
                             
-                            RingBuffer.addLongValue(RingBuffer.primaryBuffer(ringBuffer), ringBuffer.mask, RingBuffer.getWorkingHeadPositionObject(ringBuffer), value);
+                            Pipe.addLongValue(Pipe.primaryBuffer(ringBuffer), ringBuffer.mask, Pipe.getWorkingHeadPositionObject(ringBuffer), value);
                             if (0==longDataIndex) {
                                 longDataIndex = ReaderWriterPrimitiveTest.unsignedLongData.length;
                             }
                         }
-                        RingBuffer.publishWrites(ringBuffer);
-                        if (RingReader.tryReadFragment(ringBuffer)) {//without move next we get no stats.
+                        Pipe.publishWrites(ringBuffer);
+                        if (PipeReader.tryReadFragment(ringBuffer)) {//without move next we get no stats.
                             FASTDynamicWriter.write(dynamicWriter);
                         }
                     }
@@ -704,16 +703,16 @@ public class CatalogGeneratorTest {
                     int exponent = 2;
           
                     while (--i>=0) {
-                        RingBuffer.addMsgIdx(ringBuffer, testMessageIdx);
+                        Pipe.addMsgIdx(ringBuffer, testMessageIdx);
                         int j = fieldCount;
                         while (--j>=0) {
-                            RingBuffer.addDecimal(exponent, ReaderWriterPrimitiveTest.unsignedLongData[--longDataIndex],ringBuffer);
+                            Pipe.addDecimal(exponent, ReaderWriterPrimitiveTest.unsignedLongData[--longDataIndex],ringBuffer);
                             if (0==longDataIndex) {
                                 longDataIndex = ReaderWriterPrimitiveTest.unsignedLongData.length;
                             }
                         }
-                        RingBuffer.publishWrites(ringBuffer);
-                        if (RingReader.tryReadFragment(ringBuffer)) {//without move next we get no stats.
+                        Pipe.publishWrites(ringBuffer);
+                        if (PipeReader.tryReadFragment(ringBuffer)) {//without move next we get no stats.
                             FASTDynamicWriter.write(dynamicWriter);
                         }
                     }
@@ -731,18 +730,18 @@ public class CatalogGeneratorTest {
                    
       
                     while (--i>=0) {
-                        RingBuffer.addMsgIdx(ringBuffer, testMessageIdx);
+                        Pipe.addMsgIdx(ringBuffer, testMessageIdx);
                         int j = fieldCount;
                         while (--j>=0) {
                             //TODO: B, this test is not using UTF8 encoding for the UTF8 type mask!!!! this is only ASCII enoding always.
                             byte[] source = ReaderWriterPrimitiveTest.stringDataBytes[--stringDataIndex];
-							RingBuffer.addByteArray(source, 0, source.length, ringBuffer);
+							Pipe.addByteArray(source, 0, source.length, ringBuffer);
                             if (0==stringDataIndex) {
                                 stringDataIndex = ReaderWriterPrimitiveTest.stringData.length;
                             }
                         }
-                        RingBuffer.publishWrites(ringBuffer);
-                        if (RingReader.tryReadFragment(ringBuffer)) {//without move next we get no stats.
+                        Pipe.publishWrites(ringBuffer);
+                        if (PipeReader.tryReadFragment(ringBuffer)) {//without move next we get no stats.
                             FASTDynamicWriter.write(dynamicWriter);
                         }
                     }

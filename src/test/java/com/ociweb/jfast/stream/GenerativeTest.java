@@ -13,12 +13,12 @@ import com.ociweb.jfast.generator.FASTClassLoader;
 import com.ociweb.jfast.primitive.FASTOutput;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTOutputStream;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingReader;
-import com.ociweb.pronghorn.ring.stream.StreamingVisitorWriter;
-import com.ociweb.pronghorn.ring.stream.StreamingWriteVisitorGenerator;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeReader;
+import com.ociweb.pronghorn.pipe.stream.StreamingVisitorWriter;
+import com.ociweb.pronghorn.pipe.stream.StreamingWriteVisitorGenerator;
 
 public class GenerativeTest {
 
@@ -33,13 +33,13 @@ public class GenerativeTest {
         TemplateCatalogConfig catalog = new TemplateCatalogConfig(catBytes);
         FieldReferenceOffsetManager from = catalog.getFROM();
         
-        RingBufferConfig rbConfig = new RingBufferConfig(from, messages, varLength);
+        PipeConfig rbConfig = new PipeConfig(from, messages, varLength);
         
         int commonSeed = 300;   
         int iterations = 2;
         
         //This ring contains generated data
-        RingBuffer generatedTestData = buildPopulatedRing(from, rbConfig, commonSeed, iterations);
+        Pipe generatedTestData = buildPopulatedRing(from, rbConfig, commonSeed, iterations);
         
         FASTClassLoader.deleteFiles();
         
@@ -73,9 +73,9 @@ public class GenerativeTest {
         
     }
     
-    public RingBuffer buildPopulatedRing(FieldReferenceOffsetManager from, RingBufferConfig rbConfig, int commonSeed, int iterations) {
+    public Pipe buildPopulatedRing(FieldReferenceOffsetManager from, PipeConfig rbConfig, int commonSeed, int iterations) {
         int i;
-        RingBuffer ring2 = new RingBuffer(rbConfig);
+        Pipe ring2 = new Pipe(rbConfig);
         ring2.initBuffers();
         StreamingWriteVisitorGenerator swvg2 = new StreamingWriteVisitorGenerator(from, new Random(commonSeed), varLength, varLength);    
         StreamingVisitorWriter svw2 = new StreamingVisitorWriter(ring2, swvg2);

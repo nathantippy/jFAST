@@ -12,15 +12,15 @@ import javax.tools.JavaFileObject;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.stream.GeneratorDriving;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.RingReader;
-import com.ociweb.pronghorn.ring.token.OperatorMask;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
-import com.ociweb.pronghorn.ring.token.TypeMask;
-import com.ociweb.pronghorn.ring.util.IntWriteOnceOrderedSet;
-import com.ociweb.pronghorn.ring.util.hash.LongHashTable;
-import com.ociweb.pronghorn.ring.util.hash.LongHashTableVisitor;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.PipeReader;
+import com.ociweb.pronghorn.pipe.token.OperatorMask;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.token.TypeMask;
+import com.ociweb.pronghorn.pipe.util.IntWriteOnceOrderedSet;
+import com.ociweb.pronghorn.pipe.util.hash.LongHashTable;
+import com.ociweb.pronghorn.pipe.util.hash.LongHashTableVisitor;
 
 public class GeneratorUtils {
     
@@ -44,7 +44,7 @@ public class GeneratorUtils {
         if (name.contains("Writer")) {
         	target.append("public "+name+"(byte[] catBytes) {super(new "+TemplateCatalogConfig.class.getSimpleName()+"(catBytes));}");//constructor 	
         } else {
-        	target.append("public "+name+"(byte[] catBytes, "+RingBuffers.class.getSimpleName()+" ringBuffers) {super(new "+TemplateCatalogConfig.class.getSimpleName()+"(catBytes),ringBuffers);}");//constructor       	
+        	target.append("public "+name+"(byte[] catBytes, "+PipeBundle.class.getSimpleName()+" ringBuffers) {super(new "+TemplateCatalogConfig.class.getSimpleName()+"(catBytes),ringBuffers);}");//constructor       	
         }
         
         target.append("\n");
@@ -161,7 +161,7 @@ public class GeneratorUtils {
             builder.append("        beginMessage("+primVarName+",this);\n");
             builder.append("    }\n");
         } else {
-        	methodParaDef = primClass.getSimpleName()+" "+primVarName+", "+RingBuffer.class.getSimpleName()+" rb";
+        	methodParaDef = primClass.getSimpleName()+" "+primVarName+", "+Pipe.class.getSimpleName()+" rb";
         	methodArgsCall = primVarName+", rb";
             builder.append("public final void "+entryMethodName+"("+methodParaDef+") {\n"); 
             
@@ -169,7 +169,7 @@ public class GeneratorUtils {
             builder.append("\n");
             builder.append("setActiveScriptCursor(RingBuffer.cursor(rb));\n");        
 
-            builder.append("if ("+RingReader.class.getCanonicalName()+".isNewMessage(rb)) {\n");                
+            builder.append("if ("+PipeReader.class.getCanonicalName()+".isNewMessage(rb)) {\n");                
             
             if (preambleLength==0) {
                 builder.append("    beginMessage(this);\n");
@@ -184,7 +184,7 @@ public class GeneratorUtils {
         //now that the cursor position / template id is known do normal processing
         builder.append("    int x = activeScriptCursor;\n");
         if (isReader) {
-            builder.append("    "+RingBuffer.class.getSimpleName()+" rb="+RingBuffers.class.getSimpleName()+".get(ringBuffers,x);\n" ); 
+            builder.append("    "+Pipe.class.getSimpleName()+" rb="+PipeBundle.class.getSimpleName()+".get(ringBuffers,x);\n" ); 
             
 			builder.append(" {int fragmentSize = RingBuffer.from(rb).fragDataSize[x];\n\r")
 			       .append("if (!RingBuffer.roomToLowLevelWrite(rb, fragmentSize)) {return 0;}\n\r")
@@ -223,8 +223,8 @@ public class GeneratorUtils {
         
         
         if (isReader) {
-            builder.append("    ").append(RingBuffer.class.getSimpleName()).append(".publishHeadPositions(rb);\n");
-            builder.append("    ").append(RingBuffer.class.getSimpleName()).append(".publishAllBatchedWrites(rb);\n");
+            builder.append("    ").append(Pipe.class.getSimpleName()).append(".publishHeadPositions(rb);\n");
+            builder.append("    ").append(Pipe.class.getSimpleName()).append(".publishAllBatchedWrites(rb);\n");
             builder.append("    return 1;//read a fragment\n"); 
         } 
         builder.append("}\n");

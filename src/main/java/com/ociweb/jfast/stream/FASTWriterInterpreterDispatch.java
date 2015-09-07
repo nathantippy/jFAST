@@ -6,14 +6,14 @@ package com.ociweb.jfast.stream;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.generator.FASTWriterDispatchTemplates;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBuffer.PaddedLong;
-import com.ociweb.pronghorn.ring.RingReader;
-import com.ociweb.pronghorn.ring.token.OperatorMask;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
-import com.ociweb.pronghorn.ring.token.TypeMask;
-import com.ociweb.pronghorn.ring.util.LocalHeap;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeReader;
+import com.ociweb.pronghorn.pipe.Pipe.PaddedLong;
+import com.ociweb.pronghorn.pipe.token.OperatorMask;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.token.TypeMask;
+import com.ociweb.pronghorn.pipe.util.LocalHeap;
 
 //May drop interface if this causes a performance problem from virtual table 
 public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates implements GeneratorDriving{ 
@@ -37,11 +37,11 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
     }
     
 
-    public void acceptLongSignedOptional(int token, long valueOfNull, int rbPos, RingBuffer rbRingBuffer, PrimitiveWriter writer) {
+    public void acceptLongSignedOptional(int token, long valueOfNull, int rbPos, Pipe rbRingBuffer, PrimitiveWriter writer) {
         
-        int[] buffer = rbRingBuffer==null?null:RingBuffer.primaryBuffer(rbRingBuffer);
+        int[] buffer = rbRingBuffer==null?null:Pipe.primaryBuffer(rbRingBuffer);
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
+        PaddedLong workingTailPos = rbRingBuffer==null?null:Pipe.getWorkingTailPositionObject(rbRingBuffer);
         
         int target = (token & longInstanceMask);
         
@@ -89,11 +89,11 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
     }
 
 
-    public void acceptLongSigned(int token, int rbPos, RingBuffer rbRingBuffer, PrimitiveWriter writer) {
+    public void acceptLongSigned(int token, int rbPos, Pipe rbRingBuffer, PrimitiveWriter writer) {
         
-        int[] buffer = rbRingBuffer==null?null:RingBuffer.primaryBuffer(rbRingBuffer);
+        int[] buffer = rbRingBuffer==null?null:Pipe.primaryBuffer(rbRingBuffer);
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
+        PaddedLong workingTailPos = rbRingBuffer==null?null:Pipe.getWorkingTailPositionObject(rbRingBuffer);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -145,11 +145,11 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
 
 
 
-    void acceptLongUnsignedOptional(int token, long valueOfNull, int rbPos, RingBuffer rbRingBuffer, PrimitiveWriter writer) {
+    void acceptLongUnsignedOptional(int token, long valueOfNull, int rbPos, Pipe rbRingBuffer, PrimitiveWriter writer) {
 
-        int[] buffer = rbRingBuffer==null?null:RingBuffer.primaryBuffer(rbRingBuffer);
+        int[] buffer = rbRingBuffer==null?null:Pipe.primaryBuffer(rbRingBuffer);
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
+        PaddedLong workingTailPos = rbRingBuffer==null?null:Pipe.getWorkingTailPositionObject(rbRingBuffer);
         
         int target = token & longInstanceMask;
         
@@ -198,11 +198,11 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
     }
 
 
-    public void acceptLongUnsigned(int token, int rbPos, RingBuffer rbRingBuffer, PrimitiveWriter writer) {
+    public void acceptLongUnsigned(int token, int rbPos, Pipe rbRingBuffer, PrimitiveWriter writer) {
         
-        int[] buffer = rbRingBuffer==null?null:RingBuffer.primaryBuffer(rbRingBuffer);
+        int[] buffer = rbRingBuffer==null?null:Pipe.primaryBuffer(rbRingBuffer);
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
+        PaddedLong workingTailPos = rbRingBuffer==null?null:Pipe.getWorkingTailPositionObject(rbRingBuffer);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -254,11 +254,11 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
 
 
 
-    public void acceptIntegerSigned(int token, int rbPos, RingBuffer rbRingBuffer, PrimitiveWriter writer) {
+    public void acceptIntegerSigned(int token, int rbPos, Pipe rbRingBuffer, PrimitiveWriter writer) {
         
-        int[] buffer = rbRingBuffer==null?null:RingBuffer.primaryBuffer(rbRingBuffer);
+        int[] buffer = rbRingBuffer==null?null:Pipe.primaryBuffer(rbRingBuffer);
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
+        PaddedLong workingTailPos = rbRingBuffer==null?null:Pipe.getWorkingTailPositionObject(rbRingBuffer);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -308,11 +308,11 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         }
     }
 
-    public void acceptIntegerUnsigned(int token, int rbPos, RingBuffer rbRingBuffer, PrimitiveWriter writer) {
+    public void acceptIntegerUnsigned(int token, int rbPos, Pipe rbRingBuffer, PrimitiveWriter writer) {
         
-        int[] buffer = rbRingBuffer==null?null:RingBuffer.primaryBuffer(rbRingBuffer);
+        int[] buffer = rbRingBuffer==null?null:Pipe.primaryBuffer(rbRingBuffer);
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
+        PaddedLong workingTailPos = rbRingBuffer==null?null:Pipe.getWorkingTailPositionObject(rbRingBuffer);
 
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -361,11 +361,11 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         }
     }
  
-    public void acceptIntegerSignedOptional(int token, int valueOfNull, int rbPos, RingBuffer rbRingBuffer, PrimitiveWriter writer) {
+    public void acceptIntegerSignedOptional(int token, int valueOfNull, int rbPos, Pipe rbRingBuffer, PrimitiveWriter writer) {
         
-        int[] buffer = rbRingBuffer==null?null:RingBuffer.primaryBuffer(rbRingBuffer);
+        int[] buffer = rbRingBuffer==null?null:Pipe.primaryBuffer(rbRingBuffer);
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
+        PaddedLong workingTailPos = rbRingBuffer==null?null:Pipe.getWorkingTailPositionObject(rbRingBuffer);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -409,11 +409,11 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         }
     }
 
-    public void acceptIntegerUnsignedOptional(int token, int valueOfNull, int rbPos, RingBuffer rbRingBuffer, PrimitiveWriter writer) {
+    public void acceptIntegerUnsignedOptional(int token, int valueOfNull, int rbPos, Pipe rbRingBuffer, PrimitiveWriter writer) {
        
-        int[] buffer = rbRingBuffer==null?null:RingBuffer.primaryBuffer(rbRingBuffer);
+        int[] buffer = rbRingBuffer==null?null:Pipe.primaryBuffer(rbRingBuffer);
         int mask = rbRingBuffer==null?0:rbRingBuffer.mask;
-        PaddedLong workingTailPos = rbRingBuffer==null?null:RingBuffer.getWorkingTailPositionObject(rbRingBuffer);
+        PaddedLong workingTailPos = rbRingBuffer==null?null:Pipe.getWorkingTailPositionObject(rbRingBuffer);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {
             // none, constant, delta
@@ -458,7 +458,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         }
     }
 
-    public void acceptByteArrayOptional(int token, PrimitiveWriter writer, LocalHeap byteHeap, int rbPos, RingBuffer rbRingBuffer) {
+    public void acceptByteArrayOptional(int token, PrimitiveWriter writer, LocalHeap byteHeap, int rbPos, Pipe rbRingBuffer) {
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {// compiler does all
                                                             // the work.
             // none constant delta tail
@@ -503,7 +503,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
     }
 
 
-    public void acceptByteArray(int token, PrimitiveWriter writer, LocalHeap byteHeap, int rbPos, RingBuffer rbRingBuffer) {
+    public void acceptByteArray(int token, PrimitiveWriter writer, LocalHeap byteHeap, int rbPos, Pipe rbRingBuffer) {
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {// compiler does all
                                                             // the work.
             // none constant delta tail
@@ -543,7 +543,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
     }
 
 
-    public void acceptCharSequenceASCIIOptional(int token, PrimitiveWriter writer, LocalHeap byteHeap, int fieldPos, RingBuffer rbRingBuffer) {
+    public void acceptCharSequenceASCIIOptional(int token, PrimitiveWriter writer, LocalHeap byteHeap, int fieldPos, Pipe rbRingBuffer) {
 
         int idx = token & TEXT_INSTANCE_MASK;
         if (0 == (token & (1 << TokenBuilder.SHIFT_OPER))) {// compiler does all
@@ -609,7 +609,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
 
     }
 
-    public void acceptCharSequenceASCII(int token, PrimitiveWriter writer, LocalHeap byteHeap, int fieldPos, RingBuffer rbRingBuffer) {
+    public void acceptCharSequenceASCII(int token, PrimitiveWriter writer, LocalHeap byteHeap, int fieldPos, Pipe rbRingBuffer) {
        
         int idx = token & TEXT_INSTANCE_MASK;
         
@@ -680,7 +680,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
 
       int x = 0;
     
-    private boolean dispatchWriteByToken(PrimitiveWriter writer, RingBuffer rbRingBuffer) {
+    private boolean dispatchWriteByToken(PrimitiveWriter writer, Pipe rbRingBuffer) {
         int token = fullScript[activeScriptCursor];
         try {            
             assert (gatherWriteData(writer, token, activeScriptCursor, fieldPos, rbRingBuffer));
@@ -689,15 +689,15 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         } catch (Exception e) {
             //TODO: change to propper logging            
             System.err.println("ERROR in FASTWriterInterpreterDispatch: while processing token "+TokenBuilder.tokenToString(token)+
-                                  " name "+RingBuffer.from(rbRingBuffer).fieldNameScript[activeScriptCursor]+   
+                                  " name "+Pipe.from(rbRingBuffer).fieldNameScript[activeScriptCursor]+   
                                   " fieldPos "+fieldPos+"   cursor "+activeScriptCursor+ "   bytes finished:"+  (writer.bytesReadyToWrite(writer)+writer.totalWritten(writer)));
            
-            FieldReferenceOffsetManager.debugFROM( RingBuffer.from(rbRingBuffer));
+            FieldReferenceOffsetManager.debugFROM( Pipe.from(rbRingBuffer));
             throw new RuntimeException(e);
         }
     }
       
-    private boolean dispatchWriteByToken2(PrimitiveWriter writer, RingBuffer rbRingBuffer, int token) {
+    private boolean dispatchWriteByToken2(PrimitiveWriter writer, Pipe rbRingBuffer, int token) {
 
                            
 
@@ -709,7 +709,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                 if (0 == (token & (4 << TokenBuilder.SHIFT_TYPE))) {
                 	
                 	//all these types will be reading 1 positions from the ring so we can do a bounds check here
-                	assert(0==RingBuffer.headPosition(rbRingBuffer) || RingBuffer.getWorkingTailPosition(rbRingBuffer)+1<RingBuffer.headPosition(rbRingBuffer)) : "Reading ring data past head!";
+                	assert(0==Pipe.headPosition(rbRingBuffer) || Pipe.getWorkingTailPosition(rbRingBuffer)+1<Pipe.headPosition(rbRingBuffer)) : "Reading ring data past head!";
                 	
                     if (0 == (token & (1 << TokenBuilder.SHIFT_TYPE))) {// compiler does all
                                                                         // the work.
@@ -722,7 +722,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                     } else {
 
                         // optional
-                        FieldReferenceOffsetManager r = RingBuffer.from(rbRingBuffer);
+                        FieldReferenceOffsetManager r = Pipe.from(rbRingBuffer);
 						int valueOfNull = FieldReferenceOffsetManager.getAbsent32Value(r);
                         if (0 == (token & (2 << TokenBuilder.SHIFT_TYPE))) {                            
                             acceptIntegerUnsignedOptional(token, valueOfNull, fieldPos, rbRingBuffer, writer);                            
@@ -744,7 +744,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                             acceptLongSigned(token, fieldPos, rbRingBuffer, writer);
                         }
                     } else {
-                        FieldReferenceOffsetManager r = RingBuffer.from(rbRingBuffer);
+                        FieldReferenceOffsetManager r = Pipe.from(rbRingBuffer);
 						long valueOfNull = FieldReferenceOffsetManager.getAbsent64Value(r);
 
                         // optional
@@ -762,7 +762,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                 if (0 == (token & (4 << TokenBuilder.SHIFT_TYPE))) {
                     
                 	//all these types will be reading 2 positions from the ring so we can do a bounds check here
-                	assert(0==RingBuffer.headPosition(rbRingBuffer) || RingBuffer.getWorkingTailPosition(rbRingBuffer)+2<=RingBuffer.headPosition(rbRingBuffer)) : "Reading ring data past head!";
+                	assert(0==Pipe.headPosition(rbRingBuffer) || Pipe.getWorkingTailPosition(rbRingBuffer)+2<=Pipe.headPosition(rbRingBuffer)) : "Reading ring data past head!";
                 	
                 	
                     //text is written to the ring buffer encoded as ascii or utf8
@@ -807,7 +807,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                     if (0 == (token & (2 << TokenBuilder.SHIFT_TYPE))) {
                         // 0110? Decimal and DecimalOptional
                     	//all these types will be reading 3 positions from the ring so we can do a bounds check here
-                    	assert(0==RingBuffer.headPosition(rbRingBuffer) || RingBuffer.getWorkingTailPosition(rbRingBuffer)+3<RingBuffer.headPosition(rbRingBuffer)) : "Reading ring data past head!";
+                    	assert(0==Pipe.headPosition(rbRingBuffer) || Pipe.getWorkingTailPosition(rbRingBuffer)+3<Pipe.headPosition(rbRingBuffer)) : "Reading ring data past head!";
                         
                         int expoToken = token;
                         
@@ -832,7 +832,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                         fieldPos+=3;
                     } else {
                     	//all these types will be reading 2 positions from the ring so we can do a bounds check here
-                    	assert(0==RingBuffer.headPosition(rbRingBuffer) || RingBuffer.getWorkingTailPosition(rbRingBuffer)+2<RingBuffer.headPosition(rbRingBuffer)) : "Reading ring data past head!";
+                    	assert(0==Pipe.headPosition(rbRingBuffer) || Pipe.getWorkingTailPosition(rbRingBuffer)+2<Pipe.headPosition(rbRingBuffer)) : "Reading ring data past head!";
                     	
                         if (readFromIdx>=0) {
                             int source = token & instanceBytesMask;
@@ -870,7 +870,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
 	                        	
 	                            //must start at a location after the preamble and templateId.
 	                        	//add 1 for templateId room.
-	                            fieldPos = 1 + RingBuffer.from(rbRingBuffer).templateOffset;
+	                            fieldPos = 1 + Pipe.from(rbRingBuffer).templateOffset;
 	                            
 	                            openMessage(token, templatePMapSize, fieldPos-1, writer, rbRingBuffer);
 	                                                        
@@ -890,7 +890,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
 
                 } else {
                 	//all these types will be reading 1 positions from the ring so we can do a bounds check here
-                	assert(0==RingBuffer.headPosition(rbRingBuffer) || RingBuffer.getWorkingTailPosition(rbRingBuffer)+1<RingBuffer.headPosition(rbRingBuffer)) : "Reading ring data past head!";
+                	assert(0==Pipe.headPosition(rbRingBuffer) || Pipe.getWorkingTailPosition(rbRingBuffer)+1<Pipe.headPosition(rbRingBuffer)) : "Reading ring data past head!";
                 	
                     // 101??
                     // Length Type, no others defined so no need to keep
@@ -901,7 +901,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                         acceptIntegerUnsigned(token, fieldPos, rbRingBuffer, writer);
                     } else {
                         // optional
-                        FieldReferenceOffsetManager r = RingBuffer.from(rbRingBuffer);
+                        FieldReferenceOffsetManager r = Pipe.from(rbRingBuffer);
 						int valueOfNull = FieldReferenceOffsetManager.getAbsent32Value(r);
                         acceptIntegerUnsignedOptional(token, valueOfNull, fieldPos, rbRingBuffer, writer);
                     }
@@ -978,9 +978,9 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
     }
 
 
-    private void acceptOptionalDecimal(PrimitiveWriter writer, int expoToken, int rbPos, RingBuffer rbRingBuffer) {
+    private void acceptOptionalDecimal(PrimitiveWriter writer, int expoToken, int rbPos, Pipe rbRingBuffer) {
         int mantissaToken = fullScript[1+activeScriptCursor];
-		FieldReferenceOffsetManager r = RingBuffer.from(rbRingBuffer);
+		FieldReferenceOffsetManager r = Pipe.from(rbRingBuffer);
         
         int exponentValueOfNull = FieldReferenceOffsetManager.getAbsent32Value(r);
         int exponentTarget = (expoToken & intInstanceMask);
@@ -1227,7 +1227,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
 
 
 
-    private boolean gatherWriteData(PrimitiveWriter writer, int token, int cursor, int fieldPos, RingBuffer queue) {
+    private boolean gatherWriteData(PrimitiveWriter writer, int token, int cursor, int fieldPos, Pipe queue) {
 
         if (null != observer) {
 
@@ -1237,15 +1237,15 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
                     || type == TypeMask.IntegerSignedOptional || type == TypeMask.IntegerUnsigned
                     || type == TypeMask.IntegerUnsignedOptional) {
 
-                value = "<" + RingReader.readInt(queue, fieldPos) + ">";
+                value = "<" + PipeReader.readInt(queue, fieldPos) + ">";
 
             } else if (type == TypeMask.Decimal || type == TypeMask.DecimalOptional) {
 
-                value = "<e:" + RingReader.readInt(queue, fieldPos) + "m:" + RingReader.readLong(queue, fieldPos + 1) + ">";
+                value = "<e:" + PipeReader.readInt(queue, fieldPos) + "m:" + PipeReader.readLong(queue, fieldPos + 1) + ">";
 
             } else if (type == TypeMask.TextASCII || type == TypeMask.TextASCIIOptional || type == TypeMask.TextUTF8
                     || type == TypeMask.TextUTF8Optional) {
-                value = "<len:" + RingReader.readDataLength(queue, fieldPos) + ">";
+                value = "<len:" + PipeReader.readDataLength(queue, fieldPos) + ">";
             }
 
             // TotalWritten is updated each time the pump pulls more bytes to
@@ -1261,12 +1261,12 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
         return true;
     }
     
-    private void openMessage(int token, int pmapSize, int fieldPos,  PrimitiveWriter writer, RingBuffer rb) {
+    private void openMessage(int token, int pmapSize, int fieldPos,  PrimitiveWriter writer, Pipe rb) {
         assert (token < 0);
         assert (0 == (token & (OperatorMask.Group_Bit_Close << TokenBuilder.SHIFT_OPER)));
         assert (0 != (token & (OperatorMask.Group_Bit_Templ << TokenBuilder.SHIFT_OPER)));
 
-       	genWriteOpenTemplatePMap(pmapSize, fieldPos, activeScriptCursor, writer, RingBuffer.primaryBuffer(rb), rb.mask, RingBuffer.getWorkingTailPositionObject(rb), this);
+       	genWriteOpenTemplatePMap(pmapSize, fieldPos, activeScriptCursor, writer, Pipe.primaryBuffer(rb), rb.mask, Pipe.getWorkingTailPositionObject(rb), this);
 
         if (0 == (token & (OperatorMask.Group_Bit_PMap << TokenBuilder.SHIFT_OPER))) {
             //group does not require PMap so we will close our 1 bit PMap now when we use it.
@@ -1280,18 +1280,18 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
       callBeginMessage(null,null);
     }
     
-    public void callBeginMessage(PrimitiveWriter writer, RingBuffer ringBuffer) {
+    public void callBeginMessage(PrimitiveWriter writer, Pipe ringBuffer) {
         beginMessage(writer, ringBuffer);
     }
     
-    private void beginMessage(PrimitiveWriter writer, RingBuffer ringBuffer) {
+    private void beginMessage(PrimitiveWriter writer, Pipe ringBuffer) {
         //called only once when generating to create the needed method for beginning of messages
         fieldPos = 0;
         
         if (preambleData.length != 0) {
-            int[] buffer = ringBuffer==null?null:RingBuffer.primaryBuffer(ringBuffer);
+            int[] buffer = ringBuffer==null?null:Pipe.primaryBuffer(ringBuffer);
             int mask = ringBuffer==null?0:ringBuffer.mask;
-            genWritePreamble(fieldPos, writer, buffer, mask, null==ringBuffer? null : RingBuffer.getWorkingTailPositionObject(ringBuffer), this);
+            genWritePreamble(fieldPos, writer, buffer, mask, null==ringBuffer? null : Pipe.getWorkingTailPositionObject(ringBuffer), this);
             
             fieldPos += (preambleData.length+3)>>2;//must adjust this because it is meta data and when generating it will be used.
         };
@@ -1301,7 +1301,7 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
     }
     
     @Override
-    public void runFromCursor(RingBuffer mockRB) {
+    public void runFromCursor(Pipe mockRB) {
          //NOTE: openMessage has fieldPos set based on constant in encode, if not this default value will stand
          fieldPos = 0;//value only needed for start of fragments that are NOT messages
          //The ring buffer will not be written to because this is for code generation only however it must exist and contain the FROM
@@ -1325,17 +1325,17 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
     ///////////////////////
 
     @Override
-    public void encode(PrimitiveWriter writer, RingBuffer rbRingBuffer) {
+    public void encode(PrimitiveWriter writer, Pipe rbRingBuffer) {
         
         //set the cursor positions for the interpreter if we are not generating code
         if (rbRingBuffer.mask!=0) { //mask !=0, checks if this is not the code generation
             //cursor and limit already set
-            setActiveScriptCursor(RingBuffer.cursor(rbRingBuffer));
+            setActiveScriptCursor(Pipe.cursor(rbRingBuffer));
             fieldPos = 0;//needed for fragments in interpreter but is not called when generating
         }
         
         //start new message with preamble if needed        
-        if (rbRingBuffer.mask!=0 && RingReader.isNewMessage(rbRingBuffer)) { //mask !=0, checks if this is not the code generation    
+        if (rbRingBuffer.mask!=0 && PipeReader.isNewMessage(rbRingBuffer)) { //mask !=0, checks if this is not the code generation    
             callBeginMessage(writer, rbRingBuffer);
         }
 

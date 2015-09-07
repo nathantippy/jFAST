@@ -14,15 +14,15 @@ import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.schema.loader.DictionaryFactory;
-import com.ociweb.pronghorn.ring.schema.loader.TemplateHandler;
-import com.ociweb.pronghorn.ring.token.OperatorMask;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
-import com.ociweb.pronghorn.ring.token.TypeMask;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.schema.loader.DictionaryFactory;
+import com.ociweb.pronghorn.pipe.schema.loader.TemplateHandler;
+import com.ociweb.pronghorn.pipe.token.OperatorMask;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.token.TypeMask;
 
 public class StreamingDecimalTest extends BaseStreamingTest {
 
@@ -47,7 +47,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
 
     FASTReaderInterpreterDispatch fr;
 
-    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+    Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
 
 
     public StreamingDecimalTest() {
@@ -126,15 +126,15 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                         assert (0 != (token & (8 << TokenBuilder.SHIFT_TYPE)));
 
                         //bridge solution as the ring buffer is introduce into all the APIs
-                        RingBuffer.dump(rbRingBufferLocal);
+                        Pipe.dump(rbRingBufferLocal);
                        
-                        long whp = RingBuffer.workingHeadPosition(rbRingBufferLocal);
-                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,testExpConst);
-                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (testValue >>> 32));
-                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (testValue & 0xFFFFFFFF)); 
-                        RingBuffer.setWorkingHead(rbRingBufferLocal,whp);
+                        long whp = Pipe.workingHeadPosition(rbRingBufferLocal);
+                        Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,testExpConst);
+                        Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (testValue >>> 32));
+                        Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (testValue & 0xFFFFFFFF)); 
+                        Pipe.setWorkingHead(rbRingBufferLocal,whp);
                         
-                        RingBuffer.publishWrites(rbRingBufferLocal);
+                        Pipe.publishWrites(rbRingBufferLocal);
                         int rbPos = 0;
 
                         if (0 == (token & (1 << TokenBuilder.SHIFT_TYPE))) {
@@ -160,15 +160,15 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                         assert (0 != (token & (8 << TokenBuilder.SHIFT_TYPE)));
 
                         //bridge solution as the ring buffer is introduce into all the APIs
-                        RingBuffer.dump(rbRingBufferLocal);
+                        Pipe.dump(rbRingBufferLocal);
                         
-                        long whp = RingBuffer.workingHeadPosition(rbRingBufferLocal);
-                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,1);
-                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (mantissa >>> 32));
-                        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (mantissa & 0xFFFFFFFF)); 
-                        RingBuffer.setWorkingHead(rbRingBufferLocal,whp);
+                        long whp = Pipe.workingHeadPosition(rbRingBufferLocal);
+                        Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,1);
+                        Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (mantissa >>> 32));
+                        Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,(int) (mantissa & 0xFFFFFFFF)); 
+                        Pipe.setWorkingHead(rbRingBufferLocal,whp);
                         
-                        RingBuffer.publishWrites(rbRingBufferLocal);
+                        Pipe.publishWrites(rbRingBufferLocal);
                         int rbPos = 0;
 
                         if (0 == (token & (1 << TokenBuilder.SHIFT_TYPE))) {                                
@@ -207,8 +207,8 @@ public class StreamingDecimalTest extends BaseStreamingTest {
             int[] tokenLookup, DictionaryFactory dcr) {
 
         TemplateCatalogConfig testCatalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null, 64, maxGroupCount * 10, -1, new ClientConfig());
-		RingBuffer rb = new RingBuffer(new RingBufferConfig((byte)15, (byte)7, testCatalog.ringByteConstants(), testCatalog.getFROM()));
-		fr = new FASTReaderInterpreterDispatch(testCatalog, RingBuffers.buildRingBuffers(rb.initBuffers()));
+		Pipe rb = new Pipe(new PipeConfig((byte)15, (byte)7, testCatalog.ringByteConstants(), testCatalog.getFROM()));
+		fr = new FASTReaderInterpreterDispatch(testCatalog, PipeBundle.buildRingBuffers(rb.initBuffers()));
         
         long start = System.nanoTime();
         if (operationIters < 3) {
@@ -252,18 +252,18 @@ public class StreamingDecimalTest extends BaseStreamingTest {
     private void readDecimalOthers(int[] tokenLookup, FASTReaderInterpreterDispatch fr, long none, int f, int token) {
         
         if (sendNulls && (f & 0xF) == 0 && TokenBuilder.isOptional(token)) {
-            int exp = StreamingDecimalTest.readDecimalExponent(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
+            int exp = StreamingDecimalTest.readDecimalExponent(tokenLookup[f], reader, fr, PipeBundle.get(fr.ringBuffers,0));
             if (exp != TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT) {
                 assertEquals(TokenBuilder.tokenToString(tokenLookup[f]),
                         TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, exp);
             }
-            long man = StreamingDecimalTest.readDecimalMantissa(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
+            long man = StreamingDecimalTest.readDecimalMantissa(tokenLookup[f], reader, fr, PipeBundle.get(fr.ringBuffers,0));
             if (none != man) {
                 assertEquals(TokenBuilder.tokenToString(tokenLookup[f]), none, man);
             }
         } else {
-            int exp = StreamingDecimalTest.readDecimalExponent(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
-            long man = StreamingDecimalTest.readDecimalMantissa(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
+            int exp = StreamingDecimalTest.readDecimalExponent(tokenLookup[f], reader, fr, PipeBundle.get(fr.ringBuffers,0));
+            long man = StreamingDecimalTest.readDecimalMantissa(tokenLookup[f], reader, fr, PipeBundle.get(fr.ringBuffers,0));
             if (testData[f] != man) {
                 assertEquals(testData[f], man);
             }
@@ -272,20 +272,20 @@ public class StreamingDecimalTest extends BaseStreamingTest {
 
     private void readDecimalConstant(int[] tokenLookup, FASTReaderInterpreterDispatch fr, long none, int f, int token, int i) {
         if (sendNulls && (i & 0xF) == 0 && TokenBuilder.isOptional(token)) {
-            int exp = StreamingDecimalTest.readDecimalExponent(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
+            int exp = StreamingDecimalTest.readDecimalExponent(tokenLookup[f], reader, fr, PipeBundle.get(fr.ringBuffers,0));
             if (exp != TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT) {
                 assertEquals(TokenBuilder.tokenToString(tokenLookup[f]),
                         TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT, exp);
             }
-            long man = StreamingDecimalTest.readDecimalMantissa(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
+            long man = StreamingDecimalTest.readDecimalMantissa(tokenLookup[f], reader, fr, PipeBundle.get(fr.ringBuffers,0));
             if (none != man) {
                 assertEquals(TokenBuilder.tokenToString(tokenLookup[f]), none, man);
             }
         } else {
             
             
-            int exp = StreamingDecimalTest.readDecimalExponent(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
-            long man = StreamingDecimalTest.readDecimalMantissa(tokenLookup[f], reader, fr, RingBuffers.get(fr.ringBuffers,0));
+            int exp = StreamingDecimalTest.readDecimalExponent(tokenLookup[f], reader, fr, PipeBundle.get(fr.ringBuffers,0));
+            long man = StreamingDecimalTest.readDecimalMantissa(tokenLookup[f], reader, fr, PipeBundle.get(fr.ringBuffers,0));
             if (testMantConst != man) {
                 assertEquals(testMantConst, man);
             }
@@ -323,37 +323,37 @@ public class StreamingDecimalTest extends BaseStreamingTest {
         reader = new PrimitiveReader(4096, input, maxGroupCount * 10);
     }
 
-    public static long readDecimalMantissa(int token, PrimitiveReader reader, FASTReaderInterpreterDispatch decoder, RingBuffer ringBuffer) {
+    public static long readDecimalMantissa(int token, PrimitiveReader reader, FASTReaderInterpreterDispatch decoder, Pipe ringBuffer) {
         assert (0 == (token & (2 << TokenBuilder.SHIFT_TYPE))) : TokenBuilder.tokenToString(token);
         assert (0 != (token & (4 << TokenBuilder.SHIFT_TYPE))) : TokenBuilder.tokenToString(token);
         assert (0 != (token & (8 << TokenBuilder.SHIFT_TYPE))) : TokenBuilder.tokenToString(token);
         
         if (0 == (token & (1 << TokenBuilder.SHIFT_TYPE))) {
             // not optional
-            decoder.readLongSigned(token, decoder.rLongDictionary, decoder.MAX_LONG_INSTANCE_MASK, decoder.readFromIdx, reader, RingBuffers.get(decoder.ringBuffers,0));
+            decoder.readLongSigned(token, decoder.rLongDictionary, decoder.MAX_LONG_INSTANCE_MASK, decoder.readFromIdx, reader, PipeBundle.get(decoder.ringBuffers,0));
         } else {
             // optional
-            decoder.readLongSignedOptional(token, decoder.rLongDictionary, decoder.MAX_LONG_INSTANCE_MASK, decoder.readFromIdx, reader, RingBuffers.get(decoder.ringBuffers,0));
+            decoder.readLongSignedOptional(token, decoder.rLongDictionary, decoder.MAX_LONG_INSTANCE_MASK, decoder.readFromIdx, reader, PipeBundle.get(decoder.ringBuffers,0));
         }
         
         //must return what was written
-        return RingBuffer.peekLong(RingBuffer.primaryBuffer(ringBuffer), RingBuffer.workingHeadPosition(ringBuffer)-2, ringBuffer.mask);
+        return Pipe.peekLong(Pipe.primaryBuffer(ringBuffer), Pipe.workingHeadPosition(ringBuffer)-2, ringBuffer.mask);
     }
 
-    public static int readDecimalExponent(int token, PrimitiveReader reader, FASTReaderInterpreterDispatch decoder, RingBuffer ringBuffer) {
+    public static int readDecimalExponent(int token, PrimitiveReader reader, FASTReaderInterpreterDispatch decoder, Pipe ringBuffer) {
         assert (0 == (token & (2 << TokenBuilder.SHIFT_TYPE))) : TokenBuilder.tokenToString(token);
         assert (0 != (token & (4 << TokenBuilder.SHIFT_TYPE))) : TokenBuilder.tokenToString(token);
         assert (0 != (token & (8 << TokenBuilder.SHIFT_TYPE))) : TokenBuilder.tokenToString(token);
                 
         if (0 == (token & (1 << TokenBuilder.SHIFT_TYPE))) {
             // 00010 IntegerSigned
-            decoder.readIntegerSigned(token, decoder.rIntDictionary, decoder.MAX_INT_INSTANCE_MASK, decoder.readFromIdx, reader, RingBuffers.get(decoder.ringBuffers,0));
+            decoder.readIntegerSigned(token, decoder.rIntDictionary, decoder.MAX_INT_INSTANCE_MASK, decoder.readFromIdx, reader, PipeBundle.get(decoder.ringBuffers,0));
         } else {
             // 00011 IntegerSignedOptional
-            decoder.readIntegerSignedOptional(token, decoder.rIntDictionary, decoder.MAX_INT_INSTANCE_MASK, decoder.readFromIdx, reader, RingBuffers.get(decoder.ringBuffers,0));
+            decoder.readIntegerSignedOptional(token, decoder.rIntDictionary, decoder.MAX_INT_INSTANCE_MASK, decoder.readFromIdx, reader, PipeBundle.get(decoder.ringBuffers,0));
         }
         //NOTE: for testing we need to check what was written
-        return RingBuffer.peek(RingBuffer.primaryBuffer(ringBuffer), RingBuffer.workingHeadPosition(ringBuffer)-1, ringBuffer.mask);
+        return Pipe.peek(Pipe.primaryBuffer(ringBuffer), Pipe.workingHeadPosition(ringBuffer)-1, ringBuffer.mask);
     }
 
 }

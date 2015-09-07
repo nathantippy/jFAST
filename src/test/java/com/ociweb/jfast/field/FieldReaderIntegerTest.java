@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.ociweb.pronghorn.ring.schema.loader.TemplateHandler;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.schema.loader.TemplateHandler;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
 
 public class FieldReaderIntegerTest {
 

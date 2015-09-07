@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.error.FASTException;
-import com.ociweb.pronghorn.ring.util.hash.IntHashTable;
+import com.ociweb.pronghorn.pipe.util.hash.IntHashTable;
 
     public class FASTClassLoader extends ClassLoader{
 

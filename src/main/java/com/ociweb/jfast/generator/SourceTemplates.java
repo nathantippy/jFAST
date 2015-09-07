@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import com.ociweb.jfast.error.FASTException;
 import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
-import com.ociweb.pronghorn.ring.util.hash.IntHashTable;
-import com.ociweb.pronghorn.ring.util.hash.MurmurHash;
+import com.ociweb.pronghorn.pipe.util.hash.IntHashTable;
+import com.ociweb.pronghorn.pipe.util.hash.MurmurHash;
 
 public class SourceTemplates {
 

@@ -27,8 +27,8 @@ import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteBuffer;
 import com.ociweb.jfast.primitive.adapter.FASTOutputSocketChannel;
 import com.ociweb.jfast.primitive.adapter.FASTOutputStream;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
 
 public class ReaderWriterPrimitiveTest {
 
@@ -886,7 +886,7 @@ public class ReaderWriterPrimitiveTest {
             int limit = writer.limit;
             int c = 0;
             while (c < len) {
-                limit = RingBuffer.encodeSingleChar((int) temp.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
+                limit = Pipe.encodeSingleChar((int) temp.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
             }
             writer.limit = limit;
 		}
@@ -914,7 +914,7 @@ public class ReaderWriterPrimitiveTest {
                 //convert bytes into chars
                 long charAndPos = 0;        
                 while (charAndPos>>32 < len  ) {
-                    charAndPos = RingBuffer.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
+                    charAndPos = Pipe.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
                     builder.append((char)charAndPos);
 
                 }
@@ -956,7 +956,7 @@ public class ReaderWriterPrimitiveTest {
                     int limit = writer.limit;
                     int c = 0;
                     while (c < len) {
-                        limit = RingBuffer.encodeSingleChar((int) temp.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
+                        limit = Pipe.encodeSingleChar((int) temp.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
                     }
                     writer.limit = limit;
 				}
@@ -981,7 +981,7 @@ public class ReaderWriterPrimitiveTest {
                         
                         long charAndPos = 0;        
                         while (charAndPos>>32 < len  ) {//convert bytes to chars
-                            charAndPos = RingBuffer.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
+                            charAndPos = Pipe.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
                             target[offset++]=(char)charAndPos;
                         }
                     }
@@ -1025,7 +1025,7 @@ public class ReaderWriterPrimitiveTest {
                     int limit = writer.limit;
                     int c = 0;
                     while (c < len) {
-                        limit = RingBuffer.encodeSingleChar((int) temp.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
+                        limit = Pipe.encodeSingleChar((int) temp.charAt(c++), writer.buffer, 0xFFFFFFFF, limit);
                     }
                     writer.limit = limit;
 				}

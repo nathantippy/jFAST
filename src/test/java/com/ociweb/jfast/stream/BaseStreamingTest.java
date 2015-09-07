@@ -6,15 +6,15 @@ package com.ociweb.jfast.stream;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.ReaderWriterPrimitiveTest;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.schema.loader.DictionaryFactory;
-import com.ociweb.pronghorn.ring.schema.loader.TemplateHandler;
-import com.ociweb.pronghorn.ring.token.OperatorMask;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
-import com.ociweb.pronghorn.ring.util.LocalHeap;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.schema.loader.DictionaryFactory;
+import com.ociweb.pronghorn.pipe.schema.loader.TemplateHandler;
+import com.ociweb.pronghorn.pipe.token.OperatorMask;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.util.LocalHeap;
 
 public abstract class BaseStreamingTest {
 	
@@ -169,15 +169,15 @@ public abstract class BaseStreamingTest {
 			//close group 
 		    int idx = TokenBuilder.MAX_INSTANCE & groupToken;
 		    
-			RingBuffer ringBuffer = RingBuffers.get( fr.ringBuffers, 0);			
+			Pipe ringBuffer = PipeBundle.get( fr.ringBuffers, 0);			
 			fr.closeGroup(groupToken|(OperatorMask.Group_Bit_Close<<TokenBuilder.SHIFT_OPER),idx, reader);
 			
-			long workingHeadPos = RingBuffer.workingHeadPosition(ringBuffer);
-			RingBuffer.writeTrailingCountOfBytesConsumed(ringBuffer,   workingHeadPos); //increment because this is the low-level API calling
-			RingBuffer.setWorkingHead(ringBuffer, workingHeadPos+1);
+			long workingHeadPos = Pipe.workingHeadPosition(ringBuffer);
+			Pipe.writeTrailingCountOfBytesConsumed(ringBuffer,   workingHeadPos); //increment because this is the low-level API calling
+			Pipe.setWorkingHead(ringBuffer, workingHeadPos+1);
 			
 	    	//single length field still needs to move this value up, so this is always done
-			RingBuffer.updateBytesWriteLastConsumedPos(ringBuffer);
+			Pipe.updateBytesWriteLastConsumedPos(ringBuffer);
 	    	
 			g = fieldsPerGroup;
 			if (f>0 || i>0) {
@@ -191,7 +191,7 @@ public abstract class BaseStreamingTest {
 	}
 
 	protected int groupManagementWrite(int fieldsPerGroup, FASTWriterInterpreterDispatch fw, int i, int g,
-			                             int groupOpenToken, int groupCloseToken, int f, int pmapSize, PrimitiveWriter writer, RingBuffer ring) {
+			                             int groupOpenToken, int groupCloseToken, int f, int pmapSize, PrimitiveWriter writer, Pipe ring) {
 		if (--g<0) {
 			//close group
 			fw.closeGroup(groupOpenToken|(OperatorMask.Group_Bit_Close<<TokenBuilder.SHIFT_OPER), writer);
@@ -471,14 +471,14 @@ public abstract class BaseStreamingTest {
                 int idx = token & fw.intInstanceMask;
                 
                 //temp solution as the ring buffer is introduce into all the APIs
-                RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+                Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
                 rbRingBufferLocal.initBuffers();
-                RingBuffer.dump(rbRingBufferLocal);
-                long workingHeadPosition = RingBuffer.workingHeadPosition(rbRingBufferLocal);
-                RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,workingHeadPosition,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
-                RingBuffer.setWorkingHead(rbRingBufferLocal, workingHeadPosition+1);
-                RingBuffer ringBuffer = rbRingBufferLocal;
-                RingBuffer.publishWrites(ringBuffer);
+                Pipe.dump(rbRingBufferLocal);
+                long workingHeadPosition = Pipe.workingHeadPosition(rbRingBufferLocal);
+                Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,workingHeadPosition,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                Pipe.setWorkingHead(rbRingBufferLocal, workingHeadPosition+1);
+                Pipe ringBuffer = rbRingBufferLocal;
+                Pipe.publishWrites(ringBuffer);
                 int rbPos = 0;
     
                 // hack until all the classes no longer need this method.
@@ -538,14 +538,14 @@ public abstract class BaseStreamingTest {
                     int idx = token & fw.intInstanceMask;
                     
                     //temp solution as the ring buffer is introduce into all the APIs   
-                    RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+                    Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
                     rbRingBufferLocal.initBuffers();
-                    RingBuffer.dump(rbRingBufferLocal);
-                    long workingHeadPosition = RingBuffer.workingHeadPosition(rbRingBufferLocal);
-                    RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,workingHeadPosition,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
-                    RingBuffer.setWorkingHead(rbRingBufferLocal, workingHeadPosition+1);
-                    RingBuffer ringBuffer = rbRingBufferLocal;
-                    RingBuffer.publishWrites(ringBuffer);
+                    Pipe.dump(rbRingBufferLocal);
+                    long workingHeadPosition = Pipe.workingHeadPosition(rbRingBufferLocal);
+                    Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,workingHeadPosition,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
+                    Pipe.setWorkingHead(rbRingBufferLocal, workingHeadPosition+1);
+                    Pipe ringBuffer = rbRingBufferLocal;
+                    Pipe.publishWrites(ringBuffer);
                     int rbPos = 0;
                  
                     // hack until all the classes no longer need this method.

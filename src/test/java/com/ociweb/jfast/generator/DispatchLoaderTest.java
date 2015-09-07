@@ -21,8 +21,8 @@ import com.ociweb.jfast.stream.FASTDecoder;
 import com.ociweb.jfast.stream.FASTListener;
 import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
 import com.ociweb.jfast.stream.FASTReaderReactor;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingReader;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeReader;
 
 public class DispatchLoaderTest {
 
@@ -37,7 +37,7 @@ public class DispatchLoaderTest {
 		private final PrimitiveReader reader;
 		private final int switchToCompiled1;
 		private final AtomicBoolean alive;
-		RingBuffer queue = null;
+		Pipe queue = null;
 
 		private DemoFASTListener(FASTReaderReactor[] reactor,
 				AtomicInteger records, int switchToCompiled2, int exitTest,
@@ -57,7 +57,7 @@ public class DispatchLoaderTest {
 		}
 
 		@Override
-		public void fragment(int templateId, RingBuffer queue) {
+		public void fragment(int templateId, Pipe queue) {
 		         this.queue = queue;
 
 		}
@@ -66,10 +66,10 @@ public class DispatchLoaderTest {
 		public void fragment() {
 		    if (null!=queue) {
 		        
-		        int id = RingReader.readInt(queue, MESSAGE_ID_IDX);
+		        int id = PipeReader.readInt(queue, MESSAGE_ID_IDX);
 		      //  System.err.println(templateId+" "+id);
 		        
-		        String version = RingReader.readASCII(queue, VERSION_IDX, new StringBuilder()).toString();
+		        String version = PipeReader.readASCII(queue, VERSION_IDX, new StringBuilder()).toString();
 
 		       if (records.intValue()<switchToCompiled1) {
 		           //Interpreter
@@ -82,7 +82,7 @@ public class DispatchLoaderTest {
 		           assertEquals("2.0",version);
 		       }               
 		       
-		       RingBuffer.dump(queue); //don't need the data but do need to empty the queue.
+		       Pipe.dump(queue); //don't need the data but do need to empty the queue.
 		       
 		       records.incrementAndGet();
 		       
@@ -102,7 +102,7 @@ public class DispatchLoaderTest {
 		           alive.set(false);
 		       }                    
 		        
-		        RingBuffer.dump(queue);
+		        Pipe.dump(queue);
 		    }
 		    queue = null;
 		}

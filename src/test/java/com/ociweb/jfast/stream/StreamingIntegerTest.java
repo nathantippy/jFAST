@@ -14,15 +14,15 @@ import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.schema.loader.DictionaryFactory;
-import com.ociweb.pronghorn.ring.schema.loader.TemplateHandler;
-import com.ociweb.pronghorn.ring.token.OperatorMask;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
-import com.ociweb.pronghorn.ring.token.TypeMask;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.schema.loader.DictionaryFactory;
+import com.ociweb.pronghorn.pipe.schema.loader.TemplateHandler;
+import com.ociweb.pronghorn.pipe.token.OperatorMask;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.token.TypeMask;
 
 
 
@@ -160,18 +160,18 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 		return System.nanoTime() - start;
 	}
 
-	static RingBuffer rbRingBufferLocal = new RingBuffer(new RingBufferConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+	static Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
     static {
     	rbRingBufferLocal.initBuffers();
     }
 
     public static void writeInteger(FASTWriterInterpreterDispatch fw, int token, int value, PrimitiveWriter writer) {
         //temp solution as the ring buffer is introduce into all the APIs
-        RingBuffer.dump(rbRingBufferLocal);
-        long whp = RingBuffer.workingHeadPosition(rbRingBufferLocal);
-        RingBuffer.setValue(RingBuffer.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,value);
-        RingBuffer.setWorkingHead(rbRingBufferLocal,whp);
-        RingBuffer.publishWrites(rbRingBufferLocal);
+        Pipe.dump(rbRingBufferLocal);
+        long whp = Pipe.workingHeadPosition(rbRingBufferLocal);
+        Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,value);
+        Pipe.setWorkingHead(rbRingBufferLocal,whp);
+        Pipe.publishWrites(rbRingBufferLocal);
         int rbPos = 0;
 
         if (0 == (token & (1 << TokenBuilder.SHIFT_TYPE))) {
@@ -198,7 +198,7 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 	    TemplateCatalogConfig testCatalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null, 64,maxGroupCount * 10, -1, new ClientConfig());
 		testCatalog.clientConfig();
 		testCatalog.clientConfig();
-		FASTReaderInterpreterDispatch fr = new FASTReaderInterpreterDispatch(testCatalog, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, testCatalog.ringByteConstants(), testCatalog.getFROM())).initBuffers()));
+		FASTReaderInterpreterDispatch fr = new FASTReaderInterpreterDispatch(testCatalog, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)7, testCatalog.ringByteConstants(), testCatalog.getFROM())).initBuffers()));
 		
 		
 		long start = System.nanoTime();
@@ -211,7 +211,7 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 		
 		fr.openGroup(groupToken, maxMPapBytes, reader);
 		
-		RingBuffer ringBuffer = RingBuffers.get(fr.ringBuffers,0);
+		Pipe ringBuffer = PipeBundle.get(fr.ringBuffers,0);
 		while (--i>=0) {
 			int f = fields;
 			

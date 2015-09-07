@@ -3,12 +3,12 @@ package com.ociweb.jfast.stream;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArrayEquals;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.schema.loader.DictionaryFactory;
-import com.ociweb.pronghorn.ring.token.OperatorMask;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
-import com.ociweb.pronghorn.ring.token.TypeMask;
-import com.ociweb.pronghorn.ring.util.LocalHeap;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.schema.loader.DictionaryFactory;
+import com.ociweb.pronghorn.pipe.token.OperatorMask;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.token.TypeMask;
+import com.ociweb.pronghorn.pipe.util.LocalHeap;
 
 public abstract class FASTEncoder { 
     
@@ -110,7 +110,7 @@ public abstract class FASTEncoder {
         return true;
     }
     
-    public abstract void encode(PrimitiveWriter writer, RingBuffer ringBuffer);
+    public abstract void encode(PrimitiveWriter writer, Pipe ringBuffer);
     
 
     public void setActiveScriptCursor(int cursor) {   	

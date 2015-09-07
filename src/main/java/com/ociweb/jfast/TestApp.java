@@ -13,12 +13,12 @@ import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.catalog.loader.TemplateLoader;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.stream.FASTReaderReactor;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.RingReader;
-import com.ociweb.pronghorn.ring.stream.StreamingReadVisitorAdapter;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.PipeReader;
+import com.ociweb.pronghorn.pipe.stream.StreamingReadVisitorAdapter;
 
 public class TestApp {
 
@@ -84,8 +84,8 @@ public class TestApp {
                        
             long finishedLoadingRawData = System.currentTimeMillis();
             
-            RingBuffer ringBuffer = buildMessageSpecificRingBuffer(maxMessagesOnRing, maxStringLength, from, byteConst);            
-            FASTReaderReactor reactor = FAST.inputReactor(input, catBytes, RingBuffers.buildRingBuffers(ringBuffer));
+            Pipe ringBuffer = buildMessageSpecificRingBuffer(maxMessagesOnRing, maxStringLength, from, byteConst);            
+            FASTReaderReactor reactor = FAST.inputReactor(input, catBytes, PipeBundle.buildRingBuffers(ringBuffer));
             
             long finishedCompileOfDecoder = System.currentTimeMillis();
                         
@@ -101,19 +101,19 @@ public class TestApp {
                     //This would normally be called from a different thread!
                                        
                     //read message off the ring buffer to make room for more messages                    
-                    if (RingReader.tryReadFragment(ringBuffer)) {
+                    if (PipeReader.tryReadFragment(ringBuffer)) {
                         
-                        if (RingReader.isNewMessage(ringBuffer)) {
+                        if (PipeReader.isNewMessage(ringBuffer)) {
                             localCount++;
                             
-                            final int msgIdx = RingReader.getMsgIdx(ringBuffer);
+                            final int msgIdx = PipeReader.getMsgIdx(ringBuffer);
                             long templateId = from.fieldIdScript[msgIdx]; 
                             String templateName = from.fieldNameScript[msgIdx];
                             //
                             //NOTE: If this were a real application using the data, read fields here using LOC for each that was constructed earlier
                             
                         }
-                        RingReader.releaseReadLock(ringBuffer);
+                        PipeReader.releaseReadLock(ringBuffer);
                     } 
                 }
                 
@@ -170,11 +170,11 @@ public class TestApp {
     }
 
 
-    private static RingBuffer buildMessageSpecificRingBuffer(
+    private static Pipe buildMessageSpecificRingBuffer(
             int maxMessagesOnRing, int maxStringLength,
             FieldReferenceOffsetManager from, byte[] byteConst) {        
-        RingBufferConfig ringConfig = new RingBufferConfig(from, maxMessagesOnRing, maxStringLength, byteConst);
-        RingBuffer ringBuffer = new RingBuffer(ringConfig);
+        PipeConfig ringConfig = new PipeConfig(from, maxMessagesOnRing, maxStringLength, byteConst);
+        Pipe ringBuffer = new Pipe(ringConfig);
         ringBuffer.initBuffers();
         return ringBuffer;
     }

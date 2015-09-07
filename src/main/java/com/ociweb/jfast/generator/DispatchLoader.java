@@ -10,14 +10,14 @@ import com.ociweb.jfast.stream.FASTDecoder;
 import com.ociweb.jfast.stream.FASTEncoder;
 import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
 import com.ociweb.jfast.stream.FASTWriterInterpreterDispatch;
-import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.pipe.PipeBundle;
 
 public class DispatchLoader {
 
     private static final boolean FORCE_COMPILE = true;
     private static final Logger log = LoggerFactory.getLogger(DispatchLoader.class);
 
-    public static FASTDecoder loadDispatchReader(byte[] catalog, RingBuffers ringBuffers) {
+    public static FASTDecoder loadDispatchReader(byte[] catalog, PipeBundle ringBuffers) {
         //always try to load the generated reader because it will be faster 
         try {
             return loadGeneratedReaderDispatch(catalog, FASTClassLoader.READER, ringBuffers);
@@ -27,7 +27,7 @@ public class DispatchLoader {
         }
     }
     
-    public static FASTDecoder loadDispatchReaderDebug(byte[] catalog, RingBuffers ringBuffers) {
+    public static FASTDecoder loadDispatchReaderDebug(byte[] catalog, PipeBundle ringBuffers) {
         ///NOTE: when there is only 1 template the compiled dispatch may continue to work if the templateId is wrong
         //       because it does not do extra checking.  The interpreted one will use the templateId as defined.
         return new FASTReaderInterpreterDispatch(catalog, ringBuffers);
@@ -47,7 +47,7 @@ public class DispatchLoader {
 		return new FASTWriterInterpreterDispatch(new TemplateCatalogConfig(catBytes));
     }
     
-    public static <T> T loadGeneratedReaderDispatch(byte[] catBytes, String type, RingBuffers ringBuffers)
+    public static <T> T loadGeneratedReaderDispatch(byte[] catBytes, String type, PipeBundle ringBuffers)
             throws ReflectiveOperationException, SecurityException {
         
         ClassLoader parentClassLoader = FASTDecoder.class.getClassLoader();

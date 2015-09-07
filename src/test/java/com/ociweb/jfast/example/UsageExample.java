@@ -1,12 +1,12 @@
 package com.ociweb.jfast.example;
 
-import static com.ociweb.pronghorn.ring.RingReader.eqASCII;
-import static com.ociweb.pronghorn.ring.RingReader.readASCII;
-import static com.ociweb.pronghorn.ring.RingReader.readDataLength;
-import static com.ociweb.pronghorn.ring.RingReader.readDecimalExponent;
-import static com.ociweb.pronghorn.ring.RingReader.readDecimalMantissa;
-import static com.ociweb.pronghorn.ring.RingReader.readInt;
-import static com.ociweb.pronghorn.ring.RingReader.readLong;
+import static com.ociweb.pronghorn.pipe.PipeReader.eqASCII;
+import static com.ociweb.pronghorn.pipe.PipeReader.readASCII;
+import static com.ociweb.pronghorn.pipe.PipeReader.readDataLength;
+import static com.ociweb.pronghorn.pipe.PipeReader.readDecimalExponent;
+import static com.ociweb.pronghorn.pipe.PipeReader.readDecimalMantissa;
+import static com.ociweb.pronghorn.pipe.PipeReader.readInt;
+import static com.ociweb.pronghorn.pipe.PipeReader.readLong;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
@@ -34,11 +34,11 @@ import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTInputStream;
 import com.ociweb.jfast.stream.FASTDecoder;
 import com.ociweb.jfast.stream.FASTReaderReactor;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.RingReader;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.PipeReader;
 
 public class UsageExample {
 
@@ -74,7 +74,7 @@ public class UsageExample {
    
           catalog.clientConfig();
 		catalog.clientConfig();
-		FASTDecoder readerDispatch = DispatchLoader.loadDispatchReaderDebug(catBytes, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+		FASTDecoder readerDispatch = DispatchLoader.loadDispatchReaderDebug(catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
        //  FASTDecoder readerDispatch = new FASTReaderInterpreterDispatch(catBytes); 
          
          System.out.println("Using: "+readerDispatch.getClass().getSimpleName());
@@ -127,8 +127,8 @@ public class UsageExample {
           /////////////////////////////////////
           //Example of single threaded usage
           /////////////////////////////////////
-          RingBuffers ringBuffers = readerDispatch.ringBuffers;
-          RingBuffer rb = RingBuffers.get(ringBuffers, 0);  
+          PipeBundle ringBuffers = readerDispatch.ringBuffers;
+          Pipe rb = PipeBundle.get(ringBuffers, 0);  
 
           boolean ok = true;
           int bufId;
@@ -145,11 +145,11 @@ public class UsageExample {
                       
                       
                       
-                      if (RingReader.tryReadFragment(rb)) {
+                      if (PipeReader.tryReadFragment(rb)) {
                           
-                          if (RingReader.isNewMessage(rb)) {
+                          if (PipeReader.isNewMessage(rb)) {
                         	  
-                        	  if (RingReader.getMsgIdx(rb)<0) {
+                        	  if (PipeReader.getMsgIdx(rb)<0) {
                         		  break;
                         	  }
                         	  
@@ -184,7 +184,7 @@ public class UsageExample {
     
     private double multiThreadedExample(FASTDecoder readerDispatch, final AtomicInteger msgs, final FASTReaderReactor reactor, PrimitiveReader reader) {
 
-        RingBuffer[] buffers = RingBuffers.buffers(readerDispatch.ringBuffers);
+        Pipe[] buffers = PipeBundle.buffers(readerDispatch.ringBuffers);
                 
         int reactors = 1;
         final ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(reactors+buffers.length); 
@@ -195,7 +195,7 @@ public class UsageExample {
 
         int b = buffers.length;
         while (--b>=0) {
-            final RingBuffer rb = buffers[b]; //Too many buffers!
+            final Pipe rb = buffers[b]; //Too many buffers!
             Runnable run = new Runnable() {
                 char[] temp = new char[64];
                 
@@ -205,9 +205,9 @@ public class UsageExample {
                     do {                        
                         //NOTE: the stats object shows that this is empty 75% of the time, eg needs more
 
-                        if (RingReader.tryReadFragment(rb)) { 
-                                assert(RingReader.isNewMessage(rb)) : "";
-                                if (RingReader.getMsgIdx(rb)<0 ){
+                        if (PipeReader.tryReadFragment(rb)) { 
+                                assert(PipeReader.isNewMessage(rb)) : "";
+                                if (PipeReader.getMsgIdx(rb)<0 ){
                                 	break;
                                 }
                                 totalMessages++;
@@ -224,9 +224,9 @@ public class UsageExample {
                     } while (totalMessages<30000 || isAlive.get());
                     
                     //is alive is done writing but we need to empty out
-                    while (RingReader.tryReadFragment(rb)) { 
-                        if (RingReader.isNewMessage(rb)) {
-                        	if (RingReader.getMsgIdx(rb)<0) {
+                    while (PipeReader.tryReadFragment(rb)) { 
+                        if (PipeReader.isNewMessage(rb)) {
+                        	if (PipeReader.getMsgIdx(rb)<0) {
                         		break;
                         	}
                         	
@@ -400,21 +400,21 @@ public class UsageExample {
     }
     
     private void validate(String message, int expectedOffset, int id) {
-        if (expectedOffset!=(RingReader.OFF_MASK&id)) {
+        if (expectedOffset!=(PipeReader.OFF_MASK&id)) {
             System.err.println("expected: "+expectedOffset+" but found "+id+" for "+message);
         }
     }
     
     
-    private void processMessage(char[] temp, RingBuffer rb, FASTReaderReactor reactor) {
+    private void processMessage(char[] temp, Pipe rb, FASTReaderReactor reactor) {
        
-        populateFieldIDs(RingBuffer.from(rb), reactor); 
+        populateFieldIDs(Pipe.from(rb), reactor); 
 
 
         templateId = readInt(rb, IDX_TemplateId);
         preamble = readInt(rb, IDX_Preamble);
 
-        switch (RingReader.getMsgIdx(rb)) {
+        switch (PipeReader.getMsgIdx(rb)) {
             case 1:
                 
                 if (!eqASCII(rb, IDX1_AppVerId, "1.0")) {
@@ -436,7 +436,7 @@ public class UsageExample {
                 int seqCount = readInt(rb, IDX1_NoMDEntries);
                 // System.err.println(sendingTime+" "+tradeDate+" "+seqCount);
                 while (--seqCount >= 0) {
-                    while (!RingReader.tryReadFragment(rb)) { // keep calling if we
+                    while (!PipeReader.tryReadFragment(rb)) { // keep calling if we
                                                            // have no data?
                     };
                     
@@ -519,7 +519,7 @@ public class UsageExample {
                int seqCount2 = readInt(rb, 12);
                
                while (--seqCount2 >= 0) {
-                   while (!RingReader.tryReadFragment(rb)) { // keep calling if we
+                   while (!PipeReader.tryReadFragment(rb)) { // keep calling if we
                                                           // have no data?
                       
                        len = readDataLength(rb, 0);
@@ -548,7 +548,7 @@ public class UsageExample {
     
                 break;
             default:
-                System.err.println("Did not expect " + RingReader.getMsgIdx(rb));
+                System.err.println("Did not expect " + PipeReader.getMsgIdx(rb));
         }
     }
 

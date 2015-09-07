@@ -32,10 +32,10 @@ import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.stream.FASTDecoder;
 import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
 import com.ociweb.jfast.stream.FASTReaderReactor;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.RingReader;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.PipeReader;
 
 public class CodeGenerationTest {
 
@@ -160,24 +160,24 @@ public class CodeGenerationTest {
 
         FASTInputByteArray fastInput1 = new FASTInputByteArray(TemplateLoaderTest.buildInputArrayForTesting(sourceDataFile));
         final PrimitiveReader primitiveReader1 = new PrimitiveReader(2048, fastInput1, maxPMapCountInBytes);
-        FASTReaderInterpreterDispatch readerDispatch1 = new FASTReaderInterpreterDispatch(catalog, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)rbPrimaryRingBits, (byte)rbTextRingBits, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+        FASTReaderInterpreterDispatch readerDispatch1 = new FASTReaderInterpreterDispatch(catalog, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)rbPrimaryRingBits, (byte)rbTextRingBits, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
 
         
-        RingBuffer queue1 = RingBuffers.get(readerDispatch1.ringBuffers,0);
+        Pipe queue1 = PipeBundle.get(readerDispatch1.ringBuffers,0);
 
         FASTInputByteArray fastInput2 = new FASTInputByteArray(TemplateLoaderTest.buildInputArrayForTesting(sourceDataFile));
         final PrimitiveReader primitiveReader2 = new PrimitiveReader(2048, fastInput2, maxPMapCountInBytes);
 
         FASTDecoder readerDispatch2 = null;
         try {
-            readerDispatch2 = DispatchLoader.loadGeneratedReaderDispatch(catBytes, FASTClassLoader.READER, RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)rbPrimaryRingBits, (byte)rbTextRingBits, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+            readerDispatch2 = DispatchLoader.loadGeneratedReaderDispatch(catBytes, FASTClassLoader.READER, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)rbPrimaryRingBits, (byte)rbTextRingBits, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
             fail(e.getMessage());
         } catch (SecurityException e) {
             fail(e.getMessage());
         }
-        RingBuffer queue2 = RingBuffers.get(readerDispatch2.ringBuffers,0);
+        Pipe queue2 = PipeBundle.get(readerDispatch2.ringBuffers,0);
 
 
         FASTReaderReactor reactor1 = new FASTReaderReactor(readerDispatch1, primitiveReader1);
@@ -189,11 +189,11 @@ public class CodeGenerationTest {
         while (FASTReaderReactor.pump(reactor1) >= 0 && //continue if no room to read or read new message
                FASTReaderReactor.pump(reactor2) >= 0) {
 
-            assertEquals(RingBuffer.contentRemaining(queue1),RingBuffer.contentRemaining(queue2));
+            assertEquals(Pipe.contentRemaining(queue1),Pipe.contentRemaining(queue2));
             
-            while (RingBuffer.contentRemaining(queue1)>0 && RingBuffer.contentRemaining(queue2)>0) {
-				int int1 = RingBuffer.readInt(RingBuffer.primaryBuffer(queue1), queue1.mask, RingBuffer.addAndGetWorkingTail(queue1, 1));
-                int int2 = RingBuffer.readInt(RingBuffer.primaryBuffer(queue2), queue2.mask, RingBuffer.addAndGetWorkingTail(queue2, 1));
+            while (Pipe.contentRemaining(queue1)>0 && Pipe.contentRemaining(queue2)>0) {
+				int int1 = Pipe.readInt(Pipe.primaryBuffer(queue1), queue1.mask, Pipe.addAndGetWorkingTail(queue1, 1));
+                int int2 = Pipe.readInt(Pipe.primaryBuffer(queue2), queue2.mask, Pipe.addAndGetWorkingTail(queue2, 1));
 
                 //System.err.println(i+" "+int1+"  "+int2);
                 
@@ -202,7 +202,7 @@ public class CodeGenerationTest {
 
                     if (errCount > 1) {
 
-                        System.err.println("back up  " + RingBuffer.contentRemaining(queue1) + " fixed spots in ring buffer. From positions:"+RingBuffer.getWorkingTailPosition(queue1)+" & "+RingBuffer.getWorkingTailPosition(queue2));
+                        System.err.println("back up  " + Pipe.contentRemaining(queue1) + " fixed spots in ring buffer. From positions:"+Pipe.getWorkingTailPosition(queue1)+" & "+Pipe.getWorkingTailPosition(queue2));
                                            
                         System.err.println("Value from Intrp:" + Integer.toBinaryString(int1));
                         System.err.println("Value from Compl:" + Integer.toBinaryString(int2));
@@ -213,13 +213,17 @@ public class CodeGenerationTest {
                     }
                 }
                 
-                RingBuffer.takeValue(queue1); 
-                
-                RingBuffer.releaseReadLock(queue1);
-                
-                RingBuffer.takeValue(queue2); 
-                
-                RingBuffer.releaseReadLock(queue2);
+                Pipe.releaseReads(queue1);
+                Pipe.releaseReads(queue2);
+
+//delete
+//                RingBuffer.takeValue(queue1); 
+//                
+//                RingBuffer.releaseReadLock(queue1);
+//                
+//                RingBuffer.takeValue(queue2); 
+//                
+//                RingBuffer.releaseReadLock(queue2);
                 
 				i++;
             }

@@ -1,21 +1,21 @@
 package com.ociweb.jfast.primitive.adapter;
 
-import static com.ociweb.pronghorn.ring.RingBuffer.headPosition;
-import static com.ociweb.pronghorn.ring.RingBuffer.tailPosition;
+import static com.ociweb.pronghorn.pipe.Pipe.headPosition;
+import static com.ociweb.pronghorn.pipe.Pipe.tailPosition;
 
 import com.ociweb.jfast.primitive.DataTransfer;
 import com.ociweb.jfast.primitive.FASTOutput;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
-import com.ociweb.pronghorn.ring.RingBuffer;
+import com.ociweb.pronghorn.pipe.Pipe;
 
 public class FASTOutputRingBuffer implements FASTOutput {
 
-	private final RingBuffer ringBuffer;
+	private final Pipe ringBuffer;
 	private DataTransfer dataTransfer;
     private int fill;
 	private long tailPosCache;
 		
-	public FASTOutputRingBuffer(RingBuffer ringBuffer) {
+	public FASTOutputRingBuffer(Pipe ringBuffer) {
 		this.ringBuffer = ringBuffer;
 		this.fill =  1 + ringBuffer.mask - 2;
 		this.tailPosCache = tailPosition(ringBuffer);
@@ -31,11 +31,11 @@ public class FASTOutputRingBuffer implements FASTOutput {
 		int size = PrimitiveWriter.nextBlockSize(dataTransfer.writer);
 		while (size>0) {
 		    
-			tailPosCache = RingBuffer.spinBlockOnTail(tailPosCache, headPosition(ringBuffer)-fill, ringBuffer);			
-			RingBuffer.addMsgIdx(ringBuffer, 0);
-			RingBuffer.addByteArray(dataTransfer.writer.buffer, PrimitiveWriter.nextOffset(dataTransfer.writer), size, ringBuffer);
+			tailPosCache = Pipe.spinBlockOnTail(tailPosCache, headPosition(ringBuffer)-fill, ringBuffer);			
+			Pipe.addMsgIdx(ringBuffer, 0);
+			Pipe.addByteArray(dataTransfer.writer.buffer, PrimitiveWriter.nextOffset(dataTransfer.writer), size, ringBuffer);
 			size = PrimitiveWriter.nextBlockSize(dataTransfer.writer);		
 		}
-		RingBuffer.publishWrites(ringBuffer);		
+		Pipe.publishWrites(ringBuffer);		
 	}
 }

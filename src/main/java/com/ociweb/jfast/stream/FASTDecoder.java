@@ -2,13 +2,13 @@ package com.ociweb.jfast.stream;
 
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.RingBuffers;
-import com.ociweb.pronghorn.ring.schema.loader.DictionaryFactory;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
-import com.ociweb.pronghorn.ring.util.LocalHeap;
-import com.ociweb.pronghorn.ring.util.hash.LongHashTable;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.PipeBundle;
+import com.ociweb.pronghorn.pipe.schema.loader.DictionaryFactory;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.util.LocalHeap;
+import com.ociweb.pronghorn.pipe.util.hash.LongHashTable;
 
 public abstract class FASTDecoder{
         
@@ -18,7 +18,7 @@ public abstract class FASTDecoder{
     public final int[] sequenceCountStack;
     
     //private ring buffers for writing content into
-    public final RingBuffers ringBuffers;
+    public final PipeBundle ringBuffers;
     
     //dictionary data
     protected final long[] rLongDictionary; //final array with constant references
@@ -36,11 +36,11 @@ public abstract class FASTDecoder{
         
     public FASTDecoder(TemplateCatalogConfig catalog) {
 		this(catalog, 
-             RingBuffers.buildRingBuffers(new RingBuffer(new RingBufferConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()) );
+             PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()) );
         
     }
     
-    public FASTDecoder(TemplateCatalogConfig catalog, RingBuffers ringBuffers) {
+    public FASTDecoder(TemplateCatalogConfig catalog, PipeBundle ringBuffers) {
         this(catalog.dictionaryFactory(), 
         	 catalog.getMaxGroupDepth(),
         	 catalog.getTemplateStartIdx(), 
@@ -53,7 +53,7 @@ public abstract class FASTDecoder{
     private FASTDecoder(DictionaryFactory dcr, int maxNestedGroupDepth, 
     		            LongHashTable templateStartIdx,
     		            int preambleBytes,
-			            RingBuffers ringBuffers, 
+			            PipeBundle ringBuffers, 
 			            int maxPMapCountInBytes) {
 
         this.byteHeap = dcr.byteDictionary();
@@ -88,7 +88,7 @@ public abstract class FASTDecoder{
         }
         decoder.sequenceCountStackHead = -1;
         
-        RingBuffers.reset(decoder.ringBuffers);        
+        PipeBundle.reset(decoder.ringBuffers);        
 
     }
     

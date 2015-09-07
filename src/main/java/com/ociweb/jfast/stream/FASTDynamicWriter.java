@@ -1,16 +1,16 @@
 package com.ociweb.jfast.stream;
 
 import com.ociweb.jfast.primitive.PrimitiveWriter;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.util.LocalHeap;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.util.LocalHeap;
 
 public class FASTDynamicWriter {
 
     private final FASTEncoder writerDispatch;
-    private final RingBuffer ringBuffer;
+    private final Pipe ringBuffer;
     final PrimitiveWriter writer;
 
-    public FASTDynamicWriter(PrimitiveWriter primitiveWriter, RingBuffer ringBuffer, FASTEncoder writerDispatch) {
+    public FASTDynamicWriter(PrimitiveWriter primitiveWriter, Pipe ringBuffer, FASTEncoder writerDispatch) {
 
         this.writerDispatch = writerDispatch;
         this.ringBuffer = ringBuffer;

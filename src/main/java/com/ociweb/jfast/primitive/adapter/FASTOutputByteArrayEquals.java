@@ -10,7 +10,7 @@ import com.ociweb.jfast.error.FASTException;
 import com.ociweb.jfast.primitive.DataTransfer;
 import com.ociweb.jfast.primitive.FASTOutput;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
-import com.ociweb.pronghorn.ring.token.TokenBuilder;
+import com.ociweb.pronghorn.pipe.token.TokenBuilder;
 
 
 public final class FASTOutputByteArrayEquals implements FASTOutput {

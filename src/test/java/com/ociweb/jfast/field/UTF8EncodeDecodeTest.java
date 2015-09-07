@@ -18,7 +18,7 @@ import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
-import com.ociweb.pronghorn.ring.RingBuffer;
+import com.ociweb.pronghorn.pipe.Pipe;
 
 public class UTF8EncodeDecodeTest {
 
@@ -48,7 +48,7 @@ public class UTF8EncodeDecodeTest {
         int limit = writer.limit;
         int c = 0;
         while (c < len) {
-            limit = RingBuffer.encodeSingleChar((int) unicodeTestString.charAt(c++), buffer, 0xFFFFFFFF, limit);
+            limit = Pipe.encodeSingleChar((int) unicodeTestString.charAt(c++), buffer, 0xFFFFFFFF, limit);
         }
         writer.limit = limit;
 		PrimitiveWriter.flush(writer);
@@ -72,7 +72,7 @@ public class UTF8EncodeDecodeTest {
         int limit = writer.limit;
         int c = 0;
         while (c < len) {
-            limit = RingBuffer.encodeSingleChar((int) unicodeTestString.charAt(c++), buffer, 0xFFFFFFFF, limit);
+            limit = Pipe.encodeSingleChar((int) unicodeTestString.charAt(c++), buffer, 0xFFFFFFFF, limit);
         }
         writer.limit = limit;
 		PrimitiveWriter.flush(writer);
@@ -96,7 +96,7 @@ public class UTF8EncodeDecodeTest {
         int limit = writer.limit;
                 
         while (--length >= 0) {
-            limit = RingBuffer.encodeSingleChar((int) temp[offset++], writer.buffer, 0xFFFFFFFF, limit);
+            limit = Pipe.encodeSingleChar((int) temp[offset++], writer.buffer, 0xFFFFFFFF, limit);
         }
         writer.limit = limit;
         PrimitiveWriter.flush(writer);
@@ -120,7 +120,7 @@ public class UTF8EncodeDecodeTest {
         int limit = writer.limit;
                 
         while (--length >= 0) {
-            limit = RingBuffer.encodeSingleChar((int) temp[offset++], writer.buffer, 0xFFFFFFFF, limit);
+            limit = Pipe.encodeSingleChar((int) temp[offset++], writer.buffer, 0xFFFFFFFF, limit);
         }
         writer.limit = limit;
 		PrimitiveWriter.flush(writer);
@@ -153,7 +153,7 @@ public class UTF8EncodeDecodeTest {
             
             long charAndPos = 0;        //convert bytes to chars
             while (charAndPos>>32 < byteCount  ) {
-                charAndPos = RingBuffer.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
+                charAndPos = Pipe.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
                 target[offset++]=(char)charAndPos;
             }
         }
@@ -178,7 +178,7 @@ public class UTF8EncodeDecodeTest {
             
             long charAndPos = 0;   //convert bytes to chars     
             while (charAndPos>>32 < byteCount  ) {
-                charAndPos = RingBuffer.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
+                charAndPos = Pipe.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
                 target[offset++]=(char)charAndPos;
             }
         }
@@ -231,7 +231,7 @@ public class UTF8EncodeDecodeTest {
             
             long charAndPos = 0;        //convert bytes to chars
             while (charAndPos>>32 < byteCount  ) {
-                charAndPos = RingBuffer.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
+                charAndPos = Pipe.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
                 try{
                     target1.append((char)charAndPos);
                 } catch (IOException e) {
@@ -260,7 +260,7 @@ public class UTF8EncodeDecodeTest {
             
             long charAndPos = 0;        
             while (charAndPos>>32 < byteCount  ) {//convert bytes to chars
-                charAndPos = RingBuffer.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
+                charAndPos = Pipe.decodeUTF8Fast(temp, charAndPos, Integer.MAX_VALUE);
                 try{
                     target1.append((char)charAndPos);
                 } catch (IOException e) {

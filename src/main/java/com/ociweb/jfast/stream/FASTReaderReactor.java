@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.ociweb.jfast.primitive.FASTInput;
 import com.ociweb.jfast.primitive.InputBlockagePolicy;
 import com.ociweb.jfast.primitive.PrimitiveReader;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBuffers;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeBundle;
 
 
 // TODO: B, Check support for group that may be optional
@@ -134,8 +134,8 @@ public final class FASTReaderReactor {
             return reactor.decoder.decode(reactor.reader);
     }
     
-    public RingBuffer[] ringBuffers() {
-    	return RingBuffers.buffers(decoder.ringBuffers);
+    public Pipe[] ringBuffers() {
+    	return PipeBundle.buffers(decoder.ringBuffers);
     }
     
 

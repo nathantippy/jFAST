@@ -10,11 +10,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
-import com.ociweb.pronghorn.ring.FieldReferenceOffsetManager;
-import com.ociweb.pronghorn.ring.RingBuffer;
-import com.ociweb.pronghorn.ring.RingBufferConfig;
-import com.ociweb.pronghorn.ring.util.IntWriteOnceOrderedSet;
-import com.ociweb.pronghorn.ring.util.hash.MurmurHash;
+import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.Pipe;
+import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.util.IntWriteOnceOrderedSet;
+import com.ociweb.pronghorn.pipe.util.hash.MurmurHash;
 
 public class GeneratorData {
     public SourceTemplates templates;
@@ -44,7 +44,7 @@ public class GeneratorData {
     public int writerPmapBit0=6;
     public int writerPmapBit1=6;
 	public final FieldReferenceOffsetManager from;
-	public final RingBuffer mockRB;
+	public final Pipe mockRB;
     
     
     static final String END_FIELD_METHOD = "};\n";
@@ -90,7 +90,7 @@ public class GeneratorData {
         TemplateCatalogConfig template = new TemplateCatalogConfig(catBytes);
         this.from = template.getFROM();
         //must be zero size to make the mask also zero
-        this.mockRB = new RingBuffer(new RingBufferConfig((byte)0, (byte)0, null, this.from));
+        this.mockRB = new Pipe(new PipeConfig((byte)0, (byte)0, null, this.from));
         this.mockRB.initBuffers();
     }
 
