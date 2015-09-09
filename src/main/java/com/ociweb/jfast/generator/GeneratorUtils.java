@@ -121,17 +121,17 @@ public class GeneratorUtils {
         	
             String methodCallArgs = doneScriptsParas.get(m++)
                             		.replace("rbRingBuffer","rb") //NOTE: Must be first because rb is used by following replacements
-                            		.replace("bytesBasePos", "RingBuffer.bytesWriteBase(rb)") //must be second
+                            		.replace("bytesBasePos", Pipe.class.getSimpleName()+".bytesWriteBase(rb)") //must be second
                             		.replace("dispatch","this")
-                                    .replace("byteBuffer", "RingBuffer.byteBuffer(rb)")
+                                    .replace("byteBuffer", Pipe.class.getSimpleName()+".byteBuffer(rb)")
                                     .replace("byteMask", "rb.byteMask")                                    
-                                    .replace("rbB","RingBuffer.primaryBuffer(rb)")
+                                    .replace("rbB",Pipe.class.getSimpleName()+".primaryBuffer(rb)")
                                     .replace("rbMask", "rb.mask");
             
             if (isReader) {
-                methodCallArgs = methodCallArgs.replace("rbPos","RingBuffer.getWorkingHeadPositionObject(rb)"); 
+                methodCallArgs = methodCallArgs.replace("rbPos",Pipe.class.getSimpleName()+".getWorkingHeadPositionObject(rb)"); 
             } else {
-                methodCallArgs = methodCallArgs.replace("rbPos","RingBuffer.getWorkingTailPositionObject(rb)"); 
+                methodCallArgs = methodCallArgs.replace("rbPos",Pipe.class.getSimpleName()+".getWorkingTailPositionObject(rb)"); 
             }
             
             int k = j;
@@ -167,14 +167,14 @@ public class GeneratorUtils {
             
             builder.append("fieldPos = 0;\n");
             builder.append("\n");
-            builder.append("setActiveScriptCursor(RingBuffer.cursor(rb));\n");        
+            builder.append("setActiveScriptCursor("+Pipe.class.getSimpleName()+".cursor(rb));\n");        
 
             builder.append("if ("+PipeReader.class.getCanonicalName()+".isNewMessage(rb)) {\n");                
             
             if (preambleLength==0) {
                 builder.append("    beginMessage(this);\n");
             } else {
-                builder.append("    beginMessage(writer, RingBuffer.primaryBuffer(rb), rb.mask, RingBuffer.getWorkingTailPositionObject(rb), this);\n");
+                builder.append("    beginMessage(writer, "+Pipe.class.getSimpleName()+".primaryBuffer(rb), rb.mask, "+Pipe.class.getSimpleName()+".getWorkingTailPositionObject(rb), this);\n");
             }
 
            	builder.append("}\n");            
@@ -186,9 +186,9 @@ public class GeneratorUtils {
         if (isReader) {
             builder.append("    "+Pipe.class.getSimpleName()+" rb="+PipeBundle.class.getSimpleName()+".get(ringBuffers,x);\n" ); 
             
-			builder.append(" {int fragmentSize = RingBuffer.from(rb).fragDataSize[x];\n\r")
-			       .append("if (!RingBuffer.roomToLowLevelWrite(rb, fragmentSize)) {return 0;}\n\r")
-			       .append(" RingBuffer.confirmLowLevelWrite(rb, fragmentSize);")
+			builder.append(" {int fragmentSize = "+Pipe.class.getSimpleName()+".from(rb).fragDataSize[x];\n\r")
+			       .append("if (!"+Pipe.class.getSimpleName()+".roomToLowLevelWrite(rb, fragmentSize)) {return 0;}\n\r")
+			       .append(" "+Pipe.class.getSimpleName()+".confirmLowLevelWrite(rb, fragmentSize);")
 			       .append("}\n\r");
             
         }
@@ -459,10 +459,10 @@ public class GeneratorUtils {
             
         	final StringBuilder fragmentClassBody = new StringBuilder();
         	fragmentClassBody.append("package com.ociweb.jfast.generator;\n");
-        	fragmentClassBody.append("import com.ociweb.pronghorn.ring.*;\n");
-        	fragmentClassBody.append("import com.ociweb.pronghorn.ring.schema.loader.*;\n");//TODO: B, pick an object and generate the import path
-        	fragmentClassBody.append("import com.ociweb.pronghorn.ring.util.*;\n");
-        	fragmentClassBody.append("import com.ociweb.pronghorn.ring.RingBuffer.*;\n");
+        	fragmentClassBody.append("import com.ociweb.pronghorn.pipe.*;\n");
+        	fragmentClassBody.append("import com.ociweb.pronghorn.pipe.schema.loader.*;\n");//TODO: B, pick an object and generate the import path
+        	fragmentClassBody.append("import com.ociweb.pronghorn.pipe.util.*;\n");
+        	fragmentClassBody.append("import com.ociweb.pronghorn.pipe.Pipe.*;\n");
         	fragmentClassBody.append("import com.ociweb.jfast.stream.*;\n");
         	fragmentClassBody.append("import com.ociweb.jfast.primitive.*;\n");
             fragmentClassBody.append("import com.ociweb.jfast.error.FASTException;\n");

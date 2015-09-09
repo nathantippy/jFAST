@@ -110,7 +110,7 @@ public abstract class FASTEncoder {
         return true;
     }
     
-    public abstract void encode(PrimitiveWriter writer, Pipe ringBuffer);
+    public abstract void encode(PrimitiveWriter writer, Pipe pipe);
     
 
     public void setActiveScriptCursor(int cursor) {   	

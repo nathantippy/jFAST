@@ -7,20 +7,20 @@ import com.ociweb.pronghorn.pipe.util.LocalHeap;
 public class FASTDynamicWriter {
 
     private final FASTEncoder writerDispatch;
-    private final Pipe ringBuffer;
+    private final Pipe readFromPipe;
     final PrimitiveWriter writer;
 
-    public FASTDynamicWriter(PrimitiveWriter primitiveWriter, Pipe ringBuffer, FASTEncoder writerDispatch) {
+    public FASTDynamicWriter(PrimitiveWriter primitiveWriter, Pipe readFromPipe, FASTEncoder writerDispatch) {
 
         this.writerDispatch = writerDispatch;
-        this.ringBuffer = ringBuffer;
+        this.readFromPipe = readFromPipe;
         this.writer = primitiveWriter;
         
     }
 
     // this method must never be called unless RingWalker.tryReadFragment(ringBuffer) has returned true
     public static void write(FASTDynamicWriter dynamicWriter) {
-    	dynamicWriter.writerDispatch.encode(dynamicWriter.writer, dynamicWriter.ringBuffer);
+    	dynamicWriter.writerDispatch.encode(dynamicWriter.writer, dynamicWriter.readFromPipe);
     }
 
     public void reset(boolean clearData) {

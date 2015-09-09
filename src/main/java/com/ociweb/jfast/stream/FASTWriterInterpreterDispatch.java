@@ -1325,25 +1325,25 @@ public class FASTWriterInterpreterDispatch extends FASTWriterDispatchTemplates i
     ///////////////////////
 
     @Override
-    public void encode(PrimitiveWriter writer, Pipe rbRingBuffer) {
+    public void encode(PrimitiveWriter writer, Pipe pipe) {
         
         //set the cursor positions for the interpreter if we are not generating code
-        if (rbRingBuffer.mask!=0) { //mask !=0, checks if this is not the code generation
+        if (pipe.mask!=0) { //mask !=0, checks if this is not the code generation
             //cursor and limit already set
-            setActiveScriptCursor(Pipe.cursor(rbRingBuffer));
+            setActiveScriptCursor(Pipe.cursor(pipe));
             fieldPos = 0;//needed for fragments in interpreter but is not called when generating
         }
         
         //start new message with preamble if needed        
-        if (rbRingBuffer.mask!=0 && PipeReader.isNewMessage(rbRingBuffer)) { //mask !=0, checks if this is not the code generation    
-            callBeginMessage(writer, rbRingBuffer);
+        if (pipe.mask!=0 && PipeReader.isNewMessage(pipe)) { //mask !=0, checks if this is not the code generation    
+            callBeginMessage(writer, pipe);
         }
 
         //loop over every cursor position and dispatch to do the right activity
         int stop = fullScript.length;       
         while (activeScriptCursor<stop) {
 
-            if (dispatchWriteByToken(writer,rbRingBuffer)) {
+            if (dispatchWriteByToken(writer,pipe)) {
                 break;//for stops for fragments in the middle of a message
             }          
             

@@ -158,6 +158,7 @@ public class UsageExample {
                               //processMessage(temp, rb); 
                               
                           } 
+                          PipeReader.releaseReadLock(rb);
                       }
                       
                       //your usage of these fields would go here. 
@@ -211,7 +212,8 @@ public class UsageExample {
                                 	break;
                                 }
                                 totalMessages++;
-                                processMessage(temp, rb, reactor);  
+                                processMessage(temp, rb, reactor); 
+                                PipeReader.releaseReadLock(rb);
                         } 
 //                        else {
 //                            //must wait on more to be written into the ring buffer before they can be read
@@ -232,6 +234,7 @@ public class UsageExample {
                         	
                             totalMessages++;
                         }
+                        PipeReader.releaseReadLock(rb);
                     }
                     msgs.addAndGet(totalMessages);  
                 }
@@ -438,6 +441,7 @@ public class UsageExample {
                 while (--seqCount >= 0) {
                     while (!PipeReader.tryReadFragment(rb)) { // keep calling if we
                                                            // have no data?
+                        PipeReader.releaseReadLock(rb);
                     };
                     
                     int mDUpdateAction = readInt(rb, IDX1_MDUpdateAction);
@@ -531,7 +535,7 @@ public class UsageExample {
                        int quoteType = readInt(rb, 7);
                        int securityID = readInt(rb, 8);
                        int securityIDSource = readInt(rb, 9);
-                       
+                       PipeReader.releaseReadLock(rb);
                    };
                                                         
                }
