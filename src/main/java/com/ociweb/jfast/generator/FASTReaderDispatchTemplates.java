@@ -99,8 +99,8 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
         Pipe rb = PipeBundle.get(dispatch.ringBuffers,dispatch.activeScriptCursor);  
         long whp = Pipe.workingHeadPosition(rb);
-        Pipe.setValue(Pipe.primaryBuffer(rb),rb.mask,whp++,dispatch.preambleB);
-        Pipe.setWorkingHead(rb,whp);
+        Pipe.addIntValue(dispatch.preambleB, rb);
+        Pipe.setWorkingHead(rb,1+whp);
         }
     }
 
@@ -108,8 +108,8 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
         Pipe rb = PipeBundle.get(dispatch.ringBuffers,dispatch.activeScriptCursor);
         long whp = Pipe.workingHeadPosition(rb);
-        Pipe.setValue(Pipe.primaryBuffer(rb),rb.mask,whp++,dispatch.preambleA);
-        Pipe.setWorkingHead(rb,whp);
+        Pipe.addIntValue(dispatch.preambleA, rb);
+        Pipe.setWorkingHead(rb,1+whp);
         }
     }
 
@@ -176,6 +176,7 @@ public abstract class FASTReaderDispatchTemplates extends FASTDecoder {
         {
             int length;
             int value = length = (0 == PrimitiveReader.readPMapBit(reader) ? constDefault : PrimitiveReader.readIntegerUnsigned(reader));
+           // Pipe.addIntValue(value, rb);
             Pipe.setValue(rbB,rbMask,rbPos.value++,value);
             if (length == 0) {
                 // jumping over sequence (forward) it was skipped (rare case)

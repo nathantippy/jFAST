@@ -47,10 +47,10 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
     //NOTE: assumes that the use of the constant array indicates the default value, it is the responsibility of the ring buffer writer to do this correctly
     protected void genWriteTextDefault(int fieldPos, PrimitiveWriter writer, Pipe rbRingBuffer) {
         {
-            int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
             if (0==(rawPos>>>31)) {
                 PrimitiveWriter.writePMapBit((byte)1, writer);
-                int len = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+                int len = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
                 PrimitiveWriter.writeTextASCII(Pipe.byteBackingArray(rawPos, rbRingBuffer), Pipe.bytePositionGen(rawPos, rbRingBuffer), len, rbRingBuffer.byteMask, writer);
             } else {
                 PrimitiveWriter.writePMapBit((byte)0, writer); 
@@ -62,10 +62,10 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
     //The responsibility for using the right byte array is up to the writer of the ring buffer.
     protected void genWriteTextDefaultOptional(int fieldPos, PrimitiveWriter writer, Pipe rbRingBuffer) {
         {
-            int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));
+            int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
             if (0==(rawPos>>>31)) {
                 PrimitiveWriter.writePMapBit((byte)1, writer);
-                int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+                int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
                 if (length<0) {
                     PrimitiveWriter.writeNull(writer);
                 } else {
@@ -80,9 +80,9 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
 
     protected void genWriteTextCopy(int target, int fieldPos, PrimitiveWriter writer, LocalHeap byteHeap, Pipe rbRingBuffer) {
         {
-        	int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+        	int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
         	
-            int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));
+            int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
             int offset = Pipe.bytePositionGen(rawPos, rbRingBuffer);
             // constant from heap or dynamic from char ringBuffer
             byte[] buffer = Pipe.byteBackingArray(rawPos, rbRingBuffer);
@@ -100,7 +100,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
     
     protected void genWriteTextCopyOptional(int target, int fieldPos, PrimitiveWriter writer, LocalHeap byteHeap, Pipe rbRingBuffer) {
         { 
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer)); 
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer); 
             if (length<0) {
                 if (LocalHeap.isNull(target,byteHeap)) {
                     PrimitiveWriter.writePMapBit((byte)0, writer);
@@ -109,7 +109,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                     PrimitiveWriter.writeNull(writer);
                 }
             } else {            	
-                int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));
+                int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
                 int offset = Pipe.bytePositionGen(rawPos, rbRingBuffer);
                 // constant from heap or dynamic from char ringBuffer
                 byte[] buffer = Pipe.byteBackingArray(rawPos, rbRingBuffer);
@@ -131,11 +131,11 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
   
         //	System.err.println("value to encode for delta:"+     byteHeap.toASCIIString(target)+" len "+byteHeap.length(target, byteHeap));
         	
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));   
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);   
             if (length<0) {
                 PrimitiveWriter.writeIntegerSigned(0, writer);
             } else {
-                int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));
+                int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
                 int offset = Pipe.bytePositionGen(rawPos, rbRingBuffer);
                 // constant from heap or dynamic from char ringBuffer
                 byte[] buffer = Pipe.byteBackingArray(rawPos, rbRingBuffer);
@@ -166,8 +166,8 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
         {
         	//System.err.println("value to encode for tail:"+     byteHeap.toASCIIString(target));
         	
-            int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             int offset = Pipe.bytePositionGen(rawPos, rbRingBuffer);
             // constant from heap or dynamic from char ringBuffer
             byte[] buffer = Pipe.byteBackingArray(rawPos, rbRingBuffer);
@@ -194,8 +194,8 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
     protected void genWriteTextDelta(int target, int fieldPos, PrimitiveWriter writer, LocalHeap byteHeap, Pipe rbRingBuffer) {
         {
                 	
-            int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             
             
             int offset = Pipe.bytePositionGen(rawPos, rbRingBuffer);
@@ -234,8 +234,8 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
     
     protected void genWriteTextTail(int target, int fieldPos, PrimitiveWriter writer, LocalHeap byteHeap, Pipe rbRingBuffer) {
         {
-            int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             int offset = Pipe.bytePositionGen(rawPos, rbRingBuffer);
             // constant from heap or dynamic from char ringBuffer
             byte[] buffer = Pipe.byteBackingArray(rawPos, rbRingBuffer);
@@ -253,8 +253,8 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
 
     protected void genWriteTextNone(int fieldPos, PrimitiveWriter writer, Pipe rbRingBuffer) {
         {
-            int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             int offset = Pipe.bytePositionGen(rawPos, rbRingBuffer);
             // constant from heap or dynamic from char ringBuffer
             byte[] buffer = Pipe.byteBackingArray(rawPos, rbRingBuffer);
@@ -264,29 +264,30 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
     
     protected void genWriteTextNoneOptional(int fieldPos, PrimitiveWriter writer, Pipe rbRingBuffer) {
         {
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             if (length<0) {
                 PrimitiveWriter.writeNull(writer);
             } else{        
-                int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));              
+                int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);              
                 PrimitiveWriter.writeTextASCII(Pipe.byteBackingArray(rawPos, rbRingBuffer), Pipe.bytePositionGen(rawPos, rbRingBuffer), length, rbRingBuffer.byteMask, writer);
             }
         }
     }
         
     protected void genWriteTextConstantOptional(int fieldPos, PrimitiveWriter writer, Pipe rbRingBuffer) {
-        PrimitiveWriter.writePMapBit((byte)(1&(1+(Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer))>>>31))), writer);//0 for null, 1 for present
+        PrimitiveWriter.writePMapBit((byte)(1&(1+(Pipe.readRingByteLen(fieldPos,rbRingBuffer)>>>31))), writer);//0 for null, 1 for present
     }
    
     // if (byteHeap.equals(target|INIT_VALUE_MASK, value, offset, length)) {
     protected void genWriteBytesDefault(int fieldPos, PrimitiveWriter writer, Pipe rbRingBuffer) {
          
-        int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));
+        int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
         if (0==(rawPos>>>31)) {//use the default whatever it is
-            int len = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int len = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             PrimitiveWriter.writePMapBit((byte)1, writer);
             PrimitiveWriter.writeIntegerUnsigned(len, writer);            
-            PrimitiveWriter.writeByteArrayData(Pipe.byteBuffer(rbRingBuffer), Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer),len, rbRingBuffer.byteMask, writer); 
+            PrimitiveWriter.writeByteArrayData(Pipe.byteBuffer(rbRingBuffer), 
+                    Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer),len, rbRingBuffer.byteMask, writer); 
         } else {
             PrimitiveWriter.writePMapBit((byte)0, writer); 
         }   
@@ -295,15 +296,15 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
 
     protected void genWriteBytesCopy(int target, int fieldPos, LocalHeap byteHeap, PrimitiveWriter writer, Pipe rbRingBuffer) {
     	{
-	    	int len = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+	    	int len = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
 	    	assert(len>=0) :"must not be null, those have to be optional";
-	        if (LocalHeap.equals(target,Pipe.byteBuffer(rbRingBuffer),Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer),len,rbRingBuffer.byteMask,byteHeap)) {
+	        if (LocalHeap.equals(target,Pipe.byteBuffer(rbRingBuffer),Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer),len,rbRingBuffer.byteMask,byteHeap)) {
 	            PrimitiveWriter.writePMapBit((byte)0, writer);
 	        } else {
 	            PrimitiveWriter.writePMapBit((byte)1, writer);
 	            PrimitiveWriter.writeIntegerUnsigned(len, writer);
 	            
-	            int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer);
+	            int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer);
 	            PrimitiveWriter.writeByteArrayData(Pipe.byteBuffer(rbRingBuffer), offset, len, rbRingBuffer.byteMask, writer);
 	            LocalHeap.set(target,Pipe.byteBuffer(rbRingBuffer),offset,len,rbRingBuffer.byteMask,byteHeap);
 	        }
@@ -312,8 +313,8 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
 
     public void genWriteBytesDelta(int target, int fieldPos, PrimitiveWriter writer, LocalHeap byteHeap, Pipe rbRingBuffer) {
         {
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
-            int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer);
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
+            int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer);
             int mask = rbRingBuffer.byteMask;
             byte[] value = Pipe.byteBuffer(rbRingBuffer);
             
@@ -345,8 +346,8 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
 
     public void genWriteBytesTail(int target, int fieldPos, PrimitiveWriter writer, LocalHeap byteHeap, Pipe rbRingBuffer) {
         {
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
-            int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer);
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
+            int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer);
             int mask = rbRingBuffer.byteMask;
             byte[] value = Pipe.byteBuffer(rbRingBuffer);
             
@@ -366,20 +367,20 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
 
     protected void genWriteBytesNone(int fieldPos, PrimitiveWriter writer, Pipe rbRingBuffer) {
         {
-            int len = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int len = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             PrimitiveWriter.writeIntegerUnsigned(len, writer);
-            PrimitiveWriter.writeByteArrayData(Pipe.byteBuffer(rbRingBuffer), Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer),len, rbRingBuffer.byteMask, writer);
+            PrimitiveWriter.writeByteArrayData(Pipe.byteBuffer(rbRingBuffer), Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer),len, rbRingBuffer.byteMask, writer);
         }
     }
     
     public void genWriteBytesDefaultOptional(int fieldPos, PrimitiveWriter writer, Pipe rbRingBuffer) {
        
-        int rawPos = Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer));
+        int rawPos = Pipe.readValue(fieldPos,rbRingBuffer);
         if (0==(rawPos>>>31)) {//use the default whatever it is
-            int len = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int len = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             PrimitiveWriter.writePMapBit((byte)1, writer);
             PrimitiveWriter.writeIntegerUnsigned(len+1, writer);
-            PrimitiveWriter.writeByteArrayData(Pipe.byteBuffer(rbRingBuffer), Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer),len, rbRingBuffer.byteMask, writer);
+            PrimitiveWriter.writeByteArrayData(Pipe.byteBuffer(rbRingBuffer), Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer),len, rbRingBuffer.byteMask, writer);
              
         } else {
             PrimitiveWriter.writePMapBit((byte)0, writer); 
@@ -391,18 +392,18 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
     	{
     		
     		
-	    	int len = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+	    	int len = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
 	        
 	        
 	    	
-	    	if (LocalHeap.equals(target,Pipe.byteBuffer(rbRingBuffer),Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer),len,rbRingBuffer.byteMask,byteHeap)) {
+	    	if (LocalHeap.equals(target,Pipe.byteBuffer(rbRingBuffer),Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer),len,rbRingBuffer.byteMask,byteHeap)) {
 	            PrimitiveWriter.writePMapBit((byte)0, writer);
 	        } else {
 	            PrimitiveWriter.writePMapBit((byte)1, writer);
 	            
 	            PrimitiveWriter.writeIntegerUnsigned(len+1, writer);
 	            
-	            int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer);
+	            int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer);
 	            PrimitiveWriter.writeByteArrayData(Pipe.byteBuffer(rbRingBuffer), offset, len, rbRingBuffer.byteMask, writer);
 	            LocalHeap.set(target,Pipe.byteBuffer(rbRingBuffer),offset,len,rbRingBuffer.byteMask,byteHeap);
 	        }
@@ -411,14 +412,14 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
 
     public void genWriteBytesDeltaOptional(int target, int fieldPos, PrimitiveWriter writer, LocalHeap byteHeap, Pipe rbRingBuffer) {
         {
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             
             if (length<0) {            
                 PrimitiveWriter.writeNull(writer);
                 LocalHeap.setNull(target, byteHeap); // no pmap, yes change to last value
             } else {
             
-                int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer);
+                int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer);
                 int mask = rbRingBuffer.byteMask;
                 byte[] value = Pipe.byteBuffer(rbRingBuffer);
         
@@ -451,18 +452,18 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
     }
 
     protected void genWriteBytesConstantOptional(int fieldPos, PrimitiveWriter writer, Pipe rbRingBuffer) {
-        PrimitiveWriter.writePMapBit((byte)(1&(1+(Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer))>>>31))), writer);//0 for null, 1 for present
+        PrimitiveWriter.writePMapBit((byte)(1&(1+(Pipe.readRingByteLen(fieldPos,rbRingBuffer)>>>31))), writer);//0 for null, 1 for present
     }
 
     public void genWriteBytesTailOptional(int target, int fieldPos, PrimitiveWriter writer, LocalHeap byteHeap, Pipe rbRingBuffer) {
         {
-            int length = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int length = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             if (length<0) {
                 PrimitiveWriter.writeNull(writer);
                 LocalHeap.setNull(target, byteHeap); // no pmap, yes change to last value            
             } else {
             
-                int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer);
+                int offset = Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer);
                 int mask = rbRingBuffer.byteMask;
                 byte[] value = Pipe.byteBuffer(rbRingBuffer);
                         
@@ -482,13 +483,13 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
 
     protected void genWriteBytesNoneOptional(int target, int fieldPos, PrimitiveWriter writer, Pipe rbRingBuffer, LocalHeap byteHeap) {
         {
-            int len = Pipe.readRingByteLen(fieldPos,Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer));
+            int len = Pipe.readRingByteLen(fieldPos,rbRingBuffer);
             if (len<0) {
                 PrimitiveWriter.writeNull(writer);
                 LocalHeap.setNull(target, byteHeap); // no pmap, yes change to last value
             } else {
                 PrimitiveWriter.writeIntegerUnsigned(len+1, writer);
-                PrimitiveWriter.writeByteArrayData(Pipe.byteBuffer(rbRingBuffer), Pipe.bytePositionGen(Pipe.readValue(fieldPos,Pipe.primaryBuffer(rbRingBuffer),rbRingBuffer.mask,Pipe.getWorkingTailPosition(rbRingBuffer)), rbRingBuffer),len, rbRingBuffer.byteMask, writer);
+                PrimitiveWriter.writeByteArrayData(Pipe.byteBuffer(rbRingBuffer), Pipe.bytePositionGen(Pipe.readValue(fieldPos,rbRingBuffer), rbRingBuffer),len, rbRingBuffer.byteMask, writer);
             }
         }
     }
@@ -836,7 +837,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
             }
             assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
            
-            PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1), writer); 
+            PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = Pipe.readLong(fieldPos + 1, rbRingBuffer), writer); 
         }
       }
     }
@@ -863,7 +864,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                 } 
                 assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                
-                PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1), writer); 
+                PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = Pipe.readLong(fieldPos + 1, rbRingBuffer), writer); 
             }   
         }
     }
@@ -892,7 +893,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                 }
                 assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                
-                long mantissa = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+                long mantissa = Pipe.readLong(fieldPos + 1, rbRingBuffer);
 
 				PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = mantissa, writer); 
             }
@@ -908,7 +909,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                 PrimitiveWriter.writePMapBit((byte)1, writer);  // 1 for const, 0 for absent
                 assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                
-                PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1), writer);        
+                PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = Pipe.readLong(fieldPos + 1, rbRingBuffer), writer);        
             }     
         }
     }
@@ -932,7 +933,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                 }
                 assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                
-                PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1), writer); 
+                PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = Pipe.readLong(fieldPos + 1, rbRingBuffer), writer); 
             }
         }
     }
@@ -947,7 +948,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                 PrimitiveWriter.writeIntegerSignedOptional(exponentValue, writer);
                 assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                
-                PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1), writer); 
+                PrimitiveWriter.writeLongSigned(rLongDictionary[mantissaTarget] = Pipe.readLong(fieldPos + 1, rbRingBuffer), writer); 
             }
         }
     }
@@ -974,7 +975,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                 PrimitiveWriter.writeIntegerSigned(value, writer);
             }
             assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
-            long value1 = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+            long value1 = Pipe.readLong(fieldPos + 1, rbRingBuffer);
            
             //mantissa
             if (value1 == mantissaConstDefault) {
@@ -1008,7 +1009,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                     PrimitiveWriter.writeIntegerSigned(value, writer);
                 } 
                 assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
-                long value1 = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+                long value1 = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                
                 //mantissa
                 if (value1 == mantissaConstDefault) {
@@ -1041,7 +1042,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                     PrimitiveWriter.writeIntegerSigned(rIntDictionary[exponentTarget] = value, writer);
                 }
                 assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
-                long value1 = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+                long value1 = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                
                 //mantissa
                 if (value1 == mantissaConstDefault) {
@@ -1062,7 +1063,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
             } else {
                 PrimitiveWriter.writePMapBit((byte)1, writer);  // 1 for const, 0 for absent
                 assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
-                long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+                long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                
                 //mantissa
                 if (value == mantissaConstDefault) {
@@ -1093,7 +1094,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                     PrimitiveWriter.writeLongSigned((1+(dif + (dif >>> 63))), writer);
                 }
                 assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
-                long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+                long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                
                 //mantissa
                 if (value == mantissaConstDefault) {
@@ -1115,7 +1116,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
             } else {
                 PrimitiveWriter.writeIntegerSignedOptional(exponentValue, writer);
                 assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
-                long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+                long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                
                 //mantissa
                 if (value == mantissaConstDefault) {
@@ -1153,7 +1154,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
            assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
           
            //mantissa
-           long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+           long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
            if (value == (1 + rLongDictionary[mantissaSource])) {
            PrimitiveWriter.writePMapBit((byte)0, writer);
         } else {
@@ -1188,7 +1189,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
               
                //mantissa
-               long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+               long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                if (value == (1 + rLongDictionary[mantissaSource])) {
                 PrimitiveWriter.writePMapBit((byte)0, writer);
             } else {
@@ -1222,7 +1223,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
               
                //mantissa
-               long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+               long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                if (value == (1 + rLongDictionary[mantissaSource])) {
                 PrimitiveWriter.writePMapBit((byte)0, writer);
             } else {
@@ -1244,7 +1245,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
               
                //mantissa
-               long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+               long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                if (value == (1 + rLongDictionary[mantissaSource])) {
                 PrimitiveWriter.writePMapBit((byte)0, writer);
             } else {
@@ -1276,7 +1277,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
               
                //mantissa
-               long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+               long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                if (value == (1 + rLongDictionary[mantissaSource])) {
                 PrimitiveWriter.writePMapBit((byte)0, writer);
             } else {
@@ -1299,7 +1300,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
               
                //mantissa
-               long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+               long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                if (value == (1 + rLongDictionary[mantissaSource])) {
                 PrimitiveWriter.writePMapBit((byte)0, writer);
             } else {
@@ -1334,7 +1335,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
              assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
             
              //mantissa
-             long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);   
+             long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);   
              if (value == rLongDictionary[mantissaSource]) {
                 PrimitiveWriter.writePMapBit((byte)0, writer);
             } else {
@@ -1368,7 +1369,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                  assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                 
                  //mantissa
-                 long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+                 long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                  if (value == rLongDictionary[mantissaSource]) {
                     PrimitiveWriter.writePMapBit((byte)0, writer);
                 } else {
@@ -1403,7 +1404,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                  assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                  {
 	                 //mantissa
-	                 long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+	                 long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
 	                 if (value == rLongDictionary[mantissaSource]) {
 	                    PrimitiveWriter.writePMapBit((byte)0, writer);
 	                } else {
@@ -1425,7 +1426,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                  assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                 
                  //mantissa
-                 long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+                 long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                  if (value == rLongDictionary[mantissaSource]) {
                     PrimitiveWriter.writePMapBit((byte)0, writer);
                 } else {
@@ -1456,7 +1457,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                  assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                 
                  //mantissa
-                 long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+                 long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                  if (value == rLongDictionary[mantissaSource]) {
                     PrimitiveWriter.writePMapBit((byte)0, writer);
                 } else {
@@ -1478,7 +1479,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                  assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                 
                  //mantissa
-                 long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1);
+                 long value = Pipe.readLong(fieldPos + 1, rbRingBuffer);
                  
                  if (value == rLongDictionary[mantissaSource]) {
                     PrimitiveWriter.writePMapBit((byte)0, writer);
@@ -1652,7 +1653,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                  assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
 
                  //mantissa
-                 long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1); 
+                 long value = Pipe.readLong(fieldPos + 1, rbRingBuffer); 
                   PrimitiveWriter.writeLongSigned(value - rLongDictionary[mantissaSource], writer);
                  rLongDictionary[mantissaTarget] = value;
              }
@@ -1682,7 +1683,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                      assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                     
                      //mantissa
-                     long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1); 
+                     long value = Pipe.readLong(fieldPos + 1, rbRingBuffer); 
                      PrimitiveWriter.writeLongSigned(value - rLongDictionary[mantissaSource], writer);
                      rLongDictionary[mantissaTarget] = value;
                  }   
@@ -1711,7 +1712,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                      assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                     
                      //mantissa
-                     long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1); 
+                     long value = Pipe.readLong(fieldPos + 1, rbRingBuffer); 
                      PrimitiveWriter.writeLongSigned(value - rLongDictionary[mantissaSource], writer);
                      longValue[mantissaTarget] = value;
                  }
@@ -1728,7 +1729,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                      assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                     
                      //mantissa
-                     long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1); 
+                     long value = Pipe.readLong(fieldPos + 1, rbRingBuffer); 
                      PrimitiveWriter.writeLongSigned(value - rLongDictionary[mantissaSource], writer);
                      longValue[mantissaTarget] = value;
                  }     
@@ -1755,7 +1756,7 @@ public abstract class FASTWriterDispatchTemplates extends FASTEncoder {
                      assert(FASTEncoder.notifyFieldPositions(writer, dispatch.activeScriptCursor));
                     
                      //mantissa
-                     long value = Pipe.readLong(Pipe.primaryBuffer(rbRingBuffer), rbRingBuffer.mask, Pipe.getWorkingTailPosition(rbRingBuffer) + fieldPos + 1); 
+                     long value = Pipe.readLong(fieldPos + 1, rbRingBuffer); 
                      PrimitiveWriter.writeLongSigned(value - rLongDictionary[mantissaSource], writer);
                      rLongDictionary[mantissaTarget] = value;
                  }

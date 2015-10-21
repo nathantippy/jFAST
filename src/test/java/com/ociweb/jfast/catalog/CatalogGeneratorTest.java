@@ -641,9 +641,10 @@ public class CatalogGeneratorTest {
                                 value = TokenBuilder.absentValue32(TokenBuilder.MASK_ABSENT_DEFAULT);
                             }
                             
-                            long whp = Pipe.workingHeadPosition(ringBuffer);                            
-                            Pipe.setValue(Pipe.primaryBuffer(ringBuffer),ringBuffer.mask,whp,value);
-                            Pipe.setWorkingHead(ringBuffer, whp+1);
+                            Pipe.addIntValue(value, ringBuffer);
+//                            long whp = Pipe.workingHeadPosition(ringBuffer);       //delete me three                     
+//                            Pipe.setValue(Pipe.primaryBuffer(ringBuffer),ringBuffer.mask,whp,value);
+//                            Pipe.setWorkingHead(ringBuffer, whp+1);
                             
                             if (0 == intDataIndex) {
                                 intDataIndex = ReaderWriterPrimitiveTest.unsignedIntData.length;
@@ -683,7 +684,7 @@ public class CatalogGeneratorTest {
 //                                value = TokenBuilder.absentValue64(TokenBuilder.MASK_ABSENT_DEFAULT);
 //                            }
                             
-                            Pipe.addLongValue(Pipe.primaryBuffer(ringBuffer), ringBuffer.mask, Pipe.getWorkingHeadPositionObject(ringBuffer), value);
+                            Pipe.addLongValue(value, ringBuffer);
                             if (0==longDataIndex) {
                                 longDataIndex = ReaderWriterPrimitiveTest.unsignedLongData.length;
                             }
