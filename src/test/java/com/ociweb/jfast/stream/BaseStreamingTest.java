@@ -545,7 +545,7 @@ public abstract class BaseStreamingTest {
                     Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,workingHeadPosition,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
                     Pipe.setWorkingHead(rbRingBufferLocal, workingHeadPosition+1);
                     Pipe ringBuffer = rbRingBufferLocal;
-                    Pipe.publishWrites(ringBuffer);
+
                     int rbPos = 0;
                  
                     // hack until all the classes no longer need this method.

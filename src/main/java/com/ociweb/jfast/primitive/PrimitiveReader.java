@@ -195,19 +195,18 @@ public final class PrimitiveReader {
             	throw new FASTException("buffer for PrimitiveReader is too small");
             }
             int filled = reader.input.blockingFill(reader.limit, need);
+            if (filled < need) {
+                throw new FASTException("Unexpected end of data.");
+            }
             reader.blockagePolicy.resolvedInputBlockage(reader.input);
             reader.totalReader += filled;
             reader.limit += filled;
-            if (filled<need) {
-                throw new FASTException("Unexpected end of data.");
-            }
         }
     }
     
     private static int fetchAvail(int need, PrimitiveReader reader) {
         if (reader.position >= reader.limit) {
             reader.position = reader.limit = 0;
-          //  System.err.println("reset fetchAvail");
         }
         int remainingSpace = reader.buffer.length - reader.limit;
         if (need <= remainingSpace) {
@@ -215,7 +214,6 @@ public final class PrimitiveReader {
             // but as we near the end prevent overflow by only getting what is needed.
             
             int filled = reader.input.fill(reader.limit, remainingSpace);
-     //       System.err.println("fill from "+reader.limit+" xx "+remainingSpace+" filled "+filled+" pos "+reader.position);
 
             reader.totalReader += filled;
             reader.limit += filled;

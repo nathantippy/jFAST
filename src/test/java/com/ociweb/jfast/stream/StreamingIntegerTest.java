@@ -171,7 +171,7 @@ public class StreamingIntegerTest extends BaseStreamingTest {
         long whp = Pipe.workingHeadPosition(rbRingBufferLocal);
         Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,value);
         Pipe.setWorkingHead(rbRingBufferLocal,whp);
-        Pipe.publishWrites(rbRingBufferLocal);
+
         int rbPos = 0;
 
         if (0 == (token & (1 << TokenBuilder.SHIFT_TYPE))) {
