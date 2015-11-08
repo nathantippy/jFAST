@@ -46,6 +46,7 @@ import com.ociweb.jfast.stream.FASTDynamicWriter;
 import com.ociweb.jfast.stream.FASTEncoder;
 import com.ociweb.jfast.stream.FASTReaderReactor;
 import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeBundle;
 import com.ociweb.pronghorn.pipe.PipeConfig;
@@ -136,7 +137,7 @@ public class TemplateLoaderTest {
         FASTClassLoader.deleteFiles();
         final AtomicInteger msgs = new AtomicInteger();
 
-        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers())); 
+        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, catalog.ringByteConstants(), new MessageSchemaDynamic(catalog.getFROM()))).initBuffers())); 
         
         assertEquals(1,reactor.ringBuffers().length);
         Pipe rb = reactor.ringBuffers()[0];
@@ -184,7 +185,7 @@ public class TemplateLoaderTest {
         PrimitiveReader reader = new PrimitiveReader(2048, fastInput, maxPMapCountInBytes);
 		ClientConfig r = catalog.clientConfig();
 
-        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, catalog.ringByteConstants(), new MessageSchemaDynamic(catalog.getFROM()))).initBuffers()));
 
        // readerDispatch = new FASTReaderInterpreterDispatch(catBytes);//not using compiled code
 
@@ -333,7 +334,7 @@ public class TemplateLoaderTest {
 
         PrimitiveReader reader = new PrimitiveReader(4096, fastInput, maxPMapCountInBytes);
 
-        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)22, (byte)20, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+        FASTDecoder readerDispatch = DispatchLoader.loadDispatchReader(catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)22, (byte)20, catalog.ringByteConstants(), new MessageSchemaDynamic(catalog.getFROM()))).initBuffers()));
         FASTReaderReactor reactor = new FASTReaderReactor(readerDispatch,reader);
 
         System.err.println("usingReader: "+readerDispatch.getClass().getSimpleName());
@@ -561,7 +562,7 @@ public class TemplateLoaderTest {
         final AtomicInteger msgs = new AtomicInteger();
 		ClientConfig r = catalog.clientConfig();
 
-        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+        FASTReaderReactor reactor = FAST.inputReactor(fastInput, catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, catalog.ringByteConstants(), new MessageSchemaDynamic(catalog.getFROM()))).initBuffers()));
 
         assertEquals(1,reactor.ringBuffers().length);
         Pipe rb = reactor.ringBuffers()[0];

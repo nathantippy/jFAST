@@ -2,6 +2,7 @@ package com.ociweb.jfast.stream;
 
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
 import com.ociweb.pronghorn.pipe.PipeBundle;
@@ -36,7 +37,7 @@ public abstract class FASTDecoder{
         
     public FASTDecoder(TemplateCatalogConfig catalog) {
 		this(catalog, 
-             PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()) );
+             PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)7, catalog.ringByteConstants(), new MessageSchemaDynamic(catalog.getFROM()))).initBuffers()) );
         
     }
     

@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.ociweb.jfast.catalog.loader.TemplateCatalogConfig;
 import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
 import com.ociweb.pronghorn.pipe.util.IntWriteOnceOrderedSet;
@@ -90,7 +91,7 @@ public class GeneratorData {
         TemplateCatalogConfig template = new TemplateCatalogConfig(catBytes);
         this.from = template.getFROM();
         //must be zero size to make the mask also zero
-        this.mockRB = new Pipe(new PipeConfig((byte)0, (byte)0, null, this.from));
+        this.mockRB = new Pipe(new PipeConfig((byte)0, (byte)0, null, new MessageSchemaDynamic(this.from)));
         this.mockRB.initBuffers();
     }
 

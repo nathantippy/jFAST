@@ -32,6 +32,7 @@ import com.ociweb.jfast.stream.FASTDynamicWriter;
 import com.ociweb.jfast.stream.FASTEncoder;
 import com.ociweb.jfast.stream.FASTReaderReactor;
 import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
 import com.ociweb.pronghorn.pipe.PipeBundle;
@@ -400,7 +401,7 @@ public class CatalogGeneratorTest {
         FASTClassLoader.deleteFiles();
         
 		FieldReferenceOffsetManager from = catalog.getFROM();
-        PipeBundle ringBuffers= PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)10, (byte)16, catalog.ringByteConstants(), from)).initBuffers());
+        PipeBundle ringBuffers= PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)10, (byte)16, catalog.ringByteConstants(), new MessageSchemaDynamic(from))).initBuffers());
                 
        // FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriter(catBytes);
         FASTEncoder writerDispatch = DispatchLoader.loadDispatchWriterDebug(catBytes);

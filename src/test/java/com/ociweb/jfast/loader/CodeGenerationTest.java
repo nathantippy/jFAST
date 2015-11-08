@@ -32,6 +32,7 @@ import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.stream.FASTDecoder;
 import com.ociweb.jfast.stream.FASTReaderInterpreterDispatch;
 import com.ociweb.jfast.stream.FASTReaderReactor;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
 import com.ociweb.pronghorn.pipe.PipeBundle;
@@ -160,7 +161,7 @@ public class CodeGenerationTest {
 
         FASTInputByteArray fastInput1 = new FASTInputByteArray(TemplateLoaderTest.buildInputArrayForTesting(sourceDataFile));
         final PrimitiveReader primitiveReader1 = new PrimitiveReader(2048, fastInput1, maxPMapCountInBytes);
-        FASTReaderInterpreterDispatch readerDispatch1 = new FASTReaderInterpreterDispatch(catalog, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)rbPrimaryRingBits, (byte)rbTextRingBits, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+        FASTReaderInterpreterDispatch readerDispatch1 = new FASTReaderInterpreterDispatch(catalog, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)rbPrimaryRingBits, (byte)rbTextRingBits, catalog.ringByteConstants(), new MessageSchemaDynamic(catalog.getFROM()))).initBuffers()));
 
         
         Pipe queue1 = PipeBundle.get(readerDispatch1.ringBuffers,0);
@@ -170,7 +171,7 @@ public class CodeGenerationTest {
 
         FASTDecoder readerDispatch2 = null;
         try {
-            readerDispatch2 = DispatchLoader.loadGeneratedReaderDispatch(catBytes, FASTClassLoader.READER, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)rbPrimaryRingBits, (byte)rbTextRingBits, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+            readerDispatch2 = DispatchLoader.loadGeneratedReaderDispatch(catBytes, FASTClassLoader.READER, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)rbPrimaryRingBits, (byte)rbTextRingBits, catalog.ringByteConstants(), new MessageSchemaDynamic(catalog.getFROM()))).initBuffers()));
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
             fail(e.getMessage());

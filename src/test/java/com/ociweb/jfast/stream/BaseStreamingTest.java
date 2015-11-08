@@ -9,6 +9,7 @@ import com.ociweb.jfast.primitive.ReaderWriterPrimitiveTest;
 import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.RawDataSchema;
 import com.ociweb.pronghorn.pipe.PipeBundle;
 import com.ociweb.pronghorn.pipe.schema.loader.DictionaryFactory;
 import com.ociweb.pronghorn.pipe.schema.loader.TemplateHandler;
@@ -471,7 +472,7 @@ public abstract class BaseStreamingTest {
                 int idx = token & fw.intInstanceMask;
                 
                 //temp solution as the ring buffer is introduce into all the APIs
-                Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)2, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+                Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)2, (byte)2, null, RawDataSchema.instance));
                 rbRingBufferLocal.initBuffers();
                 Pipe.dump(rbRingBufferLocal);
                 long workingHeadPosition = Pipe.workingHeadPosition(rbRingBufferLocal);
@@ -538,7 +539,7 @@ public abstract class BaseStreamingTest {
                     int idx = token & fw.intInstanceMask;
                     
                     //temp solution as the ring buffer is introduce into all the APIs   
-                    Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+                    Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)4, (byte)2, null, RawDataSchema.instance));
                     rbRingBufferLocal.initBuffers();
                     Pipe.dump(rbRingBufferLocal);
                     long workingHeadPosition = Pipe.workingHeadPosition(rbRingBufferLocal);

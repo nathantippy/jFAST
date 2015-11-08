@@ -14,8 +14,10 @@ import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
 import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.RawDataSchema;
 import com.ociweb.pronghorn.pipe.PipeBundle;
 import com.ociweb.pronghorn.pipe.schema.loader.DictionaryFactory;
 import com.ociweb.pronghorn.pipe.schema.loader.TemplateHandler;
@@ -41,7 +43,7 @@ public class StreamingLongTest extends BaseStreamingTest {
 
 	int bufferSize = 512;
 	
-	static Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+	static Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)4, (byte)2, null, RawDataSchema.instance));
 	static {
 		rbRingBufferLocal.initBuffers();
 	}
@@ -179,7 +181,7 @@ public class StreamingLongTest extends BaseStreamingTest {
 	    
 	    TemplateCatalogConfig testCatalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null, 64,maxGroupCount * 10, -1,  new ClientConfig());
 		ClientConfig r = testCatalog.clientConfig();
-		FASTReaderInterpreterDispatch fr = new FASTReaderInterpreterDispatch(testCatalog, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, testCatalog.ringByteConstants(), testCatalog.getFROM())).initBuffers()));
+		FASTReaderInterpreterDispatch fr = new FASTReaderInterpreterDispatch(testCatalog, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)15, testCatalog.ringByteConstants(), new MessageSchemaDynamic(testCatalog.getFROM()))).initBuffers()));
 		
 		long start = System.nanoTime();
 		if (operationIters<3) {

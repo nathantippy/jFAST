@@ -35,6 +35,7 @@ import com.ociweb.jfast.primitive.adapter.FASTInputStream;
 import com.ociweb.jfast.stream.FASTDecoder;
 import com.ociweb.jfast.stream.FASTReaderReactor;
 import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
 import com.ociweb.pronghorn.pipe.PipeBundle;
@@ -74,7 +75,7 @@ public class UsageExample {
    
           catalog.clientConfig();
 		catalog.clientConfig();
-		FASTDecoder readerDispatch = DispatchLoader.loadDispatchReaderDebug(catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)7, catalog.ringByteConstants(), catalog.getFROM())).initBuffers()));
+		FASTDecoder readerDispatch = DispatchLoader.loadDispatchReaderDebug(catBytes, PipeBundle.buildRingBuffers(new Pipe(new PipeConfig((byte)15, (byte)7, catalog.ringByteConstants(), new MessageSchemaDynamic(catalog.getFROM()))).initBuffers()));
        //  FASTDecoder readerDispatch = new FASTReaderInterpreterDispatch(catBytes); 
          
          System.out.println("Using: "+readerDispatch.getClass().getSimpleName());

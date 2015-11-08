@@ -15,6 +15,7 @@ import com.ociweb.jfast.primitive.PrimitiveReader;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputStream;
 import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
 import com.ociweb.pronghorn.pipe.PipeBundle;
@@ -427,7 +428,7 @@ public class TemplateCatalogConfig {
     }
 
     public static PipeBundle buildRingBuffers(TemplateCatalogConfig catalog, byte primaryBits, byte secondaryBits) {
-		return PipeBundle.buildRingBuffers(new Pipe(new PipeConfig(primaryBits, secondaryBits, catalog.ringByteConstants(), catalog.getFROM())).initBuffers());
+		return PipeBundle.buildRingBuffers(new Pipe(new PipeConfig(primaryBits, secondaryBits, catalog.ringByteConstants(), new MessageSchemaDynamic(catalog.getFROM()))).initBuffers());
 	}
     
 	public static FieldReferenceOffsetManager createFieldReferenceOffsetManager(TemplateCatalogConfig config) {

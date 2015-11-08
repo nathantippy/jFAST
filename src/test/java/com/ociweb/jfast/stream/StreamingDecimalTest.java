@@ -15,8 +15,10 @@ import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.primitive.adapter.FASTOutputByteArray;
 import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
+import com.ociweb.pronghorn.pipe.RawDataSchema;
 import com.ociweb.pronghorn.pipe.PipeBundle;
 import com.ociweb.pronghorn.pipe.schema.loader.DictionaryFactory;
 import com.ociweb.pronghorn.pipe.schema.loader.TemplateHandler;
@@ -47,7 +49,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
 
     FASTReaderInterpreterDispatch fr;
 
-    Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)4, (byte)2, null, FieldReferenceOffsetManager.RAW_BYTES));
+    Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)4, (byte)2, null, RawDataSchema.instance));
 
 
     public StreamingDecimalTest() {
@@ -207,7 +209,7 @@ public class StreamingDecimalTest extends BaseStreamingTest {
             int[] tokenLookup, DictionaryFactory dcr) {
 
         TemplateCatalogConfig testCatalog = new TemplateCatalogConfig(dcr, 3, new int[0][0], null, 64, maxGroupCount * 10, -1, new ClientConfig());
-		Pipe rb = new Pipe(new PipeConfig((byte)15, (byte)7, testCatalog.ringByteConstants(), testCatalog.getFROM()));
+		Pipe rb = new Pipe(new PipeConfig((byte)15, (byte)7, testCatalog.ringByteConstants(), new MessageSchemaDynamic(testCatalog.getFROM())));
 		fr = new FASTReaderInterpreterDispatch(testCatalog, PipeBundle.buildRingBuffers(rb.initBuffers()));
         
         long start = System.nanoTime();

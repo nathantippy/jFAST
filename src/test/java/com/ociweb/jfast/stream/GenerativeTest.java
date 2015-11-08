@@ -14,6 +14,7 @@ import com.ociweb.jfast.primitive.FASTOutput;
 import com.ociweb.jfast.primitive.PrimitiveWriter;
 import com.ociweb.jfast.primitive.adapter.FASTOutputStream;
 import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
 import com.ociweb.pronghorn.pipe.PipeReader;
@@ -33,7 +34,7 @@ public class GenerativeTest {
         TemplateCatalogConfig catalog = new TemplateCatalogConfig(catBytes);
         FieldReferenceOffsetManager from = catalog.getFROM();
         
-        PipeConfig rbConfig = new PipeConfig(from, messages, varLength);
+        PipeConfig rbConfig = new PipeConfig(new MessageSchemaDynamic(from), messages, varLength);
         
         int commonSeed = 300;   
         int iterations = 2;

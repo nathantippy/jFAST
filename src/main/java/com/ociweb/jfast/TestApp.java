@@ -14,6 +14,7 @@ import com.ociweb.jfast.catalog.loader.TemplateLoader;
 import com.ociweb.jfast.primitive.adapter.FASTInputByteArray;
 import com.ociweb.jfast.stream.FASTReaderReactor;
 import com.ociweb.pronghorn.pipe.FieldReferenceOffsetManager;
+import com.ociweb.pronghorn.pipe.MessageSchemaDynamic;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
 import com.ociweb.pronghorn.pipe.PipeBundle;
@@ -173,7 +174,7 @@ public class TestApp {
     private static Pipe buildMessageSpecificRingBuffer(
             int maxMessagesOnRing, int maxStringLength,
             FieldReferenceOffsetManager from, byte[] byteConst) {        
-        PipeConfig ringConfig = new PipeConfig(from, maxMessagesOnRing, maxStringLength, byteConst);
+        PipeConfig ringConfig = new PipeConfig(new MessageSchemaDynamic(from), maxMessagesOnRing, maxStringLength, byteConst);
         Pipe ringBuffer = new Pipe(ringConfig);
         ringBuffer.initBuffers();
         return ringBuffer;
