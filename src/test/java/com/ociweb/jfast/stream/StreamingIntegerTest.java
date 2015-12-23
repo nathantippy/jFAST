@@ -169,7 +169,10 @@ public class StreamingIntegerTest extends BaseStreamingTest {
 
     public static void writeInteger(FASTWriterInterpreterDispatch fw, int token, int value, PrimitiveWriter writer) {
         //temp solution as the ring buffer is introduce into all the APIs
-        Pipe.dump(rbRingBufferLocal);
+        //Dump
+        Pipe.publishBlobWorkingTailPosition(rbRingBufferLocal, Pipe.getBlobRingHeadPosition(rbRingBufferLocal));
+        Pipe.publishWorkingTailPosition(rbRingBufferLocal, Pipe.headPosition(rbRingBufferLocal));
+        ////
         long whp = Pipe.workingHeadPosition(rbRingBufferLocal);
         Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,value);
         Pipe.setWorkingHead(rbRingBufferLocal,whp);

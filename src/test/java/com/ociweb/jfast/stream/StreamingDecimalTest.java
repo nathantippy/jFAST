@@ -128,7 +128,10 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                         assert (0 != (token & (8 << TokenBuilder.SHIFT_TYPE)));
 
                         //bridge solution as the ring buffer is introduce into all the APIs
-                        Pipe.dump(rbRingBufferLocal);
+                        //Dump
+                        Pipe.publishBlobWorkingTailPosition(rbRingBufferLocal, Pipe.getBlobRingHeadPosition(rbRingBufferLocal));
+                        Pipe.publishWorkingTailPosition(rbRingBufferLocal, Pipe.headPosition(rbRingBufferLocal));
+                        ////
                        
                         long whp = Pipe.workingHeadPosition(rbRingBufferLocal);
                         Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,testExpConst);
@@ -162,7 +165,10 @@ public class StreamingDecimalTest extends BaseStreamingTest {
                         assert (0 != (token & (8 << TokenBuilder.SHIFT_TYPE)));
 
                         //bridge solution as the ring buffer is introduce into all the APIs
-                        Pipe.dump(rbRingBufferLocal);
+                        //Dump
+                        Pipe.publishBlobWorkingTailPosition(rbRingBufferLocal, Pipe.getBlobRingHeadPosition(rbRingBufferLocal));
+                        Pipe.publishWorkingTailPosition(rbRingBufferLocal, Pipe.headPosition(rbRingBufferLocal));
+                        ////
                         
                         long whp = Pipe.workingHeadPosition(rbRingBufferLocal);
                         Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,whp++,1);

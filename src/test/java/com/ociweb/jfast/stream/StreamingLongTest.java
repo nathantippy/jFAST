@@ -144,7 +144,10 @@ public class StreamingLongTest extends BaseStreamingTest {
     public static void writeLong(FASTWriterInterpreterDispatch fw, int token, long value, PrimitiveWriter writer) {
         assert (0 != (token & (4 << TokenBuilder.SHIFT_TYPE)));
         //  solution as the ring buffer is introduce into all the APIs
-        Pipe.dump(rbRingBufferLocal);            
+        //Dump
+        Pipe.publishBlobWorkingTailPosition(rbRingBufferLocal, Pipe.getBlobRingHeadPosition(rbRingBufferLocal));
+        Pipe.publishWorkingTailPosition(rbRingBufferLocal, Pipe.headPosition(rbRingBufferLocal));
+        ////         
         Pipe.addLongValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,Pipe.getWorkingHeadPositionObject(rbRingBufferLocal),value); 
         Pipe.publishWrites(rbRingBufferLocal);
         int rbPos = 0;                    

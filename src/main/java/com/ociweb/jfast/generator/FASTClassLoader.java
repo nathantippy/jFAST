@@ -139,7 +139,10 @@ import com.ociweb.pronghorn.pipe.util.hash.IntHashTable;
         private void reportCompileError(List<Diagnostic<? extends JavaFileObject>> diagnosticList)
                 throws ClassNotFoundException {
         	
-            FASTClassLoader.logCompileError(diagnosticList);
+            Iterator<Diagnostic<? extends JavaFileObject>> iter = diagnosticList.iterator();
+            while (iter.hasNext()) {
+                System.err.println(iter.next());
+            }
             //did not compile due to error
             if (!diagnosticList.isEmpty()) {
                 throw new ClassNotFoundException(diagnosticList.get(0).toString());
@@ -161,6 +164,16 @@ import com.ociweb.pronghorn.pipe.util.hash.IntHashTable;
         }
 
 
+//        if (exportSource) {
+//            for(JavaFileObject jfo:toCompile) {
+//                try {
+//                    exportSourceToClassFolder(jfo.getName(),jfo.getCharContent(false).toString());
+//                } catch (IOException e) {
+//                    log.trace("Unable to write source {}",e.getMessage());
+//                }                           
+//            }
+//        }
+        
         private void exportSourceToClassFolder(String name, String content) {
             try {
                 File sourceFile = targetFile(name, "java");
@@ -173,16 +186,16 @@ import com.ociweb.pronghorn.pipe.util.hash.IntHashTable;
             }
         }
         
+        private static File targetFile(String name, String ext) {
+            return new File(workingFolder,GENERATED_PACKAGE.replace('.', File.separatorChar)+File.separatorChar+name+"."+ext);
+        }
+        
         public static void logCompileError(List<Diagnostic<? extends JavaFileObject>> diagnostics) {
 		    Iterator<Diagnostic<? extends JavaFileObject>> iter = diagnostics.iterator();
 		    while (iter.hasNext()) {
 		        System.err.println(iter.next());
 		    }
 		}
-
-		private static File targetFile(String name, String ext) {
-            return new File(workingFolder,GENERATED_PACKAGE.replace('.', File.separatorChar)+File.separatorChar+name+"."+ext);
-        }
 
         public static void deleteFiles() {
             targetFile(SIMPLE_READER_NAME,"class").delete();

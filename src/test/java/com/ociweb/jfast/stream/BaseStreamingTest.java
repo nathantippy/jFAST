@@ -90,7 +90,7 @@ public abstract class BaseStreamingTest {
 		//open new group
 		boolean isGroupOpen = false;
 		boolean sendNulls = true;
-		int token = 0;
+		int token = 1<<31;
 		int id = 1;
 		while (--i>=0) {
 			int f = fields;
@@ -474,7 +474,12 @@ public abstract class BaseStreamingTest {
                 //temp solution as the ring buffer is introduce into all the APIs
                 Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)2, (byte)2, null, RawDataSchema.instance));
                 rbRingBufferLocal.initBuffers();
-                Pipe.dump(rbRingBufferLocal);
+                
+                //Dump
+                Pipe.publishBlobWorkingTailPosition(rbRingBufferLocal, Pipe.getBlobRingHeadPosition(rbRingBufferLocal));
+                Pipe.publishWorkingTailPosition(rbRingBufferLocal, Pipe.headPosition(rbRingBufferLocal));
+                ////
+                
                 long workingHeadPosition = Pipe.workingHeadPosition(rbRingBufferLocal);
                 Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,workingHeadPosition,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
                 Pipe.setWorkingHead(rbRingBufferLocal, workingHeadPosition+1);
@@ -541,7 +546,10 @@ public abstract class BaseStreamingTest {
                     //temp solution as the ring buffer is introduce into all the APIs   
                     Pipe rbRingBufferLocal = new Pipe(new PipeConfig((byte)4, (byte)2, null, RawDataSchema.instance));
                     rbRingBufferLocal.initBuffers();
-                    Pipe.dump(rbRingBufferLocal);
+                    //Dump
+                    Pipe.publishBlobWorkingTailPosition(rbRingBufferLocal, Pipe.getBlobRingHeadPosition(rbRingBufferLocal));
+                    Pipe.publishWorkingTailPosition(rbRingBufferLocal, Pipe.headPosition(rbRingBufferLocal));
+                    ////
                     long workingHeadPosition = Pipe.workingHeadPosition(rbRingBufferLocal);
                     Pipe.setValue(Pipe.primaryBuffer(rbRingBufferLocal),rbRingBufferLocal.mask,workingHeadPosition,TemplateHandler.DEFAULT_CLIENT_SIDE_ABSENT_VALUE_INT);
                     Pipe.setWorkingHead(rbRingBufferLocal, workingHeadPosition+1);

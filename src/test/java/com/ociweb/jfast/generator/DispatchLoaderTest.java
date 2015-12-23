@@ -81,9 +81,10 @@ public class DispatchLoaderTest {
 		           //Compiled 2
 		           assertEquals("2.0",version);
 		       }               
-		       
-		       Pipe.dump(queue); //don't need the data but do need to empty the queue.
-		       
+               //Dump
+               Pipe.publishBlobWorkingTailPosition(queue, Pipe.getBlobRingHeadPosition(queue));
+               Pipe.publishWorkingTailPosition(queue, Pipe.headPosition(queue));
+               ////
 		       records.incrementAndGet();
 		       
 		       if (records.intValue()==switchToCompiled1) {
@@ -102,7 +103,10 @@ public class DispatchLoaderTest {
 		           alive.set(false);
 		       }                    
 		        
-		        Pipe.dump(queue);
+                //Dump
+                Pipe.publishBlobWorkingTailPosition(queue, Pipe.getBlobRingHeadPosition(queue));
+                Pipe.publishWorkingTailPosition(queue, Pipe.headPosition(queue));
+                ////
 		    }
 		    queue = null;
 		}
