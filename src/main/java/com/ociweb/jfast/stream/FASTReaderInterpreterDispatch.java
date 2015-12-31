@@ -264,7 +264,7 @@ public class FASTReaderInterpreterDispatch extends FASTReaderDispatchTemplates i
 	        Pipe.publishWritesBatched(rbRingBuffer);
 	        Pipe.publishAllBatchedWrites(rbRingBuffer);  
         }
-        assert(Pipe.bytesWorkingHeadPosition(rbRingBuffer) == Pipe.bytesHeadPosition(rbRingBuffer));
+        assert(Pipe.bytesWorkingHeadPosition(rbRingBuffer) == Pipe.getBlobRingHeadPosition( rbRingBuffer));
         
         return 1;//read one fragment 
     }

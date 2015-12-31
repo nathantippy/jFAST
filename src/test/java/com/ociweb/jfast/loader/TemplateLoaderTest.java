@@ -376,7 +376,7 @@ public class TemplateLoaderTest {
             //read from reader and puts messages on the queue
             while (FASTReaderReactor.pump(reactor)>=0) { //continue if there is no room or a fragment is read
 
-            	assert(Pipe.getWorkingBlobRingTailPosition(dataToEncodePipe)<=Pipe.bytesHeadPosition(dataToEncodePipe));
+            	assert(Pipe.getWorkingBlobRingTailPosition(dataToEncodePipe)<=Pipe.getBlobRingHeadPosition(dataToEncodePipe));
             	
             	    //////////////////////////////////////////////
             		//confirms full fragment to read on the queue            	
@@ -389,7 +389,7 @@ public class TemplateLoaderTest {
                         	}
                             msgs.incrementAndGet();
                         }
-                        assert(Pipe.getWorkingBlobRingTailPosition(dataToEncodePipe)<=Pipe.bytesHeadPosition(dataToEncodePipe));
+                        assert(Pipe.getWorkingBlobRingTailPosition(dataToEncodePipe)<=Pipe.getBlobRingHeadPosition(dataToEncodePipe));
                         try{
                             ///////////////////////////////////////////////////////
                         	//write fragment found on the queue to the output writer
